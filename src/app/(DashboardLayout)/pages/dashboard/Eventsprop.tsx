@@ -14,9 +14,9 @@ import {
   Card,
   CardContent,
 } from "@mui/material";
-import EventNoteIcon from '@mui/icons-material/EventNote';
-import { useTheme } from "@mui/material/styles"; // Import the useTheme hook
-import './EventCalendar.css';
+import EventNoteIcon from "@mui/icons-material/EventNote";
+import { useTheme } from "@mui/material/styles";
+import "./EventCalendar.css";
 
 interface Event {
   name: string;
@@ -31,19 +31,29 @@ type ValuePiece = Date | null;
 type Value = ValuePiece | [ValuePiece, ValuePiece];
 
 const EventCalendar: React.FC<EventCalendarProps> = ({ events }) => {
-  const theme = useTheme(); // Use the theme
+  const theme = useTheme();
   const [selectedDate, setSelectedDate] = useState<Value>(new Date());
+  const [highlightedDate, setHighlightedDate] = useState<Date | null>(null);
 
   const handleDateChange = (value: Value) => {
     setSelectedDate(value);
+    setHighlightedDate(null);
+  };
+
+  const handleEventClick = (date: Date) => {
+    setSelectedDate(date);
+    setHighlightedDate(date);
+    setTimeout(() => setHighlightedDate(null), 500);
   };
 
   const hasEvent = (date: Date): boolean => {
-    return events.some(
-      (event) =>
-        event.date.toISOString().split("T")[0] ===
-        date.toISOString().split("T")[0]
-    );
+    return events.some((event) => {
+      return (
+        event.date.getFullYear() === date.getFullYear() &&
+        event.date.getMonth() === date.getMonth() &&
+        event.date.getDate() === date.getDate()
+      );
+    });
   };
 
   return (
@@ -74,7 +84,15 @@ const EventCalendar: React.FC<EventCalendarProps> = ({ events }) => {
               overflowY: "auto",
             }}
           >
-            <Typography variant="h5" sx={{ color: theme.palette.secondary.main, paddingTop: 4, paddingLeft:2, paddingBottom:3}}>
+            <Typography
+              variant="h5"
+              align="center"
+              sx={{
+                color: theme.palette.secondary.main,
+                paddingTop: 4,
+                paddingBottom: 3,
+              }}
+            >
               Upcoming Events
             </Typography>
             <List dense sx={{ padding: 0 }}>
@@ -92,10 +110,17 @@ const EventCalendar: React.FC<EventCalendarProps> = ({ events }) => {
                       },
                       display: "flex",
                       alignItems: "center",
+                      cursor: "pointer",
                     }}
+                    onClick={() => handleEventClick(event.date)}
                   >
                     <CardContent sx={{ display: "flex", alignItems: "center" }}>
-                      <EventNoteIcon sx={{ color: theme.palette.secondary.main, marginRight: 1 }} /> {/* Use secondary color */}
+                      <EventNoteIcon
+                        sx={{
+                          color: theme.palette.secondary.main,
+                          marginRight: 1,
+                        }}
+                      />
                       <ListItemText
                         primary={event.name}
                         secondary={event.date.toLocaleDateString()}
@@ -135,6 +160,13 @@ const EventCalendar: React.FC<EventCalendarProps> = ({ events }) => {
             <Calendar
               onChange={handleDateChange}
               value={selectedDate}
+              tileClassName={({ date }) =>
+                highlightedDate &&
+                date.toISOString().split("T")[0] ===
+                  highlightedDate.toISOString().split("T")[0]
+                  ? "highlight-tile"
+                  : ""
+              }
               tileContent={({ date, view }) =>
                 view === "month" && hasEvent(date) ? (
                   <div
@@ -149,6 +181,7 @@ const EventCalendar: React.FC<EventCalendarProps> = ({ events }) => {
                 ) : null
               }
               className="custom-calendar"
+              showNeighboringMonth={false}
             />
           </Paper>
         </Grid>
