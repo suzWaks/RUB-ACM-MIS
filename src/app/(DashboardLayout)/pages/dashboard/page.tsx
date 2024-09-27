@@ -27,7 +27,6 @@ const Dashboard = () => {
     <PageContainer description="Home of RUB ACM MIS">
       <DashboardCard>
         <Box>
-          {/* Announcements Section */}
           <Box mb={2}>
             <Paper elevation={2} sx={{ padding: 2 }}>
               <Typography
@@ -36,7 +35,6 @@ const Dashboard = () => {
               >
                 Announcements
               </Typography>
-
               <NotificationCard
                 message="The ACM club coordinator wants to meet all the first years"
                 time="8pm"
@@ -46,7 +44,6 @@ const Dashboard = () => {
             </Paper>
           </Box>
 
-          {/* Member Statistics Section */}
           <Box mb={2}>
             <Paper elevation={2} sx={{ padding: 2 }}>
               <Typography
@@ -56,7 +53,6 @@ const Dashboard = () => {
                 Member Statistics
               </Typography>
               <Grid container spacing={1} mt={2}>
-                {/* Individual member statistics */}
                 {[
                   { label: "Male Count", data: [20, 30, 40, 50, 40] },
                   { label: "Female Count", data: [40, 50, 55, 60, 20] },
@@ -78,19 +74,20 @@ const Dashboard = () => {
           </Box>
 
           <Grid container spacing={2} alignItems="stretch">
-            {/* Recent Activity */}
             <Grid item xs={12} md={3}>
-              <RecentActivity activities={activities} />
+              <Box sx={{ border: `1px solid ${theme.palette.grey[300]}` }}>
+                <RecentActivity activities={activities} />
+              </Box>
             </Grid>
 
-            {/* Event Calendar */}
             <Grid item xs={12} md={6}>
               <EventCalendar events={events} />
             </Grid>
 
-            {/* Financial Overview */}
             <Grid item xs={12} md={3}>
-              <FinancialOverview budgetUsed={15000} budgetRemaining={35000} />
+              <Box sx={{ border: `1px solid ${theme.palette.grey[300]}` }}>
+                <FinancialOverview budgetUsed={15000} budgetRemaining={35000} />
+              </Box>
             </Grid>
           </Grid>
         </Box>
