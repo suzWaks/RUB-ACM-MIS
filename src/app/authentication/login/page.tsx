@@ -11,6 +11,7 @@ import {
 } from "@mui/material";
 import GoogleIcon from "@mui/icons-material/Google";
 import Logo from "@/app/(DashboardLayout)/layout/shared/logo/Logo";
+import Image from "next/image";
 
 const Login2 = () => {
   const theme = useTheme();
@@ -114,7 +115,7 @@ const Login2 = () => {
               </Button>
             </Box>
             <Typography variant="body2" color="textSecondary">
-              Don't have an account?{" "}
+              Don&apos;t have an account?{" "}
               <Link href="/authentication/register" passHref>
                 <Typography
                   component="span"
@@ -153,32 +154,33 @@ const Login2 = () => {
               top: "70%",
             }}
           >
-            <Box display="flex" alignItems="center" mb={1}>
-              <Box sx={{ width: 80, height: 80 }}>
-                <img
+            <Box display="flex" flexDirection="column" alignItems="flex-start" mb={1}>
+              <Box sx={{ width: 80, height: 80, position: "relative", mb: 1 }}>
+                <Image
                   src="/images/logos/cstlogo.png"
                   alt="CST Logo"
-                  style={{ width: "100%", height: "100%" }}
+                  layout="fill"
+                  objectFit="contain"
                 />
               </Box>
-            </Box>
-            <Box display="flex" alignItems="center">
-              <Typography
-                variant="h5"
-                fontWeight="bold"
-                color={theme.palette.secondary_blue.main}
-                sx={{ display: "inline" }}
-              >
-                ACM CHAPTER
-              </Typography>
-              <Typography
-                variant="h5"
-                fontWeight="bold"
-                color="white"
-                sx={{ display: "inline", ml: 1 }}
-              >
-                MANAGEMENT SYSTEM
-              </Typography>
+              <Box display="flex" alignItems="center">
+                <Typography
+                  variant="h5"
+                  fontWeight="bold"
+                  color={theme.palette.secondary_blue.main}
+                  sx={{ display: "inline" }}
+                >
+                  ACM CHAPTER
+                </Typography>
+                <Typography
+                  variant="h5"
+                  fontWeight="bold"
+                  color="white"
+                  sx={{ display: "inline", ml: 1 }}
+                >
+                  MANAGEMENT SYSTEM
+                </Typography>
+              </Box>
             </Box>
             <Typography variant="h2" fontWeight="bold" color="white">
               College of Science and Technology
