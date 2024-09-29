@@ -8,6 +8,7 @@ import theme from "@/utils/theme";
 import RecentActivity from "./RecentActivityProp";
 import FinancialOverview from "@/app/(DashboardLayout)/pages/dashboard/OverviewProp";
 import EventCalendar from "./Eventsprop";
+import NotificationCard from "./AnnouncementProp";
 
 const Dashboard = () => {
   const activities = [
@@ -17,43 +18,52 @@ const Dashboard = () => {
   ];
 
   const events = [
-    { name: "Event 1", date: new Date(2024, 9, 1) }, // October 1, 2024
-    { name: "Event 2", date: new Date(2024, 9, 5) }, // October 5, 2024
-    { name: "Event 3", date: new Date(2024, 9, 10) }, // October 10, 2024
+    { name: "Event 1", date: new Date(2024, 9, 1) },
+    { name: "Event 2", date: new Date(2024, 9, 5) },
+    { name: "Event 3", date: new Date(2024, 9, 10) },
   ];
 
   return (
     <PageContainer description="Home of RUB ACM MIS">
       <DashboardCard>
         <Box>
-          {/* Announcements Section */}
           <Box mb={2}>
             <Paper elevation={2} sx={{ padding: 2 }}>
-              <Typography variant="h5" sx={{ color: theme.palette.primary.main }}>
+              <Typography
+                variant="h5"
+                sx={{ color: theme.palette.primary.main, mb: 2 }}
+              >
                 Announcements
               </Typography>
-              {/* Add actual content later */}
+              <NotificationCard
+                message="The ACM club coordinator wants to meet all the first years"
+                time="8pm"
+                date="26th Sept"
+                postedBy="Admin"
+              />
             </Paper>
           </Box>
 
-          {/* Member Statistics Section */}
           <Box mb={2}>
             <Paper elevation={2} sx={{ padding: 2 }}>
-              <Typography variant="h5" sx={{ color: theme.palette.primary.main }}>
+              <Typography
+                variant="h5"
+                sx={{ color: theme.palette.primary.main, mb: 2 }}
+              >
                 Member Statistics
               </Typography>
-              <Grid container spacing={2} mt={2}>
-                {/* Individual member statistics */}
+              <Grid container spacing={1} mt={2}>
                 {[
-                  { label: 'Male Count', data: [20, 30, 40, 50, 40] },
-                  { label: 'Female Count', data: [40, 50, 55, 60, 20] },
-                  { label: 'Others', data: [3, 4, 5, 6, 33] },
-                  { label: 'Total Members', data: [50, 70, 80, 90, 105] },
+                  { label: "Male Count", data: [20, 30, 40, 50, 40] },
+                  { label: "Female Count", data: [40, 50, 55, 60, 20] },
+                  { label: "Others", data: [3, 4, 5, 6, 33] },
+                  { label: "Total Members", data: [50, 70, 80, 90, 105] },
                 ].map((stat, index) => (
                   <Grid item xs={6} md={3} key={index}>
                     <Paper elevation={2} sx={{ padding: 0 }}>
                       <Typography variant="h6" padding={1}>
-                        {stat.label}: {stat.data.reduce((acc, curr) => acc + curr, 0)}
+                        {stat.label}:{" "}
+                        {stat.data.reduce((acc, curr) => acc + curr, 0)}
                       </Typography>
                       <StudentGraph data={stat.data} />
                     </Paper>
@@ -64,19 +74,20 @@ const Dashboard = () => {
           </Box>
 
           <Grid container spacing={2} alignItems="stretch">
-            {/* Recent Activity */}
             <Grid item xs={12} md={3}>
-              <RecentActivity activities={activities} />
+              <Box sx={{ border: `1px solid ${theme.palette.grey[300]}` }}>
+                <RecentActivity activities={activities} />
+              </Box>
             </Grid>
 
-            {/* Event Calendar */}
             <Grid item xs={12} md={6}>
               <EventCalendar events={events} />
             </Grid>
 
-            {/* Financial Overview */}
             <Grid item xs={12} md={3}>
-              <FinancialOverview budgetUsed={15000} budgetRemaining={35000} />
+              <Box sx={{ border: `1px solid ${theme.palette.grey[300]}` }}>
+                <FinancialOverview budgetUsed={15000} budgetRemaining={35000} />
+              </Box>
             </Grid>
           </Grid>
         </Box>

@@ -1,6 +1,6 @@
 import dynamic from "next/dynamic";
 import { useTheme } from "@mui/material/styles";
-import { Grid, Typography, Stack } from "@mui/material";
+import { Grid, Typography, Stack, Box } from "@mui/material";
 import DashboardCard from "@/app/(DashboardLayout)/components/shared/DashboardCard";
 
 const Chart = dynamic(() => import("react-apexcharts"), { ssr: false });
@@ -15,28 +15,26 @@ const BudgetOverview: React.FC<BudgetOverviewProps> = ({
   budgetRemaining,
 }) => {
   const theme = useTheme();
-  const primary = theme.palette.secondary.main;
-  const purple = "#9c27b0";
-
+  const primary = theme.palette.primary.main;
+  const secondary = theme.palette.secondary.main;
   const totalBudget = budgetUsed + budgetRemaining;
 
   const optionsPieChart: any = {
     chart: {
       type: "donut",
-      fontFamily: "'Plus Jakarta Sans', sans-serif;",
-      foreColor: "#adb0bb",
-      toolbar: {
-        show: false,
-      },
-      height: 155,
+      fontFamily: theme.typography.fontFamily,
+      foreColor: theme.palette.text.secondary,
+      toolbar: { show: false },
+      height: 160,
     },
-    colors: [primary, purple],
+    colors: [primary, secondary],
     plotOptions: {
       pie: {
         donut: {
           size: "75%",
           background: "transparent",
         },
+        expandOnClick: true,
       },
     },
     tooltip: {
@@ -44,10 +42,44 @@ const BudgetOverview: React.FC<BudgetOverviewProps> = ({
       fillSeriesColor: false,
     },
     dataLabels: {
-      enabled: false,
+      enabled: true,
+      formatter: (val: number) => `${val.toFixed(1)}%`,
+      style: {
+        colors: ["black"],
+        fontWeight: "bold",
+        fontSize: "16px",
+        textStroke: "3px #ffff",
+      },
+      dropShadow: {
+        enabled: true,
+        top: 2,
+        left: 2,
+        blur: 3,
+        color: "rgba(0, 0, 0, 0.6)",
+        opacity: 0.8,
+      },
+      offsetY: -10,
+    },
+    stroke: {
+      show: true,
+      width: 2,
+      colors: [theme.palette.background.paper],
     },
     legend: {
       show: false,
+    },
+    fill: {
+      type: "gradient",
+      gradient: {
+        shade: "dark",
+        type: "horizontal",
+        shadeIntensity: 0.8,
+        gradientToColors: [
+          theme.palette.primary.dark,
+          theme.palette.secondary.dark,
+        ],
+        stops: [0, 100],
+      },
     },
   };
 
@@ -55,12 +87,15 @@ const BudgetOverview: React.FC<BudgetOverviewProps> = ({
 
   return (
     <DashboardCard>
-      <>
+      <Box>
         <Typography
           variant="h5"
           sx={{
-            color: primary,
+            textAlign: "center",
+            color: secondary,
+            fontWeight: 600,
             marginBottom: 2,
+            ...theme.typography.h5,
           }}
         >
           Budget Overview
@@ -72,57 +107,59 @@ const BudgetOverview: React.FC<BudgetOverviewProps> = ({
           alignItems="center"
           direction="column"
         >
-          {/* Centered Pie Chart */}
           <Grid item xs={12} md={6} sx={{ textAlign: "center" }}>
             <Chart
               options={optionsPieChart}
               series={seriesPieChart}
               type="donut"
-              height={150}
+              height={170}
               width={"100%"}
             />
           </Grid>
-          {/* Budget Summary Below the Chart */}
           <Grid item xs={12} md={6}>
             <Stack spacing={1} alignItems="center" mt={2}>
-              <Typography
-                variant="body1"
-                color={primary}
-                sx={{ display: "flex", alignItems: "center" }}
-              >
-                <span
-                  style={{
-                    display: "inline-block",
+              <Box display="flex" alignItems="center">
+                <Box
+                  sx={{
                     width: 12,
                     height: 12,
                     backgroundColor: primary,
                     borderRadius: "50%",
-                    marginRight: 8,
+                    marginRight: 1,
                   }}
-                ></span>
-                Used: ${budgetUsed.toLocaleString()}
-              </Typography>
-              <Typography
-                variant="body1"
-                color={purple}
-                sx={{ display: "flex", alignItems: "center" }}
-              >
-                <span
-                  style={{
-                    display: "inline-block",
+                />
+                <Typography
+                  variant="body1"
+                  color={primary}
+                  fontWeight={500}
+                  fontFamily={theme.typography.fontFamily}
+                >
+                  Used: ${budgetUsed.toLocaleString()}
+                </Typography>
+              </Box>
+              <Box display="flex" alignItems="center">
+                <Box
+                  sx={{
                     width: 12,
                     height: 12,
-                    backgroundColor: purple,
+                    backgroundColor: secondary,
                     borderRadius: "50%",
-                    marginRight: 8,
+                    marginRight: 1,
                   }}
-                ></span>
-                Remaining: ${budgetRemaining.toLocaleString()}
-              </Typography>
+                />
+                <Typography
+                  variant="body1"
+                  color={secondary}
+                  fontWeight={500}
+                  fontFamily={theme.typography.fontFamily}
+                >
+                  Remaining: ${budgetRemaining.toLocaleString()}
+                </Typography>
+              </Box>
             </Stack>
           </Grid>
         </Grid>
-      </>
+      </Box>
     </DashboardCard>
   );
 };

@@ -6,18 +6,13 @@ import DashboardCard from "@/app/(DashboardLayout)/components/shared/DashboardCa
 const Chart = dynamic(() => import("react-apexcharts"), { ssr: false });
 
 interface StudentGraphProps {
-  data: number[]; // Array for the graph data
+  data: number[];
 }
 
 const StudentGraph: React.FC<StudentGraphProps> = ({ data }) => {
   const theme = useTheme();
-  const secondary = theme.palette.secondary.main;
-  const primary = theme.palette.primary.main; // Get the primary color from the theme
+  const color = theme.palette.secondary.main;
 
-  // Calculate total count
-  const totalCount = data.reduce((acc, curr) => acc + curr, 0);
-
-  // Chart options
   const optionsColumnChart: any = {
     chart: {
       type: "area",
@@ -65,13 +60,13 @@ const StudentGraph: React.FC<StudentGraphProps> = ({ data }) => {
         shade: "light",
         type: "vertical",
         shadeIntensity: 0.6,
-        gradientToColors: [secondary],
+        gradientToColors: [color],
         stops: [0, 100],
       },
     },
     markers: {
       size: 4,
-      colors: [secondary],
+      colors: [color],
       strokeColors: "#fff",
       strokeWidth: 2,
       hover: {
@@ -98,7 +93,7 @@ const StudentGraph: React.FC<StudentGraphProps> = ({ data }) => {
       formatter: (value: number) => value.toString(),
       style: {
         fontSize: "12px",
-        colors: [primary], // Change label color to the primary color
+        colors: [color],
       },
       dropShadow: {
         enabled: true,
@@ -113,8 +108,12 @@ const StudentGraph: React.FC<StudentGraphProps> = ({ data }) => {
   const seriesColumnChart: any = [
     {
       name: `Growth`,
-      color: secondary,
-      data: data,
+      color: color,
+      data: data.map((value, index) => ({
+        x: `Data ${index + 1}`,
+        y: value,
+        fillColor: color,
+      })),
     },
   ];
 

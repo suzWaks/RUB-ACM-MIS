@@ -1,68 +1,59 @@
 .custom-calendar {
-    border: none; /* Remove the default border */
-    box-shadow: none; /* Remove any shadow */
-    width: 100%; /* Full width of the container */
-  }
-  
-  /* Custom styles for the calendar */
-  .react-calendar {
-    width: 100%;
-    max-width: 100%;
-    background: #ffffff; /* White background for the calendar */
-    border-radius: 0; /* Remove border radius */
-  }
-  
-  /* Customize the month view */
-  .react-calendar__month-view__days__day {
-    padding: 10px; /* Adjust padding for day cells */
-    color: var(--dark-purple, #4b0082); /* Use CSS variable or fallback to dark purple text color */
-  }
-  
-  /* Customize the tile */
-  .react-calendar__tile {
-    transition: background-color 0.2s; /* Smooth transition for hover */
-  }
-  
-  /* Hover effect for tiles */
-  .react-calendar__tile:hover {
-    background: rgba(128, 0, 128, 0.2); /* Light purple background on hover */
-  }
-  
-  /* Highlight today's date */
-  .react-calendar__tile--now {
-    background: #e0e0e0; /* Light gray background for today */
-    border-radius: 50%; /* Round today's tile */
-  }
-  
-  /* Highlight tiles that have events */
-  .react-calendar__tile--hasEvent {
-    background: rgba(148, 0, 211, 0.5); /* Light purple for event tiles */
-    border-radius: 5px; /* Slightly rounded corners */
-  }
-  
-  /* Text color for the highlighted tiles */
-  .react-calendar__tile--hasEvent:hover {
-    background: rgba(148, 0, 211, 0.7); /* Darker purple on hover for event tiles */
-  }
-  
-  /* Adjust the header styles */
-  .react-calendar__navigation {
-    background-color: var(--dark-purple, #6a0dad); /* Use CSS variable or fallback to dark purple for the navigation header */
-    color: white; /* White text color */
-  }
-  
-  .react-calendar__navigation button {
-    color: white; /* White color for navigation buttons */
-  }
-  
-  /* Header styles */
-  .react-calendar__month-view__weekdays {
-    background: var(--dark-purple, #6a0dad); /* Use CSS variable or fallback to dark purple for weekdays header */
-    color: white; /* White text color */
-  }
-  
-  /* Individual weekday styles */
-  .react-calendar__month-view__weekdays__weekday {
-    color: var(--light-purple, #e1bee7); /* Use CSS variable or fallback to light purple for weekday text */
-  }
-  
+  border: none;
+  box-shadow: none;
+  width: 100%;
+}
+
+.react-calendar {
+  width: 100%;
+  max-width: 100%;
+  background: #ffffff;
+  border-radius: 0;
+}
+
+.react-calendar__month-view__days__day {
+  padding: 10px;
+  color: var(--dark-purple, #4b0082);
+}
+
+.react-calendar__tile {
+  transition: background-color 0.2s;
+}
+
+.react-calendar__tile:hover {
+  background: rgba(128, 0, 128, 0.2);
+}
+
+.react-calendar__tile--now {
+  background: #e0e0e0;
+  border-radius: 50%;
+}
+
+.react-calendar__tile--hasEvent {
+  background: rgba(148, 0, 211, 0.5);
+  border-radius: 5px;
+}
+
+.react-calendar__tile--hasEvent:hover {
+  background: rgba(148, 0, 211, 0.7);
+}
+
+.react-calendar__navigation {
+  background-color: var(--dark-purple, #6a0dad);
+  color: white;
+  display: flex;
+  justify-content: center; /* Align the month title to the center */
+}
+
+.react-calendar__navigation button {
+  color: white;
+}
+
+.react-calendar__month-view__weekdays {
+  background: var(--dark-purple, #6a0dad);
+  color: white;
+}
+
+.react-calendar__month-view__weekdays__weekday {
+  color: var(--light-purple, #e1bee7);
+}
