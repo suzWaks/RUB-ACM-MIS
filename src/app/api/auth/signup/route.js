@@ -41,7 +41,7 @@ export const POST = async (req, res) => {
   const newUser = new users({
     email,
     password: hashedPassword,
-    role: "admin",
+    role: "member",
     stdID: member.std_id,
   });
 
