@@ -45,10 +45,10 @@ const BudgetOverview: React.FC<BudgetOverviewProps> = ({
       enabled: true,
       formatter: (val: number) => `${val.toFixed(1)}%`,
       style: {
-        colors: ["#FFFFFF"],
+        colors: ["black"],
         fontWeight: "bold",
         fontSize: "16px",
-        textStroke: "2px #000000",
+        textStroke: "3px #ffff",
       },
       dropShadow: {
         enabled: true,
