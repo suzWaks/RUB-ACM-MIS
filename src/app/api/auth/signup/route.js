@@ -13,7 +13,6 @@ export const POST = async (req, res) => {
       { status: 422 }
     );
   }
-  s;
 
   //Connect to database
   await connectToDB();
