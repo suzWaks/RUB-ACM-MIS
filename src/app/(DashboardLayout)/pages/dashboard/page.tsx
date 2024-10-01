@@ -23,6 +23,13 @@ const Dashboard = () => {
     { name: "Event 3", date: new Date(2024, 9, 10) },
   ];
 
+  const graphColors = [
+    theme.palette.primary.main,
+    theme.palette.primary_blue.main,
+    theme.palette.secondary_blue.main,
+    theme.palette.secondary_teal.main,
+  ];
+
   return (
     <PageContainer description="Home of RUB ACM MIS">
       <DashboardCard>
@@ -65,7 +72,11 @@ const Dashboard = () => {
                         {stat.label}:{" "}
                         {stat.data.reduce((acc, curr) => acc + curr, 0)}
                       </Typography>
-                      <StudentGraph data={stat.data} />
+                      {/* Passing different colors to each StudentGraph */}
+                      <StudentGraph
+                        data={stat.data}
+                        color={graphColors[index]} // Assign different color from the array
+                      />
                     </Paper>
                   </Grid>
                 ))}

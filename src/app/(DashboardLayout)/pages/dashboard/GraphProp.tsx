@@ -9,9 +9,13 @@ interface StudentGraphProps {
   data: number[];
 }
 
-const StudentGraph: React.FC<StudentGraphProps> = ({ data }) => {
+interface StudentGraphProps {
+  data: number[];
+  color: string; 
+}
+
+const StudentGraph: React.FC<StudentGraphProps> = ({ data, color }) => {
   const theme = useTheme();
-  const color = theme.palette.secondary.main;
 
   const optionsColumnChart: any = {
     chart: {
@@ -142,3 +146,4 @@ const StudentGraph: React.FC<StudentGraphProps> = ({ data }) => {
 };
 
 export default StudentGraph;
+
