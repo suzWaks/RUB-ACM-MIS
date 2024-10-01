@@ -25,6 +25,8 @@ interface RecentActivityProps {
 const RecentActivity: React.FC<RecentActivityProps> = ({ activities }) => {
   const theme = useTheme();
 
+  const colors = ["#6f42c1", "#007BFF", "#00CCCC", "#0DCAF0"];
+
   return (
     <DashboardCard>
       <>
@@ -32,8 +34,9 @@ const RecentActivity: React.FC<RecentActivityProps> = ({ activities }) => {
           variant="h5"
           align="center"
           sx={{
-            color: theme.palette.secondary.main,
+            color: "#6f42c1",
             marginBottom: 2,
+            fontFamily: theme.typography.fontFamily,
           }}
         >
           Recent Activity
@@ -45,12 +48,12 @@ const RecentActivity: React.FC<RecentActivityProps> = ({ activities }) => {
             marginBottom: "-20px",
             "& .MuiTimelineConnector-root": {
               width: "2px",
-              backgroundColor: theme.palette.divider,
+              backgroundColor: "#e0e0e0",
             },
             [`& .${timelineOppositeContentClasses.root}`]: {
               flex: 0.5,
               paddingLeft: 0,
-              color: theme.palette.text.secondary,
+              color: "#666",
             },
           }}
         >
@@ -62,7 +65,7 @@ const RecentActivity: React.FC<RecentActivityProps> = ({ activities }) => {
                 <Typography
                   variant="body2"
                   sx={{
-                    color: theme.palette.text.secondary,
+                    color: "#666",
                     fontFamily: theme.typography.fontFamily,
                   }}
                 >
@@ -77,7 +80,7 @@ const RecentActivity: React.FC<RecentActivityProps> = ({ activities }) => {
                 <TimelineDot
                   className="animate"
                   sx={{
-                    backgroundColor: theme.palette.secondary.main,
+                    backgroundColor: colors[index % colors.length],
                     width: 10,
                     height: 10,
                     margin: 0,
@@ -85,7 +88,7 @@ const RecentActivity: React.FC<RecentActivityProps> = ({ activities }) => {
                 />
                 <TimelineConnector
                   className="animate"
-                  sx={{ backgroundColor: theme.palette.divider }}
+                  sx={{ backgroundColor: "#e0e0e0" }}
                 />
               </TimelineSeparator>
               <TimelineContent sx={{ padding: 0, marginLeft: "10px" }}>
@@ -111,7 +114,7 @@ const RecentActivity: React.FC<RecentActivityProps> = ({ activities }) => {
             textAlign: "center",
             marginTop: "20px",
             fontWeight: "600",
-            color: theme.palette.secondary.main,
+            color: "#6f42c1",
             "&:hover": {
               textDecoration: "underline",
             },

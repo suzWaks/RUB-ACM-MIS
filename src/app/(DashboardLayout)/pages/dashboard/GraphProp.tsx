@@ -114,7 +114,7 @@ const StudentGraph: React.FC<StudentGraphProps> = ({ data, color }) => {
       name: `Growth`,
       color: color,
       data: data.map((value, index) => ({
-        x: `Data ${index + 1}`,
+        x: `Year ${index + 1}`,
         y: value,
         fillColor: color,
       })),
