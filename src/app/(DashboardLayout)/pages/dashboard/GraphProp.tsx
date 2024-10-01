@@ -11,7 +11,7 @@ interface StudentGraphProps {
 
 interface StudentGraphProps {
   data: number[];
-  color: string; 
+  color: string;
 }
 
 const StudentGraph: React.FC<StudentGraphProps> = ({ data, color }) => {
@@ -146,4 +146,3 @@ const StudentGraph: React.FC<StudentGraphProps> = ({ data, color }) => {
 };
 
 export default StudentGraph;
-

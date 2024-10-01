@@ -72,10 +72,10 @@ const Dashboard = () => {
                         {stat.label}:{" "}
                         {stat.data.reduce((acc, curr) => acc + curr, 0)}
                       </Typography>
-                      {/* Passing different colors to each StudentGraph */}
+
                       <StudentGraph
                         data={stat.data}
-                        color={graphColors[index]} // Assign different color from the array
+                        color={graphColors[index]} 
                       />
                     </Paper>
                   </Grid>
