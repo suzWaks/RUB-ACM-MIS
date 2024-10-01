@@ -9,9 +9,13 @@ interface StudentGraphProps {
   data: number[];
 }
 
-const StudentGraph: React.FC<StudentGraphProps> = ({ data }) => {
+interface StudentGraphProps {
+  data: number[];
+  color: string;
+}
+
+const StudentGraph: React.FC<StudentGraphProps> = ({ data, color }) => {
   const theme = useTheme();
-  const color = theme.palette.secondary.main;
 
   const optionsColumnChart: any = {
     chart: {
@@ -49,7 +53,7 @@ const StudentGraph: React.FC<StudentGraphProps> = ({ data }) => {
     },
     yaxis: {
       labels: {
-        show: true,
+        show: false,
       },
       min: Math.min(...data) - 5,
       max: Math.max(...data) + 5,
@@ -110,7 +114,7 @@ const StudentGraph: React.FC<StudentGraphProps> = ({ data }) => {
       name: `Growth`,
       color: color,
       data: data.map((value, index) => ({
-        x: `Data ${index + 1}`,
+        x: `Year ${index + 1}`,
         y: value,
         fillColor: color,
       })),

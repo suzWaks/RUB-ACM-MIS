@@ -1,0 +1,24 @@
+[
+  {
+    "name": "Jigme Phuntsho Wangyel",
+    "std_id": "02210200",
+    "programme": "Bachelor of Engineering in Information Technology",
+    "year": "4",
+    "contact_number": "17809910",
+    "email": "02210200.cst@rub.edu.bt",
+    "department": "Information Technology",
+    "gender": "Male",
+    "designation": "Chairmen"
+  },
+  {
+    "name": "Jimpa Jamtsho",
+    "std_id": "02210201",
+    "programme": "Bachelor of Engineering in Information Technology",
+    "year": "4",
+    "contact_number": "177777777",
+    "email": "02210201.cst@rub.edu.bt",
+    "department": "Information Technology",
+    "gender": "Male",
+    "designation": "Vice Chairmen"
+  }
+]

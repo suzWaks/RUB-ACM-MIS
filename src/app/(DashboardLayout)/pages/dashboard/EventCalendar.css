@@ -13,7 +13,7 @@
 
 .react-calendar__month-view__days__day {
   padding: 10px;
-  color: var(--dark-purple, #4b0082);
+  color: #6f42c1;
 }
 
 .react-calendar__tile {
@@ -21,11 +21,11 @@
 }
 
 .react-calendar__tile:hover {
-  background: rgba(128, 0, 128, 0.2);
+  background: rgba(111, 66, 193, 0.2);
 }
 
 .react-calendar__tile--now {
-  background: #e0e0e0;
+  background: rgba(111, 66, 193, 0.3);
   border-radius: 50%;
 }
 
@@ -39,10 +39,10 @@
 }
 
 .react-calendar__navigation {
-  background-color: var(--dark-purple, #6a0dad);
+  background-color: #6f42c1;
   color: white;
   display: flex;
-  justify-content: center; /* Align the month title to the center */
+  justify-content: center;
 }
 
 .react-calendar__navigation button {
@@ -50,10 +50,10 @@
 }
 
 .react-calendar__month-view__weekdays {
-  background: var(--dark-purple, #6a0dad);
+  background: #6f42c1;
   color: white;
 }
 
 .react-calendar__month-view__weekdays__weekday {
-  color: var(--light-purple, #e1bee7);
+  color: rgba(255, 255, 255, 0.8);
 }
