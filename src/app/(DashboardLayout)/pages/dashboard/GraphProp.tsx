@@ -53,7 +53,7 @@ const StudentGraph: React.FC<StudentGraphProps> = ({ data, color }) => {
     },
     yaxis: {
       labels: {
-        show: true,
+        show: false,
       },
       min: Math.min(...data) - 5,
       max: Math.max(...data) + 5,
