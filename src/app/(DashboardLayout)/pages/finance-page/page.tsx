@@ -44,7 +44,7 @@ const FinanceDashboard = () => {
       {
         label: 'Expenses',
         data: [2000, 3000, 2500, 1000, 4000, 3000, 5000],
-        borderColor: themeColors.primary_purple,
+        borderColor: theme.palette.primary.main,
         fill: false,
         tension: 0.1,
       },
@@ -71,8 +71,8 @@ const FinanceDashboard = () => {
   ];
 
   const transactionData = [
-    { title: 'MBoB', description: 'Refreshments for Members', amount: 'Nu. 1193.21', icon: <AccountCircleIcon sx={{ fontSize: 40, color: themeColors.primary_purple }} />, actionIcon: <DirectionsCarIcon sx={{ color: themeColors.primary_blue }} /> },
-    { title: 'MBoB', description: 'Purchase of equipment', amount: 'Nu.1000.00', icon: <AccountCircleIcon sx={{ fontSize: 40, color: themeColors.primary_purple }} />, actionIcon: <DirectionsCarIcon sx={{ color: themeColors.primary_purple }} /> },
+    { title: 'MBoB', description: 'Refreshments for Members', amount: 'Nu. 1193.21', icon: <AccountCircleIcon sx={{ fontSize: 40, color: theme.palette.primary.main }} />, actionIcon: <DirectionsCarIcon sx={{ color: theme.palette.primary_blue.main }} /> },
+    { title: 'MBoB', description: 'Purchase of equipment', amount: 'Nu.1000.00', icon: <AccountCircleIcon sx={{ fontSize: 40, color: theme.palette.primary.main }} />, actionIcon: <DirectionsCarIcon sx={{ color: themeColors.primary_purple }} /> },
   ];
 
   const expenseGraphData = {
@@ -81,7 +81,7 @@ const FinanceDashboard = () => {
       {
         label: 'Expenses',
         data: [1060, 500, 750, 300],
-        backgroundColor: themeColors.secondary_teal,
+        backgroundColor: theme.palette.secondary_teal.main,
       },
     ],
   };
