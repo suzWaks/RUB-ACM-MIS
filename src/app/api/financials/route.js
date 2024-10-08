@@ -8,7 +8,7 @@ const { ObjectId } = mongoose.Types;
 //Add a finance record
 export const POST = async (req) => {
     try {
-        const { amount, type, description = "", items = [], eventID = null } = await req.json();
+        const { amount, type, description = "", items = [], eventID = null, created_by } = await req.json();
 
         // Validate required fields
         if (!amount || !type) {
