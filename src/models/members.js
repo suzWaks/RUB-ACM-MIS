@@ -43,12 +43,6 @@ const MemberSchema = new Schema(
       type: String,
       required: false,
     },
-    attendance: [
-      {
-        type: Schema.Types.ObjectId,
-        ref: "attendance",
-      },
-    ],
   },
   { timestamps: true }
 );
