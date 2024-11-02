@@ -27,13 +27,38 @@ import dayjs, { Dayjs } from "dayjs";
 
 interface EventFormProps {
     onClose: () => void;
+    onSubmit: (eventData: any) => void;
 }
 
-const EventForm: React.FC<EventFormProps> = ({ onClose }) => {
+const EventForm: React.FC<EventFormProps> = ({ onClose, onSubmit }) => {
+    const [eventName, setEventName] = useState("");
+    const [attendees, setAttendees] = useState("");
+    const [location, setLocation] = useState("");
     const [startDate, setStartDate] = useState<Dayjs | null>(null);
     const [startTime, setStartTime] = useState<Dayjs | null>(null);
     const [endDate, setEndDate] = useState<Dayjs | null>(null);
     const [endTime, setEndTime] = useState<Dayjs | null>(null);
+    const [description, setDescription] = useState("");
+
+    const handleSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+        const eventData = {
+            name: eventName,
+            attendees,
+            venue: location,
+            startDate: startDate ? dayjs(startDate).format("MM/DD/YYYY") : "",
+            endDate: endDate ? dayjs(endDate).format("MM/DD/YYYY") : "",
+            startTime: startTime ? dayjs(startTime).format("HH:mm") : "",
+            endTime: endTime ? dayjs(endTime).format("HH:mm") : "",
+            description,
+            status: "Scheduled", // Default status when creating a new event
+        };
+
+        console.log("Submitting event data:", eventData);
+        onSubmit(eventData); // Send the event data to parent
+        onClose(); // Close the form after submission
+    };
+
 
     return (
         <Box
@@ -87,6 +112,8 @@ const EventForm: React.FC<EventFormProps> = ({ onClose }) => {
                                 fullWidth
                                 variant="outlined"
                                 label="Add Name"
+                                value={eventName}
+                                onChange={(e) => setEventName(e.target.value)}
                                 sx={{ mt: 2 }}
                                 InputProps={{
                                     startAdornment: (
@@ -104,6 +131,8 @@ const EventForm: React.FC<EventFormProps> = ({ onClose }) => {
                                 fullWidth
                                 variant="outlined"
                                 label="Add Required Attendees"
+                                value={attendees}
+                                onChange={(e) => setAttendees(e.target.value)}
                                 InputProps={{
                                     startAdornment: (
                                         <InputAdornment position="start">
@@ -119,7 +148,9 @@ const EventForm: React.FC<EventFormProps> = ({ onClose }) => {
                             <TextField
                                 fullWidth
                                 variant="outlined"
-                                label="Add Location"
+                                label="Add Venue"
+                                value={location}
+                                onChange={(e) => setLocation(e.target.value)}
                                 InputProps={{
                                     startAdornment: (
                                         <InputAdornment position="start">
@@ -198,6 +229,8 @@ const EventForm: React.FC<EventFormProps> = ({ onClose }) => {
                                 fullWidth
                                 variant="outlined"
                                 label="Add Description"
+                                value={description}
+                                onChange={(e) => setDescription(e.target.value)}
                                 multiline
                                 rows={4}
                                 InputProps={{
@@ -249,6 +282,7 @@ const EventForm: React.FC<EventFormProps> = ({ onClose }) => {
                         <Button
                             variant="contained"
                             color="primary"
+                            onClick={handleSubmit}
                             sx={{
                                 backgroundColor: "#16A1B8",
                                 "&:hover": { backgroundColor: "#138f9b" },
