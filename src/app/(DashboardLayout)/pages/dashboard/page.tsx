@@ -9,6 +9,8 @@ import RecentActivity from "./RecentActivityProp";
 import FinancialOverview from "@/app/(DashboardLayout)/pages/dashboard/OverviewProp";
 import EventCalendar from "./Eventsprop";
 import NotificationCard from "./AnnouncementProp";
+import { useSession } from "next-auth/react";
+import { redirect } from "next/dist/server/api-utils";
 
 const Dashboard = () => {
   const activities = [
@@ -29,6 +31,15 @@ const Dashboard = () => {
     theme.palette.secondary_blue.main,
     theme.palette.secondary_teal.main,
   ];
+
+  const { data: session } = useSession();
+
+  //Test Code
+  if (session) {
+    console.log(session.user?.email);
+  } else {
+    console.log("Not Signed In");
+  }
 
   return (
     <PageContainer description="Home of RUB ACM MIS">
@@ -75,7 +86,7 @@ const Dashboard = () => {
 
                       <StudentGraph
                         data={stat.data}
-                        color={graphColors[index]} 
+                        color={graphColors[index]}
                       />
                     </Paper>
                   </Grid>
