@@ -17,6 +17,7 @@ const Dashboard = () => {
     { date: "2024-09-26", title: "Joined the ACM chapter" },
     { date: "2024-09-25", title: "Attended the Workshop" },
     { date: "2024-09-24", title: "Completed a Project" },
+    { date: "2024-10-24", title: "Programming contest" },
   ];
 
   const events = [
@@ -46,7 +47,7 @@ const Dashboard = () => {
       <DashboardCard>
         <Box>
           <Box mb={2}>
-            <Paper elevation={2} sx={{ padding: 2 }}>
+            <Paper sx={{ padding: 2 }} elevation={0}>
               <Typography
                 variant="h5"
                 sx={{ color: theme.palette.primary.main, mb: 2 }}
@@ -63,7 +64,7 @@ const Dashboard = () => {
           </Box>
 
           <Box mb={2}>
-            <Paper elevation={2} sx={{ padding: 2 }}>
+            <Paper sx={{ padding: 2 }} elevation={0}>
               <Typography
                 variant="h5"
                 sx={{ color: theme.palette.primary.main, mb: 2 }}
@@ -78,7 +79,7 @@ const Dashboard = () => {
                   { label: "Total Members", data: [50, 70, 80, 90, 105] },
                 ].map((stat, index) => (
                   <Grid item xs={6} md={3} key={index}>
-                    <Paper elevation={2} sx={{ padding: 0 }}>
+                    <Paper sx={{ padding: 0 }} elevation={2}>
                       <Typography variant="h6" padding={1}>
                         {stat.label}:{" "}
                         {stat.data.reduce((acc, curr) => acc + curr, 0)}
@@ -97,7 +98,7 @@ const Dashboard = () => {
 
           <Grid container spacing={2} alignItems="stretch">
             <Grid item xs={12} md={3}>
-              <Box sx={{ border: `1px solid ${theme.palette.grey[300]}` }}>
+              <Box>
                 <RecentActivity activities={activities} />
               </Box>
             </Grid>
@@ -107,7 +108,7 @@ const Dashboard = () => {
             </Grid>
 
             <Grid item xs={12} md={3}>
-              <Box sx={{ border: `1px solid ${theme.palette.grey[300]}` }}>
+              <Box >
                 <FinancialOverview budgetUsed={15000} budgetRemaining={35000} />
               </Box>
             </Grid>

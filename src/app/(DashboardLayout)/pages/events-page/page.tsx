@@ -1,52 +1,24 @@
 "use client";
 
-import React, { useState } from "react";
-import { Grid, Button } from "@mui/material";
-import Calendar from "./calendar";
-import EventSidebar from "./eventsidebar";
-import EventTable from "./eventtable"; // Import the event table
+import React from "react";
+import { Typography, Box } from "@mui/material";
 import PageContainer from "@/app/(DashboardLayout)/components/container/PageContainer";
-import DashboardCard from "@/app/(DashboardLayout)/components/shared/DashboardCard";
+import theme from "@/utils/theme";
+import Calendar from './calendar'; // For named export
+// Import the Calendar component
 
 const EventsPage: React.FC = () => {
-  const [view, setView] = useState<"sidebar" | "table">("sidebar"); // Manage view state
-
-  const handleViewAllEvents = () => {
-    setView("table"); // Switch to the event table view
-  };
-
-  const handleBackToCalendar = () => {
-    setView("sidebar"); // Switch back to the sidebar and calendar view
-  };
-
   return (
     <PageContainer title="Event Page" description="Members page">
-      <DashboardCard title="Event">
-        <Grid container spacing={3}>
-          {view === "sidebar" && (
-            <>
-              {/* Sidebar Section (Left) */}
-              <Grid item xs={3}>
-                <EventSidebar onViewAllEvents={handleViewAllEvents} />
-              </Grid>
+      <Box>
+        {/* Custom Title with Purple Color */}
+        <Typography variant="h3" style={{ color: theme.palette.primary.main, marginBottom: theme.spacing(2) }}>
+          Events
+        </Typography>
 
-              {/* Calendar Section (Right) */}
-              <Grid item xs={9}>
-                <Calendar />
-              </Grid>
-            </>
-          )}
-
-          {view === "table" && (
-            <>
-              {/* Event Table Section (Takes Full Width) */}
-              <Grid item xs={12}>
-                <EventTable onClose={handleBackToCalendar} />
-              </Grid>
-            </>
-          )}
-        </Grid>
-      </DashboardCard>
+        {/* Include the Calendar component here */}
+        <Calendar />
+      </Box>
     </PageContainer>
   );
 };

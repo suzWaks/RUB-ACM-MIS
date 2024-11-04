@@ -342,7 +342,10 @@ const FinanceDashboard = () => {
             </Box>
           </Card>
         </Grid>
-        {/* Payment Transactions */}
+      </Grid>
+
+      <Grid container spacing={3} sx={{ mt: 3 }}>
+        {/* Recent Transactions Section */}
         <Grid item xs={12} md={6}>
           <Card
             sx={{
@@ -433,7 +436,7 @@ const FinanceDashboard = () => {
           </Card>
         </Grid>
 
-        {/* Expenses Graph */}
+        {/* Expenses Graph Section */}
         <Grid item xs={12} md={6}>
           <Card
             sx={{

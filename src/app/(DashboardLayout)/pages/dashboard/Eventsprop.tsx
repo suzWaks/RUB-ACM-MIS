@@ -69,7 +69,7 @@ const EventCalendar: React.FC<EventCalendarProps> = ({ events }) => {
       }}
     >
       <Grid container spacing={0} sx={{ flexGrow: 1, height: "100%" }}>
-        <Grid item xs={12} md={6} sx={{ height: "100%" }}>
+        <Grid item xs={12} md={6} sx={{ height: "100%", borderRight: "none" }}>
           <Paper
             elevation={2}
             sx={{
@@ -80,7 +80,8 @@ const EventCalendar: React.FC<EventCalendarProps> = ({ events }) => {
               margin: 0,
               padding: 0,
               backgroundColor: "#ffffff",
-              border: "1px solid #ccc",
+              border: "1px solid #ccc", // Maintain the border for the events list
+              borderRight: "none", // Remove the right border
               overflowY: "auto",
             }}
           >
@@ -141,7 +142,7 @@ const EventCalendar: React.FC<EventCalendarProps> = ({ events }) => {
           </Paper>
         </Grid>
 
-        <Grid item xs={12} md={6} sx={{ height: "100%", padding: 2 }}>
+        <Grid item xs={12} md={6} sx={{ height: "100%" }}>
           <Paper
             elevation={2}
             sx={{
@@ -149,10 +150,11 @@ const EventCalendar: React.FC<EventCalendarProps> = ({ events }) => {
               justifyContent: "center",
               alignItems: "center",
               height: "100%",
+              width: "100%",
               margin: 0,
               padding: 0,
               backgroundColor: "#ffffff",
-              border: "1px solid #ccc",
+              border: "1px solid #ccc", // Maintain the border for the calendar
               borderRadius: 0,
               overflow: "hidden",
             }}
