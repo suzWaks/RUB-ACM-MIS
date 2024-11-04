@@ -13,21 +13,22 @@ const BudgetOverview: React.FC<BudgetOverviewProps> = ({
   budgetUsed,
   budgetRemaining,
 }) => {
-  // Hardcoded colors because global theme disrupts local theme set up
-  const title = "#6f42c1";
-  const primary = "#007BFF";
-  const secondary = "#0DCAF0";
+  const titleColor = "#6f42c1";
+  const primaryColor = "#007BFF";
+  const secondaryColor = "#0DCAF0";
 
-  const totalBudget = budgetUsed + budgetRemaining;
+  const seriesPieChart: any = [budgetUsed, budgetRemaining];
 
   const optionsPieChart: any = {
     chart: {
       type: "donut",
       fontFamily: "'Roboto', sans-serif",
-      foreColor: "#6e6b7b",
       height: 160,
+      animations: {
+        enabled: true,
+      },
     },
-    colors: [primary, secondary],
+    colors: [primaryColor, secondaryColor],
     plotOptions: {
       pie: {
         donut: {
@@ -35,30 +36,25 @@ const BudgetOverview: React.FC<BudgetOverviewProps> = ({
           background: "transparent",
         },
         expandOnClick: true,
+        shadow: {
+          enabled: true,
+          color: "#000",
+          top: 5,
+          left: 5,
+          blur: 5,
+          opacity: 0.1,
+        },
       },
     },
     tooltip: {
       theme: "light",
       fillSeriesColor: false,
+      style: {
+        fontSize: '14px',
+      },
     },
     dataLabels: {
-      enabled: true,
-      formatter: (val: number) => `${val.toFixed(1)}%`,
-      style: {
-        colors: ["black"],
-        fontWeight: "bold",
-        fontSize: "16px",
-        textStroke: "3px #ffff",
-      },
-      dropShadow: {
-        enabled: true,
-        top: 2,
-        left: 2,
-        blur: 3,
-        color: "rgba(0, 0, 0, 0.6)",
-        opacity: 0.8,
-      },
-      offsetY: -10,
+      enabled: false,
     },
     stroke: {
       show: true,
@@ -80,16 +76,14 @@ const BudgetOverview: React.FC<BudgetOverviewProps> = ({
     },
   };
 
-  const seriesPieChart: any = [budgetUsed, budgetRemaining];
-
   return (
     <DashboardCard>
-      <Box>
+      <Box sx={{ padding: 2 }}>
         <Typography
           variant="h5"
           sx={{
             textAlign: "center",
-            color: title,
+            color: titleColor,
             fontWeight: 600,
             marginBottom: 2,
           }}
@@ -119,12 +113,12 @@ const BudgetOverview: React.FC<BudgetOverviewProps> = ({
                   sx={{
                     width: 12,
                     height: 12,
-                    backgroundColor: primary,
+                    backgroundColor: primaryColor,
                     borderRadius: "50%",
                     marginRight: 1,
                   }}
                 />
-                <Typography variant="body1" color={primary} fontWeight={500}>
+                <Typography variant="body1" color={primaryColor} fontWeight={500}>
                   Used: ${budgetUsed.toLocaleString()}
                 </Typography>
               </Box>
@@ -133,12 +127,12 @@ const BudgetOverview: React.FC<BudgetOverviewProps> = ({
                   sx={{
                     width: 12,
                     height: 12,
-                    backgroundColor: secondary, // Hardcoded secondary color
+                    backgroundColor: secondaryColor,
                     borderRadius: "50%",
                     marginRight: 1,
                   }}
                 />
-                <Typography variant="body1" color={secondary} fontWeight={500}>
+                <Typography variant="body1" color={secondaryColor} fontWeight={500}>
                   Remaining: ${budgetRemaining.toLocaleString()}
                 </Typography>
               </Box>

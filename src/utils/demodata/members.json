@@ -1,16 +1,5 @@
 [
   {
-    "name": "Jigme Phuntsho Wangyel",
-    "std_id": "02210200",
-    "programme": "Bachelor of Engineering in Information Technology",
-    "year": "4",
-    "contact_number": "17809910",
-    "email": "02210200.cst@rub.edu.bt",
-    "department": "Information Technology",
-    "gender": "Male",
-    "designation": "Chairmen"
-  },
-  {
     "name": "Jimpa Jamtsho",
     "std_id": "02210201",
     "programme": "Bachelor of Engineering in Information Technology",
@@ -20,5 +9,104 @@
     "department": "Information Technology",
     "gender": "Male",
     "designation": "Vice Chairmen"
+  },
+  {
+    "name": "Kezang Wangmo",
+    "std_id": "02210202",
+    "programme": "Bachelor of Engineering in Civil Engineering",
+    "year": "3",
+    "contact_number": "171234567",
+    "email": "02210202.cst@rub.edu.bt",
+    "department": "Civil Engineering",
+    "gender": "Female",
+    "designation": "Secretary"
+  },
+  {
+    "name": "Tashi Dendup",
+    "std_id": "02210203",
+    "programme": "Bachelor of Engineering in Electrical Engineering",
+    "year": "4",
+    "contact_number": "179876543",
+    "email": "02210203.cst@rub.edu.bt",
+    "department": "Electrical Engineering",
+    "gender": "Male",
+    "designation": "Treasurer"
+  },
+  {
+    "name": "Pema Choden",
+    "std_id": "02210204",
+    "programme": "Bachelor of Engineering in Architecture",
+    "year": "2",
+    "contact_number": "176543210",
+    "email": "02210204.cst@rub.edu.bt",
+    "department": "Architecture",
+    "gender": "Female",
+    "designation": "Member"
+  },
+  {
+    "name": "Sonam Tobgay",
+    "std_id": "02210205",
+    "programme": "Bachelor of Engineering in Mechanical Engineering",
+    "year": "1",
+    "contact_number": "171234876",
+    "email": "02210205.cst@rub.edu.bt",
+    "department": "Mechanical Engineering",
+    "gender": "Male",
+    "designation": "Member"
+  },
+  {
+    "name": "Chimi Dorji",
+    "std_id": "02210206",
+    "programme": "Bachelor of Engineering in Information Technology",
+    "year": "2",
+    "contact_number": "179543210",
+    "email": "02210206.cst@rub.edu.bt",
+    "department": "Information Technology",
+    "gender": "Male",
+    "designation": "Member"
+  },
+  {
+    "name": "Tandin Wangchuk",
+    "std_id": "02210207",
+    "programme": "Bachelor of Engineering in Civil Engineering",
+    "year": "4",
+    "contact_number": "178765432",
+    "email": "02210207.cst@rub.edu.bt",
+    "department": "Civil Engineering",
+    "gender": "Male",
+    "designation": "Member"
+  },
+  {
+    "name": "Dechen Pem",
+    "std_id": "02210208",
+    "programme": "Bachelor of Engineering in Information Technology",
+    "year": "3",
+    "contact_number": "177654321",
+    "email": "02210208.cst@rub.edu.bt",
+    "department": "Information Technology",
+    "gender": "Female",
+    "designation": "Member"
+  },
+  {
+    "name": "Karma Lhamo",
+    "std_id": "02210209",
+    "programme": "Bachelor of Engineering in Electrical Engineering",
+    "year": "2",
+    "contact_number": "179876512",
+    "email": "02210209.cst@rub.edu.bt",
+    "department": "Electrical Engineering",
+    "gender": "Female",
+    "designation": "Member"
+  },
+  {
+    "name": "Sangay Dorji",
+    "std_id": "02210210",
+    "programme": "Bachelor of Engineering in Mechanical Engineering",
+    "year": "3",
+    "contact_number": "174321098",
+    "email": "02210210.cst@rub.edu.bt",
+    "department": "Mechanical Engineering",
+    "gender": "Male",
+    "designation": "Member"
   }
 ]

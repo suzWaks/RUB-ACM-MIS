@@ -39,7 +39,7 @@ export const POST = async (req, res) => {
 
   //Create a new user
   const newUser = new users({
-    email,
+    email: email,
     password: hashedPassword,
     role: "member",
     stdID: member.std_id,

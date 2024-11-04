@@ -1,7 +1,6 @@
-// EventForm.tsx
-
 "use client";
-import React from "react";
+
+import React, { useState } from "react";
 import {
     Box,
     Card,
@@ -12,6 +11,11 @@ import {
     IconButton,
     Grid,
     InputAdornment,
+    Select,
+    MenuItem,
+    Checkbox,
+    ListItemText,
+    OutlinedInput,
 } from "@mui/material";
 import { DatePicker, TimePicker } from "@mui/x-date-pickers";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
@@ -24,202 +28,291 @@ import LocationOnIcon from "@mui/icons-material/LocationOn";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import DescriptionIcon from "@mui/icons-material/Description";
 import dayjs, { Dayjs } from "dayjs";
+import { SelectChangeEvent } from "@mui/material";
 
-const EventForm: React.FC = () => {
-    const [startDate, setStartDate] = React.useState<Dayjs | null>(null);
-    const [startTime, setStartTime] = React.useState<Dayjs | null>(null);
-    const [endDate, setEndDate] = React.useState<Dayjs | null>(null);
-    const [endTime, setEndTime] = React.useState<Dayjs | null>(null);
+interface EventFormProps {
+    onClose: () => void;
+    onSubmit: (eventData: any) => void;
+}
+
+const attendeesOptions = ["First Year", "Second Year", "Third Year", "Fourth Year"];
+
+const EventForm: React.FC<EventFormProps> = ({ onClose, onSubmit }) => {
+    const [eventName, setEventName] = useState("");
+    const [attendees, setAttendees] = useState<string[]>([]);
+    const [location, setLocation] = useState("");
+    const [startDate, setStartDate] = useState<Dayjs | null>(null);
+    const [startTime, setStartTime] = useState<Dayjs | null>(null);
+    const [endDate, setEndDate] = useState<Dayjs | null>(null);
+    const [endTime, setEndTime] = useState<Dayjs | null>(null);
+    const [description, setDescription] = useState("");
+
+    const handleSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+        const eventData = {
+            name: eventName,
+            attendees,
+            venue: location,
+            startDate: startDate ? dayjs(startDate).format("MM/DD/YYYY") : "",
+            endDate: endDate ? dayjs(endDate).format("MM/DD/YYYY") : "",
+            startTime: startTime ? dayjs(startTime).format("HH:mm") : "",
+            endTime: endTime ? dayjs(endTime).format("HH:mm") : "",
+            description,
+            status: "Scheduled",
+        };
+
+        console.log("Submitting event data:", eventData);
+        onSubmit(eventData);
+        onClose();
+    };
+
+    const handleAttendeesChange = (event: SelectChangeEvent<string[]>) => {
+        const value = event.target.value as string[];
+        setAttendees(value);
+    };
 
     return (
-        <Card sx={{ width: "80%", margin: "0 auto", mt: 5, position: "relative" }}>
-            <CardContent>
-                {/* Close Button */}
-                <IconButton
-                    aria-label="close"
-                    sx={{ position: "absolute", top: 10, right: 10 }}
+        <Box
+            sx={{
+                position: "fixed",
+                top: 0,
+                left: 0,
+                width: "100%",
+                height: "100%",
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                backgroundColor: "rgba(0, 0, 0, 0.5)",
+                backdropFilter: "blur(10px)",
+                zIndex: 9999,
+            }}
+        >
+            <Card
+                sx={{
+                    width: "70%",
+                    height: "80%",
+                    position: "relative",
+                    boxShadow: "0px 0px 12px rgba(0, 0, 0, 0.2)",
+                    borderRadius: "10px",
+                    backgroundColor: "white",
+                    marginLeft: '15%',
+                    overflow: "hidden",
+                }}
+            >
+                <CardContent
+                    sx={{
+                        overflowY: "auto",
+                        maxHeight: "100%",
+                    }}
                 >
-                    <CloseIcon />
-                </IconButton>
+                    <IconButton
+                        aria-label="close"
+                        onClick={onClose}
+                        sx={{ position: "absolute", top: 10, right: 10 }}
+                    >
+                        <CloseIcon />
+                    </IconButton>
+                    <Typography variant="h4" color="purple" fontWeight="bold" gutterBottom>
+                        Schedule Events
+                    </Typography>
 
-                <Typography variant="h5" color="purple" fontWeight="bold" gutterBottom>
-                    Schedule Events
-                </Typography>
+                    <Grid container spacing={2}>
+                        <Grid item xs={12}>
+                            <TextField
+                                fullWidth
+                                variant="outlined"
+                                label="Add Name"
+                                value={eventName}
+                                onChange={(e) => setEventName(e.target.value)}
+                                sx={{ mt: 2 }}
+                                InputProps={{
+                                    startAdornment: (
+                                        <InputAdornment position="start">
+                                            <EventIcon />
+                                        </InputAdornment>
+                                    ),
+                                }}
+                            />
+                        </Grid>
 
-                <Grid container spacing={2}>
-                    {/* Event Name Input */}
-                    <Grid item xs={12}>
-                        <TextField
-                            fullWidth
-                            variant="outlined"
-                            label="Add Name"
-                            InputProps={{
-                                startAdornment: (
-                                    <InputAdornment position="start">
-                                        <EventIcon />
-                                    </InputAdornment>
-                                ),
-                            }}
-                        />
-                    </Grid>
+                        {/* Required Attendees Input with Dropdown */}
+                        <Grid item xs={12}>
 
-                    {/* Required Attendees Input */}
-                    <Grid item xs={12}>
-                        <TextField
-                            fullWidth
-                            variant="outlined"
-                            label="Add Required Attendees"
-                            InputProps={{
-                                startAdornment: (
+                            <Select
+                                fullWidth
+                                multiple
+                                label="Add Attendees"
+                                variant="outlined"
+                                displayEmpty
+                                value={attendees}
+                                onChange={handleAttendeesChange}
+                                input={<OutlinedInput startAdornment={
                                     <InputAdornment position="start">
                                         <PeopleIcon />
                                     </InputAdornment>
-                                ),
-                            }}
-                        />
-                    </Grid>
+                                } />}
+                                renderValue={(selected) => (selected as string[]).join(", ")}
+                            >
+                                {attendeesOptions.map((name) => (
+                                    <MenuItem key={name} value={name}>
+                                        <Checkbox checked={attendees.indexOf(name) > -1} />
+                                        <ListItemText primary={name} />
+                                    </MenuItem>
+                                ))}
+                            </Select>
+                        </Grid>
 
-                    {/* Location Input */}
-                    <Grid item xs={12}>
-                        <TextField
-                            fullWidth
-                            variant="outlined"
-                            label="Add Location"
-                            InputProps={{
-                                startAdornment: (
-                                    <InputAdornment position="start">
-                                        <LocationOnIcon />
-                                    </InputAdornment>
-                                ),
-                            }}
-                        />
-                    </Grid>
-
-                    {/* Date and Time Pickers */}
-                    <Grid item xs={6}>
-                        <LocalizationProvider dateAdapter={AdapterDayjs}>
-                            <DatePicker
-                                label="Start Date"
-                                value={startDate}
-                                onChange={(newValue) => setStartDate(newValue)}
-                                slotProps={{
-                                    textField: {
-                                        fullWidth: true,
-                                    },
+                        <Grid item xs={12}>
+                            <TextField
+                                fullWidth
+                                variant="outlined"
+                                label="Add Venue"
+                                value={location}
+                                onChange={(e) => setLocation(e.target.value)}
+                                InputProps={{
+                                    startAdornment: (
+                                        <InputAdornment position="start">
+                                            <LocationOnIcon />
+                                        </InputAdornment>
+                                    ),
                                 }}
                             />
-                        </LocalizationProvider>
-                    </Grid>
+                        </Grid>
 
-                    <Grid item xs={6}>
-                        <LocalizationProvider dateAdapter={AdapterDayjs}>
-                            <TimePicker
-                                label="Start Time"
-                                value={startTime}
-                                onChange={(newValue) => setStartTime(newValue)}
-                                slotProps={{
-                                    textField: {
-                                        fullWidth: true,
-                                        variant: "outlined",
-                                    },
+                        <Grid item xs={6}>
+                            <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                <DatePicker
+                                    label="Start Date"
+                                    value={startDate}
+                                    onChange={(newValue) => setStartDate(newValue)}
+                                    slotProps={{
+                                        textField: {
+                                            fullWidth: true,
+                                        },
+                                    }}
+                                />
+                            </LocalizationProvider>
+                        </Grid>
+
+                        <Grid item xs={6}>
+                            <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                <TimePicker
+                                    label="Start Time"
+                                    value={startTime}
+                                    onChange={(newValue) => setStartTime(newValue)}
+                                    slotProps={{
+                                        textField: {
+                                            fullWidth: true,
+                                            variant: "outlined",
+                                        },
+                                    }}
+                                />
+                            </LocalizationProvider>
+                        </Grid>
+
+                        <Grid item xs={6}>
+                            <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                <DatePicker
+                                    label="End Date"
+                                    value={endDate}
+                                    onChange={(newValue) => setEndDate(newValue)}
+                                    slotProps={{
+                                        textField: {
+                                            fullWidth: true,
+                                        },
+                                    }}
+                                />
+                            </LocalizationProvider>
+                        </Grid>
+
+                        <Grid item xs={6}>
+                            <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                <TimePicker
+                                    label="End Time"
+                                    value={endTime}
+                                    onChange={(newValue) => setEndTime(newValue)}
+                                    slotProps={{
+                                        textField: {
+                                            fullWidth: true,
+                                        },
+                                    }}
+                                />
+                            </LocalizationProvider>
+                        </Grid>
+
+                        <Grid item xs={12}>
+                            <TextField
+                                fullWidth
+                                variant="outlined"
+                                label="Add Description"
+                                value={description}
+                                onChange={(e) => setDescription(e.target.value)}
+                                multiline
+                                rows={4}
+                                InputProps={{
+                                    startAdornment: (
+                                        <InputAdornment position="start">
+                                            <DescriptionIcon />
+                                        </InputAdornment>
+                                    ),
                                 }}
                             />
-                        </LocalizationProvider>
-                    </Grid>
+                        </Grid>
 
-                    <Grid item xs={6}>
-                        <LocalizationProvider dateAdapter={AdapterDayjs}>
-                            <DatePicker
-                                label="End Date"
-                                value={endDate}
-                                onChange={(newValue) => setEndDate(newValue)}
-                                slotProps={{
-                                    textField: {
-                                        fullWidth: true,
-                                    },
+                        <Grid item xs={6}>
+                            <Box
+                                sx={{
+                                    border: "1px dashed grey",
+                                    height: 120,
+                                    display: "flex",
+                                    alignItems: "center",
+                                    justifyContent: "center",
                                 }}
+                            >
+                                <ImageIcon />
+                                <Typography>Add Image</Typography>
+                            </Box>
+                        </Grid>
+
+                        <Grid item xs={6}>
+                            <TextField
+                                fullWidth
+                                variant="outlined"
+                                label="Add People to Invite"
+                                multiline
+                                rows={4}
                             />
-                        </LocalizationProvider>
+                        </Grid>
                     </Grid>
 
-                    <Grid item xs={6}>
-                        <LocalizationProvider dateAdapter={AdapterDayjs}>
-                            <TimePicker
-                                label="End Time"
-                                value={endTime}
-                                onChange={(newValue) => setEndTime(newValue)}
-                                slotProps={{
-                                    textField: {
-                                        fullWidth: true,
-                                    },
-                                }}
-                            />
-                        </LocalizationProvider>
-                    </Grid>
-
-
-
-                    {/* Description Input */}
-                    <Grid item xs={12}>
-                        <TextField
-                            fullWidth
-                            variant="outlined"
-                            label="Add Description"
-                            multiline
-                            rows={4}
-                            InputProps={{
-                                startAdornment: (
-                                    <InputAdornment position="start">
-                                        <DescriptionIcon />
-                                    </InputAdornment>
-                                ),
-                            }}
-                        />
-                    </Grid>
-
-                    {/* Add Image Section */}
-                    <Grid item xs={6}>
-                        <Box
+                    <Box
+                        sx={{
+                            display: "flex",
+                            justifyContent: "flex-end",
+                            width: "100%",
+                            mt: 2,
+                        }}
+                    >
+                        <Button
+                            variant="contained"
+                            color="primary"
+                            onClick={handleSubmit}
                             sx={{
-                                border: "1px dashed grey",
-                                height: 120,
-                                display: "flex",
-                                alignItems: "center",
-                                justifyContent: "center",
+                                backgroundColor: "#16A1B8",
+                                "&:hover": { backgroundColor: "#138f9b" },
+                                boxShadow: "0px 0px 10px rgba(0, 0, 0, 0.2)",
+                                borderRadius: "15px",
+                                padding: "12px 24px",
+                                fontSize: "1rem",
+                                minWidth: "150px",
                             }}
                         >
-                            <ImageIcon />
-                            <Typography>Add Image</Typography>
-                        </Box>
-                    </Grid>
-
-                    {/* People to Invite Input */}
-                    <Grid item xs={6}>
-                        <TextField
-                            fullWidth
-                            variant="outlined"
-                            label="Add People to Invite"
-                            multiline
-                            rows={4}
-                        />
-                    </Grid>
-                </Grid>
-
-                {/* Schedule Event Button */}
-                <Button
-                    variant="contained"
-                    color="primary"
-                    fullWidth
-                    sx={{
-                        mt: 2,
-                        backgroundColor: "#16A1B8",
-                        "&:hover": { backgroundColor: "#138f9b" },
-                    }}
-                >
-                    Schedule Event
-                </Button>
-            </CardContent>
-        </Card>
+                            Schedule Event
+                        </Button>
+                    </Box>
+                </CardContent>
+            </Card>
+        </Box>
     );
 };
 
