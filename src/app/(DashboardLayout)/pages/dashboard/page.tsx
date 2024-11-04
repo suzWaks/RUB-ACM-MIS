@@ -15,6 +15,7 @@ const Dashboard = () => {
     { date: "2024-09-26", title: "Joined the ACM chapter" },
     { date: "2024-09-25", title: "Attended the Workshop" },
     { date: "2024-09-24", title: "Completed a Project" },
+    { date: "2024-10-24", title: "Programming contest" },
   ];
 
   const events = [

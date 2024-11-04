@@ -428,10 +428,7 @@ const FinanceDashboard = () => {
               { field: "type", headerName: "Type", width: 150 },
               { field: "description", headerName: "Description", width: 250 },
               { field: "items", headerName: "Items", width: 250 },
-              { field: "eventID", headerName: "Event ID", width: 150 },
-              { field: "createdBy", headerName: "Created By", width: 150 },
-              { field: "createdAt", headerName: "Created At", width: 150 },
-              { field: "updatedAt", headerName: "Updated At", width: 150 },
+              { field: "event", headerName: "Event", width: 150 },
             ]}
             checkboxSelection
           />
