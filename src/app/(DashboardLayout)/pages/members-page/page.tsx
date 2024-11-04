@@ -31,8 +31,8 @@ import FilterListIcon from "@mui/icons-material/FilterList"; // Import Filter ic
 import RefreshIcon from "@mui/icons-material/Refresh"; // Use Refresh icon instead of Clear
 import PageContainer from "@/app/(DashboardLayout)/components/container/PageContainer";
 import StudentGraph from "@/app/(DashboardLayout)/pages/dashboard/GraphProp"; // Import for Graph component
-import theme from "@/utils/theme"; 
-import AddMemberForm from "./AddMemberForm"; 
+import theme from "@/utils/theme";
+import AddMemberForm from "./AddMemberForm";
 
 // Define the Member interface
 interface Member {
@@ -52,7 +52,7 @@ const MembersPage = () => {
       studentNo: "02210200",
       department: "Information Technology",
       email: "jigme@gmail.com",
-      year: "2022",
+      year: "4",
       gender: "Male",
     },
     {
@@ -60,7 +60,7 @@ const MembersPage = () => {
       studentNo: "02210233",
       department: "Geology",
       email: "suzal@gmail.com",
-      year: "2022",
+      year: "4",
       gender: "Female",
     },
     {
@@ -68,7 +68,7 @@ const MembersPage = () => {
       studentNo: "02210228",
       department: "Civil",
       email: "tashi@gmail.com",
-      year: "2022",
+      year: "4",
       gender: "Male",
     },
     {
@@ -76,7 +76,7 @@ const MembersPage = () => {
       studentNo: "02210221",
       department: "Civil",
       email: "pema@gmail.com",
-      year: "2022",
+      year: "4",
       gender: "Female",
     },
     {
@@ -84,34 +84,35 @@ const MembersPage = () => {
       studentNo: "02210196",
       department: "Electrical",
       email: "depashna@gmail.com",
-      year: "2022",
+      year: "4",
       gender: "Female",
     },
-    { name: "Jigme Phuntsho", studentNo: "02210200", department: "Information Technology", email: "jigme@gmail.com", year: "4", gender: "Male" },
-    { name: "Suzal Wakhley", studentNo: "02210233", department: "Geology", email: "suzal@gmail.com", year: "4", gender: "Female" },
-    { name: "Tashi Kuenga", studentNo: "02210228", department: "Civil", email: "tashi@gmail.com", year: "4", gender: "Male" },
-    { name: "Pema Lhamo", studentNo: "02210221", department: "Civil", email: "pema@gmail.com", year: "4", gender: "Female" },
-    { name: "Depashna", studentNo: "02210196", department: "Electrical", email: "depashna@gmail.com", year: "4", gender: "Female" },
   ]);
 
   // State for the search input and filters
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedYear, setSelectedYear] = useState<string | "">("");
   const [selectedDepartment, setSelectedDepartment] = useState<string | "">("");
-  
+
   // State for managing the Add Member form dialog
   const [open, setOpen] = useState(false);
 
   // Filtered members based on search term, year, and department
-  const filteredMembers = members.filter(member => 
-    member.name.toLowerCase().includes(searchTerm.toLowerCase()) &&
-    (selectedYear ? member.year === selectedYear : true) &&
-    (selectedDepartment ? member.department === selectedDepartment : true)
+  const filteredMembers = members.filter(
+    (member) =>
+      member.name.toLowerCase().includes(searchTerm.toLowerCase()) &&
+      (selectedYear ? member.year === selectedYear : true) &&
+      (selectedDepartment ? member.department === selectedDepartment : true)
   );
 
   // Available years and departments (customize as needed)
   const years = ["1", "2", "3", "4"];
-  const departments = ["Information Technology", "Geology", "Civil", "Electrical"];
+  const departments = [
+    "Information Technology",
+    "Geology",
+    "Civil",
+    "Electrical",
+  ];
 
   // Calculations for member statistics
   const totalMembers = members.length;
@@ -159,8 +160,6 @@ const MembersPage = () => {
       description="Members statistics and list overview"
     >
       {/* Member Statistics Section */}
-
-      <Box mb={2}>
       <Box mb={4}>
         <Paper elevation={2} sx={{ padding: 2 }}>
           <Typography
@@ -191,11 +190,6 @@ const MembersPage = () => {
                 data: [50, 70, 80, 90, 105],
                 icon: <GroupIcon />,
               },
-            {[ 
-              { label: "Male Count", data: [20, 30, 40, 50, 40], icon: <MaleIcon /> },
-              { label: "Female Count", data: [40, 50, 55, 60, 20], icon: <FemaleIcon /> },
-              { label: "Others", data: [3, 4, 5, 6, 33], icon: <TransgenderIcon /> },
-              { label: "Total Members", data: [50, 70, 80, 90, 105], icon: <GroupIcon /> },
             ].map((stat, index) => (
               <Grid item xs={6} md={3} key={index}>
                 <Paper elevation={2} sx={{ padding: 0 }}>
@@ -211,7 +205,6 @@ const MembersPage = () => {
                     </Typography>
                     {stat.icon}
                   </Box>
-                  <StudentGraph data={stat.data} color={""} />
                   <StudentGraph data={stat.data} color={graphColors[index]} />
                 </Paper>
               </Grid>
@@ -230,7 +223,12 @@ const MembersPage = () => {
         </Typography>
 
         {/* Search bar and filters for year and department */}
-        <Box display="flex" justifyContent="space-between" mb={2} alignItems="center">
+        <Box
+          display="flex"
+          justifyContent="space-between"
+          mb={2}
+          alignItems="center"
+        >
           {/* Filters Section */}
           <Box display="flex" alignItems="center">
             <Select
@@ -278,8 +276,8 @@ const MembersPage = () => {
               ))}
             </Select>
             <Button
-              variant="outlined" 
-              sx={{ color: "red", borderColor: "red"}} // Set the text color to red
+              variant="outlined"
+              sx={{ color: "red", borderColor: "red" }} // Set the text color to red
               startIcon={<RefreshIcon />}
               onClick={handleResetFilters}
             >
@@ -290,8 +288,8 @@ const MembersPage = () => {
           {/* Search Bar */}
           <TextField
             variant="outlined"
-            placeholder="Search Members"
             size="small"
+            placeholder="Search Members"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             InputProps={{
@@ -302,13 +300,13 @@ const MembersPage = () => {
               ),
             }}
           />
-          
           {/* Add Member Button */}
           <Button
             variant="contained"
             color="primary"
+            onClick={() => setOpen(true)}
             startIcon={<AddIcon />}
-            onClick={() => setOpen(true)} // Open the Add Member form dialog
+            sx={{ ml: 2 }}
           >
             Add New Member
           </Button>
@@ -343,14 +341,16 @@ const MembersPage = () => {
         </TableContainer>
       </Box>
 
-      {/* Dialog for adding new member */}
+      {/* Add Member Dialog */}
       <Dialog open={open} onClose={() => setOpen(false)}>
         <DialogTitle>Add New Member</DialogTitle>
         <DialogContent>
           <AddMemberForm onAddMember={handleAddMember} />
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setOpen(false)}>Cancel</Button>
+          <Button onClick={() => setOpen(false)} color="primary">
+            Cancel
+          </Button>
         </DialogActions>
       </Dialog>
     </PageContainer>
