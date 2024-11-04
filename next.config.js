@@ -5,7 +5,7 @@ const nextConfig = {
     return [
       {
         source: "/",
-        destination: "http://localhost:3000/authentication/login", // Replace with the path to your new default page
+        destination: "/authentication/login", // Replace with the path to your new default page
         permanent: true,
       },
     ];

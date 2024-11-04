@@ -60,7 +60,7 @@ const Login2 = () => {
         const session = await getSession(); // Fetch the session details
         console.log("Session details:", session);
 
-        router.push("http://localhost:3000/pages/dashboard");
+        router.push("/pages/dashboard");
       }
     } catch (error) {
       console.error("Error during sign-in:", error);
