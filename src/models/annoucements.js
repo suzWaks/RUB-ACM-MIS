@@ -21,7 +21,7 @@ const AnnouncementSchema = new Schema(
       ref: "members",
     },
   },
-  { timestamps: true }
+  { timestamps: true } //created at
 );
 
 const announcments =

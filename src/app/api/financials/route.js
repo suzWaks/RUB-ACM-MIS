@@ -14,6 +14,7 @@ export const POST = async (req) => {
       description = "",
       items = [],
       eventID = null,
+      created_by,
     } = await req.json();
 
     // Validate required fields
