@@ -2,11 +2,6 @@ import { Schema, model, models } from "mongoose";
 
 const FinancialSchema = new Schema(
   {
-    currentBalance: {
-      type: Number,
-      default: 0,
-      required: [true, "Amount is required"],
-    },
     balanceUsed: {
       type: Number,
       default: 0,
