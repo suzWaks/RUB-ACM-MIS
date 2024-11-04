@@ -11,6 +11,11 @@ import {
     IconButton,
     Grid,
     InputAdornment,
+    Select,
+    MenuItem,
+    Checkbox,
+    ListItemText,
+    OutlinedInput,
 } from "@mui/material";
 import { DatePicker, TimePicker } from "@mui/x-date-pickers";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
@@ -23,22 +28,53 @@ import LocationOnIcon from "@mui/icons-material/LocationOn";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import DescriptionIcon from "@mui/icons-material/Description";
 import dayjs, { Dayjs } from "dayjs";
-
+import { SelectChangeEvent } from "@mui/material";
 
 interface EventFormProps {
     onClose: () => void;
+    onSubmit: (eventData: any) => void;
 }
 
-const EventForm: React.FC<EventFormProps> = ({ onClose }) => {
+const attendeesOptions = ["First Year", "Second Year", "Third Year", "Fourth Year"];
+
+const EventForm: React.FC<EventFormProps> = ({ onClose, onSubmit }) => {
+    const [eventName, setEventName] = useState("");
+    const [attendees, setAttendees] = useState<string[]>([]);
+    const [location, setLocation] = useState("");
     const [startDate, setStartDate] = useState<Dayjs | null>(null);
     const [startTime, setStartTime] = useState<Dayjs | null>(null);
     const [endDate, setEndDate] = useState<Dayjs | null>(null);
     const [endTime, setEndTime] = useState<Dayjs | null>(null);
+    const [description, setDescription] = useState("");
+
+    const handleSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+        const eventData = {
+            name: eventName,
+            attendees,
+            venue: location,
+            startDate: startDate ? dayjs(startDate).format("MM/DD/YYYY") : "",
+            endDate: endDate ? dayjs(endDate).format("MM/DD/YYYY") : "",
+            startTime: startTime ? dayjs(startTime).format("HH:mm") : "",
+            endTime: endTime ? dayjs(endTime).format("HH:mm") : "",
+            description,
+            status: "Scheduled",
+        };
+
+        console.log("Submitting event data:", eventData);
+        onSubmit(eventData);
+        onClose();
+    };
+
+    const handleAttendeesChange = (event: SelectChangeEvent<string[]>) => {
+        const value = event.target.value as string[];
+        setAttendees(value);
+    };
 
     return (
         <Box
             sx={{
-                position: "fixed", // Makes it a pop-up
+                position: "fixed",
                 top: 0,
                 left: 0,
                 width: "100%",
@@ -46,27 +82,27 @@ const EventForm: React.FC<EventFormProps> = ({ onClose }) => {
                 display: "flex",
                 justifyContent: "center",
                 alignItems: "center",
-                backgroundColor: "rgba(0, 0, 0, 0.5)", // Semi-transparent black background
-                backdropFilter: "blur(10px)", // Adds a blur effect to the background
-                zIndex: 9999, // Ensures the pop-up is on top
+                backgroundColor: "rgba(0, 0, 0, 0.5)",
+                backdropFilter: "blur(10px)",
+                zIndex: 9999,
             }}
         >
             <Card
                 sx={{
                     width: "70%",
-                    height: "80%", // Set a height to enable scrolling
+                    height: "80%",
                     position: "relative",
                     boxShadow: "0px 0px 12px rgba(0, 0, 0, 0.2)",
                     borderRadius: "10px",
-                    backgroundColor: "white", // Ensures the form has a clean white background
-                    marginLeft: '15%', // Adjust this value to shift towards the right
-                    overflow: "hidden", // Prevent overflow of the Card itself
+                    backgroundColor: "white",
+                    marginLeft: '15%',
+                    overflow: "hidden",
                 }}
             >
                 <CardContent
                     sx={{
-                        overflowY: "auto", // Enables vertical scrolling
-                        maxHeight: "100%", // Makes sure it doesn’t exceed the Card height
+                        overflowY: "auto",
+                        maxHeight: "100%",
                     }}
                 >
                     <IconButton
@@ -81,12 +117,13 @@ const EventForm: React.FC<EventFormProps> = ({ onClose }) => {
                     </Typography>
 
                     <Grid container spacing={2}>
-                        {/* Event Name Input */}
                         <Grid item xs={12}>
                             <TextField
                                 fullWidth
                                 variant="outlined"
                                 label="Add Name"
+                                value={eventName}
+                                onChange={(e) => setEventName(e.target.value)}
                                 sx={{ mt: 2 }}
                                 InputProps={{
                                     startAdornment: (
@@ -98,28 +135,40 @@ const EventForm: React.FC<EventFormProps> = ({ onClose }) => {
                             />
                         </Grid>
 
-                        {/* Required Attendees Input */}
+                        {/* Required Attendees Input with Dropdown */}
                         <Grid item xs={12}>
-                            <TextField
+
+                            <Select
                                 fullWidth
+                                multiple
+                                label="Add Attendees"
                                 variant="outlined"
-                                label="Add Required Attendees"
-                                InputProps={{
-                                    startAdornment: (
-                                        <InputAdornment position="start">
-                                            <PeopleIcon />
-                                        </InputAdornment>
-                                    ),
-                                }}
-                            />
+                                displayEmpty
+                                value={attendees}
+                                onChange={handleAttendeesChange}
+                                input={<OutlinedInput startAdornment={
+                                    <InputAdornment position="start">
+                                        <PeopleIcon />
+                                    </InputAdornment>
+                                } />}
+                                renderValue={(selected) => (selected as string[]).join(", ")}
+                            >
+                                {attendeesOptions.map((name) => (
+                                    <MenuItem key={name} value={name}>
+                                        <Checkbox checked={attendees.indexOf(name) > -1} />
+                                        <ListItemText primary={name} />
+                                    </MenuItem>
+                                ))}
+                            </Select>
                         </Grid>
 
-                        {/* Location Input */}
                         <Grid item xs={12}>
                             <TextField
                                 fullWidth
                                 variant="outlined"
-                                label="Add Location"
+                                label="Add Venue"
+                                value={location}
+                                onChange={(e) => setLocation(e.target.value)}
                                 InputProps={{
                                     startAdornment: (
                                         <InputAdornment position="start">
@@ -130,7 +179,6 @@ const EventForm: React.FC<EventFormProps> = ({ onClose }) => {
                             />
                         </Grid>
 
-                        {/* Date and Time Pickers */}
                         <Grid item xs={6}>
                             <LocalizationProvider dateAdapter={AdapterDayjs}>
                                 <DatePicker
@@ -192,12 +240,13 @@ const EventForm: React.FC<EventFormProps> = ({ onClose }) => {
                             </LocalizationProvider>
                         </Grid>
 
-                        {/* Description Input */}
                         <Grid item xs={12}>
                             <TextField
                                 fullWidth
                                 variant="outlined"
                                 label="Add Description"
+                                value={description}
+                                onChange={(e) => setDescription(e.target.value)}
                                 multiline
                                 rows={4}
                                 InputProps={{
@@ -210,7 +259,6 @@ const EventForm: React.FC<EventFormProps> = ({ onClose }) => {
                             />
                         </Grid>
 
-                        {/* Add Image Section */}
                         <Grid item xs={6}>
                             <Box
                                 sx={{
@@ -226,7 +274,6 @@ const EventForm: React.FC<EventFormProps> = ({ onClose }) => {
                             </Box>
                         </Grid>
 
-                        {/* People to Invite Input */}
                         <Grid item xs={6}>
                             <TextField
                                 fullWidth
@@ -241,22 +288,23 @@ const EventForm: React.FC<EventFormProps> = ({ onClose }) => {
                     <Box
                         sx={{
                             display: "flex",
-                            justifyContent: "flex-end", // Aligns the button to the right
-                            width: "100%", // Make sure the container takes full width
+                            justifyContent: "flex-end",
+                            width: "100%",
                             mt: 2,
                         }}
                     >
                         <Button
                             variant="contained"
                             color="primary"
+                            onClick={handleSubmit}
                             sx={{
                                 backgroundColor: "#16A1B8",
                                 "&:hover": { backgroundColor: "#138f9b" },
                                 boxShadow: "0px 0px 10px rgba(0, 0, 0, 0.2)",
                                 borderRadius: "15px",
-                                padding: "12px 24px", // Increase padding for a bigger button
-                                fontSize: "1rem", // Increase font size
-                                minWidth: "150px", // Increase minimum width
+                                padding: "12px 24px",
+                                fontSize: "1rem",
+                                minWidth: "150px",
                             }}
                         >
                             Schedule Event
