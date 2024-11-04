@@ -5,7 +5,7 @@ import React from "react";
 import { Typography, Card, Grid, Box, LinearProgress } from "@mui/material";
 import { Line, Bar, Pie } from "react-chartjs-2";
 import PageContainer from "@/app/(DashboardLayout)/components/container/PageContainer";
-import DashboardCard from "@/app/(DashboardLayout)/components/shared/DashboardCard";
+import { useRouter } from "next/navigation";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -24,7 +24,6 @@ import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import DirectionsCarIcon from "@mui/icons-material/DirectionsCar";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import theme from "@/utils/theme";
-import { CircularProgress } from "@mui/material";
 
 // Register Chart.js components
 ChartJS.register(
@@ -39,6 +38,7 @@ ChartJS.register(
 );
 
 const FinanceDashboard = () => {
+  const router = useRouter();
   const themeColors = {
     primary_blue: "#027BFE",
     primary_purple: "#6F42C1",
@@ -183,6 +183,9 @@ const FinanceDashboard = () => {
         backgroundColor: themeColors.secondary_teal,
       },
     ],
+  };
+  const handleSeeFullHistory = () => {
+    router.push("/pages/finance-page/RecentTrans");
   };
 
   return (
