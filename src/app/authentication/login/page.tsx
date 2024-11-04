@@ -12,9 +12,67 @@ import {
 import GoogleIcon from "@mui/icons-material/Google";
 import Logo from "@/app/(DashboardLayout)/layout/shared/logo/Logo";
 import Image from "next/image";
+import { signIn, useSession, getSession } from "next-auth/react";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { Snackbar, Alert } from "@mui/material";
 
 const Login2 = () => {
   const theme = useTheme();
+  const { data: session, status } = useSession();
+  const router = useRouter();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState(""); // State for error messages
+  const [open, setOpen] = useState(false); // State for alert visibility
+
+  /*
+   *Not needed Just for debugging purposes.
+   */
+  useEffect(() => {
+    // Print session data to the console when session changes
+    if (session) {
+      console.log("Session Data:", session);
+    } else if (status === "unauthenticated") {
+      console.log("No active session found.");
+    }
+  }, [session, status]);
+
+  if (status === "loading") {
+    return <p>Loading...</p>;
+  }
+
+  const handleSignIn = async (e: { preventDefault: () => void }) => {
+    e.preventDefault();
+
+    try {
+      const result = await signIn("credentials", {
+        redirect: false,
+        email,
+        password,
+      });
+
+      if (result?.error) {
+        console.log("Sign-in failed:", result.error);
+        setError("Incorrect Username or Password"); // Set the error message
+        setOpen(true); // Open the alert
+      } else {
+        const session = await getSession(); // Fetch the session details
+        console.log("Session details:", session);
+
+        router.push("http://localhost:3000/pages/dashboard");
+      }
+    } catch (error) {
+      console.error("Error during sign-in:", error);
+      setError("An unexpected error occurred."); // Set a generic error message
+      setOpen(true); // Open the alert
+    }
+  };
+
+  const handleClose = () => {
+    setOpen(false); // Close the alert
+    setError(""); // Clear the error message
+  };
 
   return (
     <Box
@@ -24,6 +82,13 @@ const Login2 = () => {
         height: "100vh",
       }}
     >
+      {/* Snackbar for displaying alerts */}
+      <Snackbar open={open} autoHideDuration={6000} onClose={handleClose}>
+        <Alert onClose={handleClose} severity="error" sx={{ width: "100%" }}>
+          {error}
+        </Alert>
+      </Snackbar>
+
       <Grid container sx={{ height: "100%" }}>
         <Grid
           item
@@ -63,6 +128,7 @@ const Login2 = () => {
                 name="email"
                 autoComplete="email"
                 autoFocus
+                onChange={(e) => setEmail(e.target.value)}
               />
               <TextField
                 margin="normal"
@@ -73,6 +139,7 @@ const Login2 = () => {
                 type="password"
                 id="password"
                 autoComplete="current-password"
+                onChange={(e) => setPassword(e.target.value)}
               />
               <Stack direction="row" justifyContent="space-between" mt={2}>
                 <Stack direction="row" spacing={1} alignItems="center">
@@ -99,6 +166,7 @@ const Login2 = () => {
                 variant="contained"
                 color="primary"
                 sx={{ mt: 3, mb: 2 }}
+                onClick={handleSignIn}
               >
                 Log in
               </Button>
@@ -154,7 +222,12 @@ const Login2 = () => {
               top: "70%",
             }}
           >
-            <Box display="flex" flexDirection="column" alignItems="flex-start" mb={1}>
+            <Box
+              display="flex"
+              flexDirection="column"
+              alignItems="flex-start"
+              mb={1}
+            >
               <Box sx={{ width: 80, height: 80, position: "relative", mb: 1 }}>
                 <Image
                   src="/images/logos/cstlogo.png"

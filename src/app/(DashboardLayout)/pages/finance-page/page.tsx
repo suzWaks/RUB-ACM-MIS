@@ -1,9 +1,9 @@
 // FinancePage.js
 
 "use client";
-import React from 'react';
-import { Typography, Card, Grid, Box, LinearProgress } from '@mui/material';
-import { Line, Bar, Pie } from 'react-chartjs-2';
+import React from "react";
+import { Typography, Card, Grid, Box, LinearProgress } from "@mui/material";
+import { Line, Bar, Pie } from "react-chartjs-2";
 import PageContainer from "@/app/(DashboardLayout)/components/container/PageContainer";
 import DashboardCard from "@/app/(DashboardLayout)/components/shared/DashboardCard";
 import {
@@ -24,10 +24,7 @@ import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import DirectionsCarIcon from "@mui/icons-material/DirectionsCar";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import theme from "@/utils/theme";
-import { CircularProgress } from '@mui/material';
-
-
-
+import { CircularProgress } from "@mui/material";
 
 // Register Chart.js components
 ChartJS.register(
@@ -52,9 +49,33 @@ const FinanceDashboard = () => {
 
   // Data for the balance overview, report expenses, and funds
   const balanceOverview = [
-    { title: 'Current Balance', amount: 'Nu.3,120.49', icon: <AccountBalanceWalletIcon sx={{ fontSize: 40, color: theme.palette.primary.dark }} /> },
-    { title: 'Balance Gained', amount: 'Nu.5,992.94', icon: <TrendingUpIcon sx={{ fontSize: 40, color: theme.palette.secondary.main }} /> },
-    { title: 'Balance Used', amount: 'Nu.12,488.04', icon: <TrendingDownIcon sx={{ fontSize: 40, color: theme.palette.secondary_teal.main }} /> }
+    {
+      title: "Current Balance",
+      amount: "Nu.3,120.49",
+      icon: (
+        <AccountBalanceWalletIcon
+          sx={{ fontSize: 40, color: theme.palette.primary.dark }}
+        />
+      ),
+    },
+    {
+      title: "Balance Gained",
+      amount: "Nu.5,992.94",
+      icon: (
+        <TrendingUpIcon
+          sx={{ fontSize: 40, color: theme.palette.secondary.main }}
+        />
+      ),
+    },
+    {
+      title: "Balance Used",
+      amount: "Nu.12,488.04",
+      icon: (
+        <TrendingDownIcon
+          sx={{ fontSize: 40, color: theme.palette.secondary_teal.main }}
+        />
+      ),
+    },
   ];
 
   const reportExpenseData = {
@@ -326,13 +347,31 @@ const FinanceDashboard = () => {
       <Grid container spacing={3} sx={{ mt: 3 }}>
         {/* Recent Transactions Section */}
         <Grid item xs={12} md={6}>
-          <Card sx={{ p: 2, height: "280px", borderRadius: '16px', boxShadow: '0px 0px 10px rgba(0, 0, 0, 0.1)' }}>
-            <Typography variant="h6" sx={{ mb: 2 }}>Payment Transactions</Typography>
+          <Card
+            sx={{
+              p: 2,
+              height: "280px",
+              borderRadius: "16px",
+              boxShadow: "0px 0px 10px rgba(0, 0, 0, 0.1)",
+            }}
+          >
+            <Typography variant="h6" sx={{ mb: 2 }}>
+              Payment Transactions
+            </Typography>
 
             {/* Total and filter dropdown */}
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                mb: 2,
+              }}
+            >
               <Typography variant="h4">Nu. 2,193.21</Typography>
-              <Typography variant="body2" sx={{ color: 'gray' }}>This Month</Typography>
+              <Typography variant="body2" sx={{ color: "gray" }}>
+                This Month
+              </Typography>
             </Box>
 
             {/* Transaction list */}
@@ -340,31 +379,44 @@ const FinanceDashboard = () => {
               <Box
                 key={index}
                 sx={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                  boxShadow: '0px 0px 10px rgba(0, 0, 0, 0.1)',
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  boxShadow: "0px 0px 10px rgba(0, 0, 0, 0.1)",
                   mb: 2,
-                  borderBottom: '1px solid #f0f0f0',
-                  pb: 2
+                  borderBottom: "1px solid #f0f0f0",
+                  pb: 2,
                 }}
               >
                 {/* Left section with icon and text */}
-                <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                  <Box sx={{ mr: 2 }}>
-                    {transaction.icon}
-                  </Box>
+                <Box sx={{ display: "flex", alignItems: "center" }}>
+                  <Box sx={{ mr: 2 }}>{transaction.icon}</Box>
                   <Box>
-                    <Typography variant="body1" sx={{ fontWeight: 'bold' }}>{transaction.title}</Typography>
-                    <Typography variant="body2" sx={{ color: 'gray' }}>{transaction.description}</Typography>
+                    <Typography variant="body1" sx={{ fontWeight: "bold" }}>
+                      {transaction.title}
+                    </Typography>
+                    <Typography variant="body2" sx={{ color: "gray" }}>
+                      {transaction.description}
+                    </Typography>
                   </Box>
                 </Box>
 
                 {/* Right section with amount and action icons */}
-                <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                  <Typography variant="body1" sx={{ fontWeight: 'bold', mr: 2 }}>{transaction.amount}</Typography>
+                <Box sx={{ display: "flex", alignItems: "center" }}>
+                  <Typography
+                    variant="body1"
+                    sx={{ fontWeight: "bold", mr: 2 }}
+                  >
+                    {transaction.amount}
+                  </Typography>
                   {transaction.actionIcon}
-                  <ArrowForwardIcon sx={{ fontSize: 16, ml: 1, color: themeColors.primary_blue }} />
+                  <ArrowForwardIcon
+                    sx={{
+                      fontSize: 16,
+                      ml: 1,
+                      color: themeColors.primary_blue,
+                    }}
+                  />
                 </Box>
               </Box>
             ))}
@@ -372,7 +424,12 @@ const FinanceDashboard = () => {
             {/* Full History Link */}
             <Typography
               variant="body2"
-              sx={{ textAlign: 'center', color: themeColors.secondary_teal, cursor: 'pointer', mt: 2 }}
+              sx={{
+                textAlign: "center",
+                color: themeColors.secondary_teal,
+                cursor: "pointer",
+                mt: 2,
+              }}
             >
               See Full History
             </Typography>
@@ -381,20 +438,31 @@ const FinanceDashboard = () => {
 
         {/* Expenses Graph Section */}
         <Grid item xs={12} md={6}>
-          <Card sx={{ p: 2, height: "280px", borderRadius: '16px', boxShadow: '0px 0px 10px rgba(0, 0, 0, 0.1)' }}>
+          <Card
+            sx={{
+              p: 2,
+              height: "280px",
+              borderRadius: "16px",
+              boxShadow: "0px 0px 10px rgba(0, 0, 0, 0.1)",
+            }}
+          >
             <Typography variant="h6">Expenses</Typography>
             <Bar data={expenseGraphData} />
           </Card>
         </Grid>
       </Grid>
-    </Box >
+    </Box>
   );
 };
 
 const FinancePage = () => {
   return (
     <PageContainer title="Finance Page" description="Finance page">
-      <Typography variant="h3" sx={{ color: theme.palette.primary.main, fontWeight: 'bold' }} mb={2}>
+      <Typography
+        variant="h3"
+        sx={{ color: theme.palette.primary.main, fontWeight: "bold" }}
+        mb={2}
+      >
         Finance
       </Typography>
       <FinanceDashboard />

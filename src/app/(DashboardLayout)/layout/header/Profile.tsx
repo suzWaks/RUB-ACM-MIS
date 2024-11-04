@@ -12,6 +12,7 @@ import {
 } from "@mui/material";
 
 import { IconListCheck, IconMail, IconUser } from "@tabler/icons-react";
+import { signOut } from "next-auth/react";
 
 const Profile = () => {
   const [anchorEl2, setAnchorEl2] = useState(null);
@@ -20,6 +21,10 @@ const Profile = () => {
   };
   const handleClose2 = () => {
     setAnchorEl2(null);
+  };
+
+  const handleSignOut = () => {
+    signOut({ callbackUrl: "http://localhost:3000/authentication/login" });
   };
 
   return (
@@ -85,11 +90,12 @@ const Profile = () => {
         </MenuItem>
         <Box mt={1} py={1} px={2}>
           <Button
-            href="/authentication/login"
+            onClick={handleSignOut}
             variant="outlined"
             color="primary"
             component={Link}
             fullWidth
+            href="/authentication/login"
           >
             Logout
           </Button>
