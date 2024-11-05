@@ -61,9 +61,7 @@ const Dashboard = () => {
 
   const fetchMemberStats = async () => {
     try {
-      const response = await fetch(
-        " http://localhost:3000/api/members/fetchMemberStats"
-      );
+      const response = await fetch("/api/members/fetchMemberStats");
 
       if (!response.ok) {
         throw new Error("Network response was not ok");
@@ -77,9 +75,7 @@ const Dashboard = () => {
 
   const fetchAnnouncement = async () => {
     try {
-      const response = await fetch(
-        " http://localhost:3000/api/announcements/lastestAnnouncement"
-      );
+      const response = await fetch("/api/announcements/lastestAnnouncement");
       if (!response.ok) {
         throw new Error("Network response was not ok");
       }
@@ -92,9 +88,7 @@ const Dashboard = () => {
 
   const fetchRecentActivity = async () => {
     try {
-      const response = await fetch(
-        " http://localhost:3000/api/events/fetchRecentActivities"
-      );
+      const response = await fetch("/api/events/fetchRecentActivities");
       if (!response.ok) {
         throw new Error("Network response was not ok");
       }
