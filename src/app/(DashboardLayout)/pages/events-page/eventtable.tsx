@@ -222,18 +222,21 @@ const EventTable: React.FC<EventTableProps> = ({ events, onClose, onEdit, onDele
                 <EventDetail
                     eventData={{
                         name: selectedEvent.title,
-                        attendees: selectedEvent.attendees || "",
+                        attendees: selectedEvent.attendees ? selectedEvent.attendees.split(',') : [], // Convert to array
                         venue: selectedEvent.venue || "",
                         startDate: new Date(selectedEvent.start).toLocaleDateString(),
-                        endDate: selectedEvent.end ? new Date(selectedEvent.end).toLocaleDateString() : "-",
                         startTime: selectedEvent.startTime || "",
-                        endTime: selectedEvent.endTime || "",
                         description: selectedEvent.description || "",
                         status: selectedEvent.status || "Scheduled"
                     }}
                     onClose={handleCloseDetails}
+                    onSubmit={(eventData) => {
+                        console.log("Submitted event data:", eventData);
+                        handleCloseDetails();
+                    }}
                 />
             )}
+
         </div>
     );
 };
