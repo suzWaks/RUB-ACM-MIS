@@ -217,7 +217,26 @@ const EventTable: React.FC<EventTableProps> = ({
               }}
             />
           </LocalizationProvider>
+            {showForm && <EventForm onClose={handleCloseForm} onSubmit={(eventData) => {/* handle event creation here */ }} />}
 
+            {showDetails && selectedEvent && (
+                <EventDetail
+                    eventData={{
+                        name: selectedEvent.title,
+                        attendees: selectedEvent.attendees ? selectedEvent.attendees.split(',') : [], // Convert to array
+                        venue: selectedEvent.venue || "",
+                        startDate: new Date(selectedEvent.start).toLocaleDateString(),
+                        startTime: selectedEvent.startTime || "",
+                        description: selectedEvent.description || "",
+                        status: selectedEvent.status || "Scheduled"
+                    }}
+                    onClose={handleCloseDetails}
+                    onSubmit={(eventData) => {
+                        console.log("Submitted event data:", eventData);
+                        handleCloseDetails();
+                    }}
+                />
+            )}
           <TextField
             select
             value={status}
