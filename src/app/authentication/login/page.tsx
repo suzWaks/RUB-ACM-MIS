@@ -16,6 +16,7 @@ import { signIn, useSession, getSession } from "next-auth/react";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Snackbar, Alert } from "@mui/material";
+import Loading from "@/app/loading";
 
 const Login2 = () => {
   const theme = useTheme();
@@ -39,7 +40,7 @@ const Login2 = () => {
   }, [session, status]);
 
   if (status === "loading") {
-    return <p>Loading...</p>;
+    return <Loading/>;
   }
 
   const handleSignIn = async (e: { preventDefault: () => void }) => {

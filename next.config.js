@@ -5,7 +5,7 @@ const nextConfig = {
     return [
       {
         source: "/",
-        destination: "/authentication/login", // Replace with the path to your new default page
+        destination: "/authentication/login",
         permanent: true,
       },
     ];

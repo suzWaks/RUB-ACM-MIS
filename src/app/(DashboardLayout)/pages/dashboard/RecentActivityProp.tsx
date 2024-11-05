@@ -10,7 +10,15 @@ import {
   TimelineContent,
   timelineOppositeContentClasses,
 } from "@mui/lab";
-import { Link, Typography, useTheme, Dialog, DialogContent, DialogTitle, Backdrop } from "@mui/material";
+import {
+  Link,
+  Typography,
+  useTheme,
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  Backdrop,
+} from "@mui/material";
 import "./RecentActivity.css";
 
 interface Activity {
@@ -68,7 +76,7 @@ const RecentActivity: React.FC<RecentActivityProps> = ({ activities }) => {
               },
             }}
           >
-            {(activities.slice(0, 3)).map((activity, index) => (
+            {activities.slice(0, 3).map((activity, index) => (
               <TimelineItem key={index} sx={{ paddingBottom: "20px" }}>
                 <TimelineOppositeContent
                   sx={{ marginRight: 2, marginBottom: "10px" }}
@@ -101,7 +109,7 @@ const RecentActivity: React.FC<RecentActivityProps> = ({ activities }) => {
                     sx={{ backgroundColor: "#e0e0e0" }}
                   />
                 </TimelineSeparator>
-                <TimelineContent sx={{ padding: 0, marginLeft: "10px" }}>
+                <TimelineContent sx={{ padding: 0, marginLeft: "20px" }}>
                   <Typography
                     fontWeight="600"
                     variant="body1"
@@ -152,7 +160,9 @@ const RecentActivity: React.FC<RecentActivityProps> = ({ activities }) => {
           },
         }}
       >
-        <DialogTitle sx={{ textAlign: "center", color: "#6f42c1" }}>All Activities</DialogTitle>
+        <DialogTitle sx={{ textAlign: "center", color: "#6f42c1" }}>
+          All Activities
+        </DialogTitle>
         <DialogContent dividers sx={{ maxHeight: "70vh" }}>
           <Timeline
             className="theme-timeline"
@@ -171,7 +181,9 @@ const RecentActivity: React.FC<RecentActivityProps> = ({ activities }) => {
           >
             {activities.map((activity, index) => (
               <TimelineItem key={index} sx={{ paddingBottom: "20px" }}>
-                <TimelineOppositeContent sx={{ marginRight: 2, marginBottom: "10px" }}>
+                <TimelineOppositeContent
+                  sx={{ marginRight: 2, marginBottom: "10px" }}
+                >
                   <Typography variant="body2" sx={{ color: "#666" }}>
                     {new Date(activity.date).toLocaleDateString(undefined, {
                       year: "numeric",
@@ -195,8 +207,12 @@ const RecentActivity: React.FC<RecentActivityProps> = ({ activities }) => {
                     sx={{ backgroundColor: "#e0e0e0" }}
                   />
                 </TimelineSeparator>
-                <TimelineContent sx={{ padding: 0, marginLeft: "10px" }}>
-                  <Typography fontWeight="600" variant="body1" sx={{ marginBottom: 1 }}>
+                <TimelineContent sx={{ padding: 0, marginLeft: "20px" }}>
+                  <Typography
+                    fontWeight="600"
+                    variant="body1"
+                    sx={{ marginBottom: 1 }}
+                  >
                     {activity.title}
                   </Typography>
                 </TimelineContent>

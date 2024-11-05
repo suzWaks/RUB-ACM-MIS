@@ -24,7 +24,7 @@ const Profile = () => {
   };
 
   const handleSignOut = () => {
-    signOut({ callbackUrl: "http://localhost:3000/authentication/login" });
+    signOut({ callbackUrl: "/authentication/login" });
   };
 
   return (
@@ -75,18 +75,6 @@ const Profile = () => {
           <Link href="/pages/profile-page">
             <ListItemText>My Profile</ListItemText>
           </Link>
-        </MenuItem>
-        <MenuItem>
-          <ListItemIcon>
-            <IconMail width={20} />
-          </ListItemIcon>
-          <ListItemText>My Account</ListItemText>
-        </MenuItem>
-        <MenuItem>
-          <ListItemIcon>
-            <IconListCheck width={20} />
-          </ListItemIcon>
-          <ListItemText>My Tasks</ListItemText>
         </MenuItem>
         <Box mt={1} py={1} px={2}>
           <Button
