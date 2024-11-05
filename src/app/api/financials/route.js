@@ -1,5 +1,6 @@
 import { connectToDB } from "../../../utils/database";
 import financials from "../../../models/financials";
+import OverallBudget from "../../../models/overallBudget";
 import mongoose from "mongoose";
 import { NextResponse } from "next/server";
 
@@ -14,7 +15,6 @@ export const POST = async (req) => {
       description = "",
       items = [],
       eventID = null,
-      created_by,
     } = await req.json();
 
     // Validate required fields
@@ -41,9 +41,25 @@ export const POST = async (req) => {
 
     const savedFinancial = await newFinRecord.save();
 
-    // Return the newly created financial record
-    return new Response(JSON.stringify("New Finance Record Added"), {
+    const overallBudget = await OverallBudget.findOne(); // Find the overall budget document
+    if (overallBudget) {
+      // Update the balanceUsed based on the transaction type
+      if (type === "expense") {
+        overallBudget.balanceUsed += amount; // Increase the used balance for expenses
+      } else if (type === "income") {
+        overallBudget.totalBudget -= amount; // Decrease the used balance for income (if it is a credit to the budget)
+      }
+
+      // Save the updated overall budget document
+      await overallBudget.save();
+    } else {
+      console.error("Overall budget document not found.");
+    }
+
+    // Return the newly created financial record as JSON
+    return new Response(JSON.stringify(savedFinancial), {
       status: 201,
+      headers: { "Content-Type": "application/json" },
     });
   } catch (error) {
     return new Response(
@@ -117,13 +133,32 @@ export async function DELETE(req) {
         );
       }
 
+      const overallBudget = await OverallBudget.findOne();
+      if (overallBudget) {
+        if (deletedRecord.type == "Expense") {
+          overallBudget.balanceUsed -= deletedRecord.amount;
+        } else if ((deletedRecord.type = "Income")) {
+          overallBudget.totalBudget -= deletedRecord.amount;
+        }
+        // Save the updated overall budget document
+        await overallBudget.save();
+      } else {
+        console.error("Overall budget document not found.");
+      }
+
       return NextResponse.json({ message: "Record deleted" }, deletedRecord, {
         status: 200,
       });
     } else {
       // Delete all financial records
       const financeRecords = await financials.deleteMany();
-
+      // Assuming you want to reset the overall budget as well
+      const overallBudget = await OverallBudget.findOne();
+      if (overallBudget) {
+        overallBudget.balanceUsed = 0;
+        overallBudget.totalBudget = 20000; // Reset total budget if needed
+        await overallBudget.save(); // Save the reset overall budget
+      }
       // Return all financial records
       return NextResponse.json(
         { message: "All financial records deleted" },
