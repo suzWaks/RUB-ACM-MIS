@@ -433,6 +433,7 @@ const FinanceDashboard = () => {
                 cursor: "pointer",
                 mt: 2,
               }}
+              onClick={handleSeeFullHistory} // Add onClick here
             >
               See Full History
             </Typography>
