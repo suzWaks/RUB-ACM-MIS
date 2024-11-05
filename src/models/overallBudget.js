@@ -1,20 +1,20 @@
 import { Schema, model, models } from "mongoose";
 
-const FinancialSchema = new Schema(
+const overallBudgetSchema = new Schema(
   {
     balanceUsed: {
       type: Number,
       default: 0,
-      required: [true, "Amount is required"],
+      required: [true, "Balance used is required"],
     },
     totalBudget: {
       type: Number,
-      default: 0,
-      required: [true, "Amount is required"],
+      required: [true, "Total budget is required"],
     },
   },
   { timestamps: true }
 );
 
-const financials = models.financials || model("financials", FinancialSchema);
-export default financials;
+const OverallBudget =
+  models.OverallBudget || model("OverallBudget", overallBudgetSchema);
+export default OverallBudget;
