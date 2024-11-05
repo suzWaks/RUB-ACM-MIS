@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import DashboardCard from "@/app/(DashboardLayout)/components/shared/DashboardCard";
 import {
   Timeline,
@@ -10,7 +10,15 @@ import {
   TimelineContent,
   timelineOppositeContentClasses,
 } from "@mui/lab";
-import { Link, Typography, useTheme } from "@mui/material";
+import {
+  Link,
+  Typography,
+  useTheme,
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  Backdrop,
+} from "@mui/material";
 import "./RecentActivity.css";
 
 interface Activity {
@@ -24,8 +32,11 @@ interface RecentActivityProps {
 
 const RecentActivity: React.FC<RecentActivityProps> = ({ activities }) => {
   const theme = useTheme();
-
+  const [open, setOpen] = useState(false);
   const colors = ["#6f42c1", "#007BFF", "#00CCCC", "#0DCAF0"];
+
+  const handleShowMore = () => setOpen(true);
+  const handleClose = () => setOpen(false);
 
   return (
     <div
@@ -65,7 +76,7 @@ const RecentActivity: React.FC<RecentActivityProps> = ({ activities }) => {
               },
             }}
           >
-            {activities.map((activity, index) => (
+            {activities.slice(0, 3).map((activity, index) => (
               <TimelineItem key={index} sx={{ paddingBottom: "20px" }}>
                 <TimelineOppositeContent
                   sx={{ marginRight: 2, marginBottom: "10px" }}
@@ -98,7 +109,7 @@ const RecentActivity: React.FC<RecentActivityProps> = ({ activities }) => {
                     sx={{ backgroundColor: "#e0e0e0" }}
                   />
                 </TimelineSeparator>
-                <TimelineContent sx={{ padding: 0, marginLeft: "10px" }}>
+                <TimelineContent sx={{ padding: 0, marginLeft: "20px" }}>
                   <Typography
                     fontWeight="600"
                     variant="body1"
@@ -113,13 +124,14 @@ const RecentActivity: React.FC<RecentActivityProps> = ({ activities }) => {
             ))}
           </Timeline>
           <Link
-            href="/"
+            onClick={handleShowMore}
             underline="none"
             sx={{
               display: "block",
               textAlign: "center",
               marginTop: "20px",
               color: "#6f42c1",
+              cursor: "pointer",
               "&:hover": {
                 textDecoration: "underline",
               },
@@ -130,6 +142,85 @@ const RecentActivity: React.FC<RecentActivityProps> = ({ activities }) => {
           </Link>
         </>
       </DashboardCard>
+
+      <Dialog
+        open={open}
+        onClose={handleClose}
+        maxWidth="sm"
+        fullWidth
+        BackdropProps={{
+          style: {
+            backgroundColor: "rgba(0, 0, 0, 0.5)", // Blurred dark background
+          },
+        }}
+        sx={{
+          "& .MuiDialog-paper": {
+            margin: "auto", // Centers the dialog in the viewport
+            overflowY: "auto", // Allows scrolling for large content
+          },
+        }}
+      >
+        <DialogTitle sx={{ textAlign: "center", color: "#6f42c1" }}>
+          All Activities
+        </DialogTitle>
+        <DialogContent dividers sx={{ maxHeight: "70vh" }}>
+          <Timeline
+            className="theme-timeline"
+            sx={{
+              padding: 0,
+              "& .MuiTimelineConnector-root": {
+                width: "2px",
+                backgroundColor: "#e0e0e0",
+              },
+              [`& .${timelineOppositeContentClasses.root}`]: {
+                flex: 0.5,
+                paddingLeft: 0,
+                color: "#666",
+              },
+            }}
+          >
+            {activities.map((activity, index) => (
+              <TimelineItem key={index} sx={{ paddingBottom: "20px" }}>
+                <TimelineOppositeContent
+                  sx={{ marginRight: 2, marginBottom: "10px" }}
+                >
+                  <Typography variant="body2" sx={{ color: "#666" }}>
+                    {new Date(activity.date).toLocaleDateString(undefined, {
+                      year: "numeric",
+                      month: "long",
+                      day: "numeric",
+                    })}
+                  </Typography>
+                </TimelineOppositeContent>
+                <TimelineSeparator>
+                  <TimelineDot
+                    className="animate"
+                    sx={{
+                      backgroundColor: colors[index % colors.length],
+                      width: 10,
+                      height: 10,
+                      margin: 0,
+                    }}
+                  />
+                  <TimelineConnector
+                    className="animate"
+                    sx={{ backgroundColor: "#e0e0e0" }}
+                  />
+                </TimelineSeparator>
+                <TimelineContent sx={{ padding: 0, marginLeft: "20px" }}>
+                  <Typography
+                    fontWeight="600"
+                    variant="body1"
+                    sx={{ marginBottom: 1 }}
+                  >
+                    {activity.title}
+                  </Typography>
+                </TimelineContent>
+              </TimelineItem>
+            ))}
+          </Timeline>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

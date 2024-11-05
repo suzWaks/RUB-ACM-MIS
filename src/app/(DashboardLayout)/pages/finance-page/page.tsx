@@ -5,7 +5,7 @@ import React from "react";
 import { Typography, Card, Grid, Box, LinearProgress } from "@mui/material";
 import { Line, Bar, Pie } from "react-chartjs-2";
 import PageContainer from "@/app/(DashboardLayout)/components/container/PageContainer";
-import DashboardCard from "@/app/(DashboardLayout)/components/shared/DashboardCard";
+import { useRouter } from "next/navigation";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -24,8 +24,6 @@ import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import DirectionsCarIcon from "@mui/icons-material/DirectionsCar";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import theme from "@/utils/theme";
-import { CircularProgress } from "@mui/material";
-import { DataGrid } from "@mui/x-data-grid"; // Import DataGrid
 
 // Register Chart.js components
 ChartJS.register(
@@ -40,6 +38,7 @@ ChartJS.register(
 );
 
 const FinanceDashboard = () => {
+  const router = useRouter();
   const themeColors = {
     primary_blue: "#027BFE",
     primary_purple: "#6F42C1",
@@ -184,6 +183,9 @@ const FinanceDashboard = () => {
         backgroundColor: themeColors.secondary_teal,
       },
     ],
+  };
+  const handleSeeFullHistory = () => {
+    router.push("/pages/finance-page/RecentTrans");
   };
 
   return (
@@ -351,39 +353,90 @@ const FinanceDashboard = () => {
           <Card
             sx={{
               p: 2,
-              borderRadius: "25px", // Match card style
-              boxShadow: "0px 0px 10px rgba(0, 0, 0, 0.1)", // Match shadow
-              backgroundColor: "#ffffff",
+              height: "280px",
+              borderRadius: "16px",
+              boxShadow: "0px 0px 10px rgba(0, 0, 0, 0.1)",
             }}
           >
-            <Typography variant="h6" color="black" sx={{ fontWeight: "bold" }}>
-              Recent Transactions
+            <Typography variant="h6" sx={{ mb: 2 }}>
+              Payment Transactions
             </Typography>
+
+            {/* Total and filter dropdown */}
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                mb: 2,
+              }}
+            >
+              <Typography variant="h4">Nu. 2,193.21</Typography>
+              <Typography variant="body2" sx={{ color: "gray" }}>
+                This Month
+              </Typography>
+            </Box>
+
+            {/* Transaction list */}
             {transactionData.map((transaction, index) => (
               <Box
                 key={index}
-                display="flex"
-                justifyContent="space-between"
-                alignItems="center"
-                sx={{ borderBottom: "1px solid #e0e0e0", py: 2 }}
+                sx={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  boxShadow: "0px 0px 10px rgba(0, 0, 0, 0.1)",
+                  mb: 2,
+                  borderBottom: "1px solid #f0f0f0",
+                  pb: 2,
+                }}
               >
+                {/* Left section with icon and text */}
                 <Box sx={{ display: "flex", alignItems: "center" }}>
-                  {transaction.icon}
-                  <Box sx={{ ml: 1 }}>
-                    <Typography variant="body1" color="textPrimary">
+                  <Box sx={{ mr: 2 }}>{transaction.icon}</Box>
+                  <Box>
+                    <Typography variant="body1" sx={{ fontWeight: "bold" }}>
                       {transaction.title}
                     </Typography>
-                    <Typography variant="body2" color="textSecondary">
+                    <Typography variant="body2" sx={{ color: "gray" }}>
                       {transaction.description}
                     </Typography>
                   </Box>
                 </Box>
-                <Typography variant="body1" color="textPrimary">
-                  {transaction.amount}
-                </Typography>
-                <Box>{transaction.actionIcon}</Box>
+
+                {/* Right section with amount and action icons */}
+                <Box sx={{ display: "flex", alignItems: "center" }}>
+                  <Typography
+                    variant="body1"
+                    sx={{ fontWeight: "bold", mr: 2 }}
+                  >
+                    {transaction.amount}
+                  </Typography>
+                  {transaction.actionIcon}
+                  <ArrowForwardIcon
+                    sx={{
+                      fontSize: 16,
+                      ml: 1,
+                      color: themeColors.primary_blue,
+                    }}
+                  />
+                </Box>
               </Box>
             ))}
+
+            {/* Full History Link */}
+            <Typography
+              variant="body2"
+              sx={{
+                textAlign: "center",
+                color: themeColors.secondary_teal,
+                cursor: "pointer",
+                mt: 2,
+              }}
+              onClick={handleSeeFullHistory} // Add onClick here
+            >
+              See Full History
+            </Typography>
           </Card>
         </Grid>
 
@@ -392,61 +445,30 @@ const FinanceDashboard = () => {
           <Card
             sx={{
               p: 2,
-              borderRadius: "25px", // Match card style
-              boxShadow: "0px 0px 10px rgba(0, 0, 0, 0.1)", // Match shadow
-              backgroundColor: "#ffffff",
+              height: "280px",
+              borderRadius: "16px",
+              boxShadow: "0px 0px 10px rgba(0, 0, 0, 0.1)",
             }}
           >
-            <Typography variant="h6" color="black" sx={{ fontWeight: "bold" }}>
-              Expenses Graph
-            </Typography>
-            <Box sx={{ height: 300 }}>
-              <Bar
-                data={expenseGraphData}
-                options={{ maintainAspectRatio: false }}
-              />
-            </Box>
+            <Typography variant="h6">Expenses</Typography>
+            <Bar data={expenseGraphData} />
           </Card>
         </Grid>
       </Grid>
-
-      {/* MUI Data Grid for Financials */}
-      <Box sx={{ mt: 4 }}>
-        <Typography
-          variant="h6"
-          color="black"
-          sx={{ fontWeight: "bold", mb: 2 }}
-        >
-          Financial Records
-        </Typography>
-        <div style={{ height: 400, width: "100%" }}>
-          <DataGrid
-            rows={[]}
-            columns={[
-              { field: "id", headerName: "ID", width: 90 },
-              { field: "amount", headerName: "Amount", width: 150 },
-              { field: "type", headerName: "Type", width: 150 },
-              { field: "description", headerName: "Description", width: 250 },
-              { field: "items", headerName: "Items", width: 250 },
-              { field: "eventID", headerName: "Event ID", width: 150 },
-              { field: "createdBy", headerName: "Created By", width: 150 },
-              { field: "createdAt", headerName: "Created At", width: 150 },
-              { field: "updatedAt", headerName: "Updated At", width: 150 },
-            ]}
-            checkboxSelection
-          />
-        </div>
-      </Box>
     </Box>
   );
 };
 
 const FinancePage = () => {
   return (
-    <PageContainer
-      title="Finance Dashboard"
-      description="Manage your financial records and reports"
-    >
+    <PageContainer title="Finance Page" description="Finance page">
+      <Typography
+        variant="h3"
+        sx={{ color: theme.palette.primary.main, fontWeight: "bold" }}
+        mb={2}
+      >
+        Finance
+      </Typography>
       <FinanceDashboard />
     </PageContainer>
   );

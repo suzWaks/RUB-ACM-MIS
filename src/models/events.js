@@ -22,15 +22,14 @@ const EventSchema = new Schema(
       type: String,
       required: [true, "Time is required"],
     },
-    registeredMember: [
+    year: [
       {
-        type: Schema.Types.ObjectId,
-        ref: "members",
+        type: String
       },
     ],
     createdBy: {
       type: Schema.Types.ObjectId,
-      ref: "members",
+      ref: "users",
     },
   },
   { timestamps: true }
