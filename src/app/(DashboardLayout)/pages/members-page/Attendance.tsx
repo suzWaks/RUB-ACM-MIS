@@ -1,4 +1,3 @@
-// Attendance.tsx
 "use client";
 import React, { useState } from "react";
 import {
@@ -16,7 +15,12 @@ import {
   TextField,
   Typography,
   Paper,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
 } from "@mui/material";
+import { SaveAlt as SaveAltIcon } from "@mui/icons-material";
 
 // Define a type for attendance data
 type AttendanceEntry = {
@@ -35,6 +39,7 @@ const Attendance = () => {
   const [event, setEvent] = useState("");
   const [date, setDate] = useState("");
   const [filteredData, setFilteredData] = useState<AttendanceEntry[]>([]); // Define the type of filteredData
+  const [openViewDialog, setOpenViewDialog] = useState(false); // State for opening the View dialog
 
   // Dummy data for departments and events
   const subjects = ["Information Technology", "Electrical", "Civil", "Mechanical"];
@@ -63,6 +68,56 @@ const Attendance = () => {
     } else {
       setFilteredData([]); // Clear data if no selection is made
     }
+  };
+
+  const handleViewSheet = () => {
+    setOpenViewDialog(true); // Open the View dialog
+  };
+
+  
+  // Function to handle the download of the attendance sheet
+  const handleDownload = () => {
+    // Convert filtered data to CSV format
+    const csvContent = [
+      ["#","Student Name", "Department", "Student ID", "Semester", "Event", "Status"],
+      ...filteredData.map(row => [
+        row.id,
+        row.name,
+        row.department,
+        row.studentId,
+        row.semester,
+        row.event,
+        row.status
+      ])
+    ]
+      .map(row => row.join(","))
+      .join("\n");
+
+    // Create a Blob from the CSV data
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+
+    // Create a link element
+    const link = document.createElement("a");
+
+    // Set download attribute with a filename
+    link.download = "attendance_sheet.csv";
+
+    // Create a URL for the Blob and set it as the href
+    link.href = URL.createObjectURL(blob);
+
+    // Append the link to the document body
+    document.body.appendChild(link);
+
+    // Trigger a click event on the link to download the file
+    link.click();
+
+    // Clean up the link element
+    document.body.removeChild(link);
+  };
+  
+  const handleOpenViewDialog = () => setOpenViewDialog(true);
+  const handleCloseViewDialog = () => {
+    setOpenViewDialog(false); // Close the View dialog
   };
 
   return (
@@ -140,37 +195,100 @@ const Attendance = () => {
 
       {/* Attendance Table */}
       {filteredData.length > 0 && (
-        <TableContainer component={Paper} sx={{ mt: 3, maxWidth: 800 }}>
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell>#</TableCell>
-                <TableCell>Student Name</TableCell>
-                <TableCell>Department</TableCell>
-                <TableCell>Student ID</TableCell>
-                <TableCell>Semester</TableCell>
-                <TableCell>Event</TableCell>
-                <TableCell>Status</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {filteredData.map((row, index) => (
-                <TableRow key={row.id}>
-                  <TableCell>
-                    <Checkbox />
-                  </TableCell>
-                  <TableCell>{row.name}</TableCell>
-                  <TableCell>{row.department}</TableCell>
-                  <TableCell>{row.studentId}</TableCell>
-                  <TableCell>{row.semester}</TableCell>
-                  <TableCell>{row.event}</TableCell>
-                  <TableCell>{row.status}</TableCell>
+        <Box>
+          {/* View Sheet Button */}
+          <Button
+            variant="contained"
+            color="primary"
+            sx={{ mt: 3 }}
+            onClick={handleViewSheet}
+          >
+            View Sheet
+          </Button>
+
+          <TableContainer component={Paper} sx={{ mt: 3, maxWidth: 800 }}>
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableCell>#</TableCell>
+                  <TableCell>Student Name</TableCell>
+                  <TableCell>Department</TableCell>
+                  <TableCell>Student ID</TableCell>
+                  <TableCell>Semester</TableCell>
+                  <TableCell>Event</TableCell>
+                  <TableCell>Status</TableCell>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
+              </TableHead>
+              <TableBody>
+                {filteredData.map((row, index) => (
+                  <TableRow key={row.id}>
+                    <TableCell>
+                      <Checkbox />
+                    </TableCell>
+                    <TableCell>{row.name}</TableCell>
+                    <TableCell>{row.department}</TableCell>
+                    <TableCell>{row.studentId}</TableCell>
+                    <TableCell>{row.semester}</TableCell>
+                    <TableCell>{row.event}</TableCell>
+                    <TableCell>{row.status}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </Box>
       )}
+
+      {/* View Dialog */}
+      <Dialog open={openViewDialog}  onClose={handleCloseViewDialog}  maxWidth="lg" fullWidth color="primary">
+        <DialogTitle sx={{ color: "secondary.main" }}>Generated Attendance Sheet</DialogTitle>
+        <DialogContent>
+        <Box display="flex" justifyContent="flex-end">
+        <Button
+            variant="contained"
+            color="primary"
+            startIcon={<SaveAltIcon />}
+            onClick={handleDownload}
+          >
+            Download Attendance Sheet
+          </Button>
+          </Box>
+          {/* Display the filtered data in a larger view */}
+          <TableContainer component={Paper}>
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableCell>#</TableCell>
+                  <TableCell>Student Name</TableCell>
+                  <TableCell>Department</TableCell>
+                  <TableCell>Student ID</TableCell>
+                  <TableCell>Semester</TableCell>
+                  <TableCell>Event</TableCell>
+                  <TableCell>Status</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {filteredData.map((row) => (
+                  <TableRow key={row.id}>
+                    <TableCell>{row.id}</TableCell>
+                    <TableCell>{row.name}</TableCell>
+                    <TableCell>{row.department}</TableCell>
+                    <TableCell>{row.studentId}</TableCell>
+                    <TableCell>{row.semester}</TableCell>
+                    <TableCell>{row.event}</TableCell>
+                    <TableCell>{row.status}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseViewDialog} color="primary">
+            Close
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 };
