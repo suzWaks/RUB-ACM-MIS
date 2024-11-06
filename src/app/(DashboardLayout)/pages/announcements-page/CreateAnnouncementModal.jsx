@@ -18,18 +18,16 @@ const CreateAnnouncementModal = ({ open, onClose, onAddAnnouncement }) => {
   const [title, setTitle] = useState("");
   const [tags, setTags] = useState("");
   const [description, setDescription] = useState("");
-  const [createdBy, setCreatedBy] = useState("");
-  const [createdOn, setCreatedOn] = useState("");
+  const [time, setTime] = useState(""); // New state for time input
 
   // Handle submission of the form
   const handleSubmit = () => {
-    if (title && createdBy && createdOn) {
+    if (title) {
       const newAnnouncement = {
         title,
         tags: tags.split(",").map(tag => tag.trim()), // Split tags by comma
-        createdBy,
-        createdOn,
-        time: "N/A", // You can set this accordingly
+        description,
+        time, // Include the time field in the announcement
       };
       onAddAnnouncement(newAnnouncement); // Call the prop function to add the announcement
       onClose(); // Close the modal
@@ -37,8 +35,7 @@ const CreateAnnouncementModal = ({ open, onClose, onAddAnnouncement }) => {
       setTitle("");
       setTags("");
       setDescription("");
-      setCreatedBy("");
-      setCreatedOn("");
+      setTime(""); // Clear time input
     }
   };
 
@@ -86,20 +83,11 @@ const CreateAnnouncementModal = ({ open, onClose, onAddAnnouncement }) => {
         />
         <TextField
           fullWidth
-          label="Created By"
+          label="Enter Time" // New field for time
           variant="outlined"
           margin="normal"
-          value={createdBy}
-          onChange={(e) => setCreatedBy(e.target.value)} // Update state on change
-          sx={{ borderRadius: "8px" }}
-        />
-        <TextField
-          fullWidth
-          label="Created On"
-          variant="outlined"
-          margin="normal"
-          value={createdOn}
-          onChange={(e) => setCreatedOn(e.target.value)} // Update state on change
+          value={time}
+          onChange={(e) => setTime(e.target.value)} // Update state on change
           sx={{ borderRadius: "8px" }}
         />
       </DialogContent>

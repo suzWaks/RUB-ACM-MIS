@@ -22,9 +22,10 @@ interface Member {
 
 interface AddMemberFormProps {
   onAddMember: (newMember: Member) => void;
+  onClose: () => void; // Add a prop for closing the dialog
 }
 
-const AddMemberForm: React.FC<AddMemberFormProps> = ({ onAddMember }) => {
+const AddMemberForm: React.FC<AddMemberFormProps> = ({ onAddMember, onClose }) => {
   const theme = useTheme();
 
   const [name, setName] = useState("");
@@ -60,7 +61,7 @@ const AddMemberForm: React.FC<AddMemberFormProps> = ({ onAddMember }) => {
   };
 
   return (
-    <Dialog open={true} onClose={() => resetForm()} fullWidth maxWidth="sm">
+    <Dialog open={true} onClose={onClose} fullWidth maxWidth="sm">
       <DialogTitle
         sx={{
           backgroundColor: theme.palette.primary.main,
@@ -90,7 +91,7 @@ const AddMemberForm: React.FC<AddMemberFormProps> = ({ onAddMember }) => {
             fontWeight: "600",
           }}
         >
-         
+          {/* Add any additional text here if needed */}
         </Typography>
         <TextField
           autoFocus
@@ -205,7 +206,10 @@ const AddMemberForm: React.FC<AddMemberFormProps> = ({ onAddMember }) => {
         }}
       >
         <Button
-          onClick={() => resetForm()}
+          onClick={() => {
+            resetForm();
+            onClose(); // Close the dialog when cancel is clicked
+          }}
           variant="outlined"
           sx={{
             borderColor: theme.palette.primary.main,
