@@ -18,7 +18,7 @@ const AnnouncementSchema = new Schema(
     ],
     created_by: {
       type: Schema.Types.ObjectId,
-      ref: "members",
+      ref: "users",
     },
   },
   { timestamps: true } //created at

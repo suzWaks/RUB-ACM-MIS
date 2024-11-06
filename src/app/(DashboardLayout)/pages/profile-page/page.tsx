@@ -9,10 +9,11 @@ import {
   TextField,
   InputAdornment,
   Grid,
+  Paper,
 } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import * as React from "react";
-import EditIcon from "@mui/icons-material/Edit"; // Importing Edit icon from Material-UI
+import EditIcon from "@mui/icons-material/Edit";
 
 const ProfilePage: React.FC = () => {
   const theme = useTheme();
@@ -52,259 +53,305 @@ const ProfilePage: React.FC = () => {
         flexDirection: "column",
         alignItems: "center",
         minHeight: "100vh",
-        backgroundColor: theme.palette.background.default,
-        padding: "3rem",
-        borderRadius: "12px",
-        boxShadow: "0 8px 20px rgba(0, 0, 0, 0.1)",
+        padding: "0",
       }}
     >
-      <Avatar
-        alt={userProfile.name}
-        src="https://via.placeholder.com/130" 
+      <Paper
+        elevation={6}
         sx={{
-          width: 130,
-          height: 130,
-          mb: 3,
-          border: `4px solid ${theme.palette.primary.main}`,
-        }}
-      />
-      <Typography
-        variant="h4"
-        sx={{
-          fontWeight: "700",
-          color: theme.palette.primary.main,
-          mb: 0.5,
-          textAlign: "center",
-          fontSize: "2rem",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          padding: "3rem",
+          marginTop: "2rem",
+          borderRadius: "20px",
+          background: "white",
+          boxShadow: "0 10px 30px rgba(0, 0, 0, 0.2)",
         }}
       >
-        {userProfile.name}
-      </Typography>
-      <Typography
-        variant="subtitle1"
-        sx={{
-          color: theme.palette.secondary.main,
-          mb: 2,
-          textAlign: "center",
-          fontSize: "1.2rem",
-        }}
-      >
-        {userProfile.studentNumber}
-      </Typography>
+        <Avatar
+          alt={userProfile.name}
+          src="https://via.placeholder.com/130"
+          sx={{
+            width: 130,
+            height: 130,
+            mb: 3,
+            border: `4px solid ${theme.palette.primary.main}`,
+            transition: "transform 0.3s",
+            "&:hover": {
+              transform: "scale(1.05)",
+            },
+          }}
+        />
+        <Typography
+          variant="h3"
+          sx={{
+            fontWeight: "700",
+            color: theme.palette.primary.main,
+            mb: 0.5,
+            textAlign: "center",
+            textTransform: "uppercase",
+            letterSpacing: "0.05em",
+          }}
+        >
+          {userProfile.name}
+        </Typography>
+        <Typography
+          variant="h6"
+          sx={{
+            color: theme.palette.secondary.main,
+            mb: 2,
+            textAlign: "center",
+            fontSize: "1.5rem",
+            fontStyle: "italic",
+          }}
+        >
+          {userProfile.studentNumber}
+        </Typography>
 
-      <form onSubmit={handleSubmit} style={{ width: "100%" }}>
-        <Grid container spacing={2}>
-
-          <Grid item xs={12}>
-            <Box
-              sx={{
-                padding: "1.5rem",
-                borderRadius: "10px",
-                backgroundColor: "#ffffff",
-                boxShadow: "0 2px 5px rgba(0, 0, 0, 0.1)",
-              }}
-            >
-              <Typography
-                variant="h6"
+        <form onSubmit={handleSubmit} style={{ width: "100%" }}>
+          <Grid container spacing={4}>
+            <Grid item xs={12}>
+              <Box
                 sx={{
-                  fontWeight: "600",
-                  color: theme.palette.secondary.main,
-                  mb: 2,
+                  padding: "2rem",
+                  borderRadius: "15px",
+                  backgroundColor: "#f9f9f9",
+                  boxShadow: "0 4px 20px rgba(0, 0, 0, 0.1)",
+                  transition: "0.3s",
+                  "&:hover": {
+                    boxShadow: "0 8px 40px rgba(0, 0, 0, 0.15)",
+                  },
                 }}
               >
-                Contact Information
-              </Typography>
+                <Typography
+                  variant="h5"
+                  sx={{
+                    fontWeight: "600",
+                    color: theme.palette.primary.main,
+                    mb: 3,
+                    textAlign: "left",
+                  }}
+                >
+                  Contact Information
+                </Typography>
 
-              <TextField
-                fullWidth
-                label="Email"
-                name="email"
-                value={userProfile.email}
-                onChange={handleChange}
-                sx={{
-                  mb: 3,
-                }}
-                InputProps={{
-                  readOnly: !isEditing,
-                  startAdornment: isEditing ? (
-                    <InputAdornment position="start">
-                      <EditIcon color="primary" />
-                    </InputAdornment>
-                  ) : null,
-                  sx: {
-                    "& input": {
-                      backgroundColor: isEditing ? "white" : "transparent",
+                <TextField
+                  fullWidth
+                  label="Email"
+                  name="email"
+                  value={userProfile.email}
+                  onChange={handleChange}
+                  sx={{
+                    mb: 3,
+                    "& .MuiOutlinedInput-root": {
+                      height: "56px",
+                      paddingTop: "12px",
+                      paddingBottom: "12px",
                     },
-                  },
-                }}
-                InputLabelProps={{
-                  sx: {
-                    color: isEditing
-                      ? theme.palette.primary.main
-                      : theme.palette.text.secondary,
-                    fontSize: "1rem",
-                    transition: "0.2s ease-in-out",
-                  },
-                  shrink: isEditing || userProfile.email !== "",
-                }}
-              />
-
-              <TextField
-                fullWidth
-                label="Contact Number"
-                name="contactNumber"
-                value={userProfile.contactNumber}
-                onChange={handleChange}
-                sx={{
-                  mb: 3,
-                }}
-                InputProps={{
-                  readOnly: !isEditing,
-                  startAdornment: isEditing ? (
-                    <InputAdornment position="start">
-                      <EditIcon color="primary" />
-                    </InputAdornment>
-                  ) : null,
-                  sx: {
-                    "& input": {
-                      backgroundColor: isEditing ? "white" : "transparent",
+                  }}
+                  InputProps={{
+                    readOnly: !isEditing,
+                    startAdornment: isEditing ? (
+                      <InputAdornment position="start">
+                        <EditIcon color="primary" />
+                      </InputAdornment>
+                    ) : null,
+                    sx: {
+                      "& input": {
+                        backgroundColor: isEditing ? "#ffffff" : "transparent",
+                        transition: "background-color 0.3s ease-in-out",
+                      },
                     },
-                  },
-                }}
-                InputLabelProps={{
-                  sx: {
-                    color: isEditing
-                      ? theme.palette.primary.main
-                      : theme.palette.text.secondary,
-                    fontSize: "1rem",
-                    transition: "0.2s ease-in-out",
-                  },
-                  shrink: isEditing || userProfile.contactNumber !== "",
-                }}
-              />
-            </Box>
-          </Grid>
+                  }}
+                  InputLabelProps={{
+                    sx: {
+                      color: isEditing
+                        ? theme.palette.primary.main
+                        : theme.palette.text.secondary,
+                      fontSize: "1rem",
+                      transition: "0.2s ease-in-out",
+                    },
+                    shrink: isEditing || userProfile.email !== "",
+                  }}
+                />
 
-          <Grid item xs={12}>
-            <Box
-              sx={{
-                padding: "1.5rem",
-                borderRadius: "10px",
-                backgroundColor: "#ffffff",
-                boxShadow: "0 2px 5px rgba(0, 0, 0, 0.1)",
-              }}
-            >
-              <Typography
-                variant="h6"
+                <TextField
+                  fullWidth
+                  label="Contact Number"
+                  name="contactNumber"
+                  value={userProfile.contactNumber}
+                  onChange={handleChange}
+                  sx={{
+                    mb: 3,
+                    "& .MuiOutlinedInput-root": {
+                      height: "56px",
+                      paddingTop: "12px",
+                      paddingBottom: "12px",
+                    },
+                  }}
+                  InputProps={{
+                    readOnly: !isEditing,
+                    startAdornment: isEditing ? (
+                      <InputAdornment position="start">
+                        <EditIcon color="primary" />
+                      </InputAdornment>
+                    ) : null,
+                    sx: {
+                      "& input": {
+                        backgroundColor: isEditing ? "#ffffff" : "transparent",
+                      },
+                    },
+                  }}
+                  InputLabelProps={{
+                    sx: {
+                      color: isEditing
+                        ? theme.palette.primary.main
+                        : theme.palette.text.secondary,
+                      fontSize: "1rem",
+                      transition: "0.2s ease-in-out",
+                    },
+                    shrink: isEditing || userProfile.contactNumber !== "",
+                  }}
+                />
+              </Box>
+            </Grid>
+
+            <Grid item xs={12}>
+              <Box
                 sx={{
-                  fontWeight: "600",
-                  color: theme.palette.secondary.main,
-                  mb: 2,
+                  padding: "2rem",
+                  borderRadius: "15px",
+                  backgroundColor: "#f9f9f9",
+                  boxShadow: "0 4px 20px rgba(0, 0, 0, 0.1)",
+                  transition: "0.3s",
+                  "&:hover": {
+                    boxShadow: "0 8px 40px rgba(0, 0, 0, 0.15)",
+                  },
                 }}
               >
-                Academic Details
-              </Typography>
+                <Typography
+                  variant="h5"
+                  sx={{
+                    fontWeight: "600",
+                    color: theme.palette.primary.main,
+                    mb: 3,
+                    textAlign: "left",
+                  }}
+                >
+                  Academic Details
+                </Typography>
 
-              <TextField
-                fullWidth
-                label="Department"
-                name="department"
-                value={userProfile.department}
-                onChange={handleChange}
-                sx={{
-                  mb: 3,
-                }}
-                InputProps={{
-                  readOnly: !isEditing,
-                  startAdornment: isEditing ? (
-                    <InputAdornment position="start">
-                      <EditIcon color="primary" />
-                    </InputAdornment>
-                  ) : null,
-                  sx: {
-                    "& input": {
-                      backgroundColor: isEditing ? "white" : "transparent",
+                <TextField
+                  fullWidth
+                  label="Department"
+                  name="department"
+                  value={userProfile.department}
+                  onChange={handleChange}
+                  sx={{
+                    mb: 3,
+                    "& .MuiOutlinedInput-root": {
+                      height: "56px",
+                      paddingTop: "12px",
+                      paddingBottom: "12px",
                     },
-                  },
-                }}
-                InputLabelProps={{
-                  sx: {
-                    color: isEditing
-                      ? theme.palette.primary.main
-                      : theme.palette.text.secondary,
-                    fontSize: "1rem",
-                    transition: "0.2s ease-in-out",
-                  },
-                  shrink: isEditing || userProfile.department !== "",
-                }}
-              />
+                  }}
+                  InputProps={{
+                    readOnly: !isEditing,
+                    startAdornment: isEditing ? (
+                      <InputAdornment position="start">
+                        <EditIcon color="primary" />
+                      </InputAdornment>
+                    ) : null,
+                    sx: {
+                      "& input": {
+                        backgroundColor: isEditing ? "#ffffff" : "transparent",
+                      },
+                    },
+                  }}
+                  InputLabelProps={{
+                    sx: {
+                      color: isEditing
+                        ? theme.palette.primary.main
+                        : theme.palette.text.secondary,
+                      fontSize: "1rem",
+                      transition: "0.2s ease-in-out",
+                    },
+                    shrink: isEditing || userProfile.department !== "",
+                  }}
+                />
 
-              <TextField
-                fullWidth
-                label="Year"
-                name="year"
-                value={userProfile.year}
-                onChange={handleChange}
-                sx={{
-                  mb: 3,
-                }}
-                InputProps={{
-                  readOnly: !isEditing,
-                  startAdornment: isEditing ? (
-                    <InputAdornment position="start">
-                      <EditIcon color="primary" />
-                    </InputAdornment>
-                  ) : null,
-                  sx: {
-                    "& input": {
-                      backgroundColor: isEditing ? "white" : "transparent",
+                <TextField
+                  fullWidth
+                  label="Year"
+                  name="year"
+                  value={userProfile.year}
+                  onChange={handleChange}
+                  sx={{
+                    mb: 3,
+                    "& .MuiOutlinedInput-root": {
+                      height: "56px",
+                      paddingTop: "12px",
+                      paddingBottom: "12px",
                     },
-                  },
-                }}
-                InputLabelProps={{
-                  sx: {
-                    color: isEditing
-                      ? theme.palette.primary.main
-                      : theme.palette.text.secondary,
-                    fontSize: "1rem",
-                    transition: "0.2s ease-in-out",
-                  },
-                  shrink: isEditing || userProfile.year !== "",
-                }}
-              />
-            </Box>
+                  }}
+                  InputProps={{
+                    readOnly: !isEditing,
+                    startAdornment: isEditing ? (
+                      <InputAdornment position="start">
+                        <EditIcon color="primary" />
+                      </InputAdornment>
+                    ) : null,
+                    sx: {
+                      "& input": {
+                        backgroundColor: isEditing ? "#ffffff" : "transparent",
+                      },
+                    },
+                  }}
+                  InputLabelProps={{
+                    sx: {
+                      color: isEditing
+                        ? theme.palette.primary.main
+                        : theme.palette.text.secondary,
+                      fontSize: "1rem",
+                      transition: "0.2s ease-in-out",
+                    },
+                    shrink: isEditing || userProfile.year !== "",
+                  }}
+                />
+              </Box>
+            </Grid>
           </Grid>
 
-          <Grid item xs={12}>
-            <Button
-              variant="contained"
-              onClick={handleEditToggle}
-              sx={{
-                marginTop: "2rem",
-                backgroundColor: theme.palette.secondary.main,
-                color: theme.palette.primary.contrastText,
-                borderRadius: 30,
-                px: 5,
-                py: 1.5,
-                textTransform: "none",
-                fontWeight: "600",
-                fontSize: "1rem",
-                transition: "background-color 0.3s, transform 0.2s",
-                "&:hover": {
-                  backgroundColor: theme.palette.secondary.dark,
-                  transform: "scale(1.02)",
-                },
-                "&:active": {
-                  transform: "scale(0.98)",
-                },
-              }}
-            >
-              {isEditing ? "Save Changes" : "Edit Profile"}
-            </Button>
-          </Grid>
-
-        </Grid>
-      </form>
+          <Button
+            variant="contained"
+            onClick={handleEditToggle}
+            sx={{
+              marginTop: "2rem",
+              backgroundColor: theme.palette.secondary.main,
+              color: theme.palette.primary.contrastText,
+              borderRadius: "30px",
+              px: 5,
+              py: 1.5,
+              textTransform: "none",
+              fontWeight: "bold",
+              fontSize: "1rem",
+              transition:
+                "background-color 0.3s, transform 0.2s, box-shadow 0.2s",
+              "&:hover": {
+                backgroundColor: theme.palette.secondary.dark,
+                transform: "scale(1.05)",
+                boxShadow: "0 4px 20px rgba(0, 0, 0, 0.2)",
+              },
+              "&:active": {
+                transform: "scale(0.98)",
+              },
+            }}
+          >
+            {isEditing ? "Save Changes" : "Edit Profile"}
+          </Button>
+        </form>
+      </Paper>
     </Container>
   );
 };

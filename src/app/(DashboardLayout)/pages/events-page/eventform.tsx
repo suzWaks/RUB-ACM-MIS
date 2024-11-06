@@ -13,6 +13,9 @@ import {
     InputAdornment,
     Select,
     MenuItem,
+    FormControl,
+    InputLabel,
+    Chip,
     Checkbox,
     ListItemText,
     OutlinedInput,
@@ -23,7 +26,7 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import CloseIcon from "@mui/icons-material/Close";
 import ImageIcon from "@mui/icons-material/Image";
 import EventIcon from "@mui/icons-material/Event";
-import PeopleIcon from "@mui/icons-material/People";
+import PeopleIcon from '@mui/icons-material/People';
 import LocationOnIcon from "@mui/icons-material/LocationOn";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import DescriptionIcon from "@mui/icons-material/Description";
@@ -43,8 +46,6 @@ const EventForm: React.FC<EventFormProps> = ({ onClose, onSubmit }) => {
     const [location, setLocation] = useState("");
     const [startDate, setStartDate] = useState<Dayjs | null>(null);
     const [startTime, setStartTime] = useState<Dayjs | null>(null);
-    const [endDate, setEndDate] = useState<Dayjs | null>(null);
-    const [endTime, setEndTime] = useState<Dayjs | null>(null);
     const [description, setDescription] = useState("");
 
     const handleSubmit = (e: React.FormEvent) => {
@@ -54,9 +55,7 @@ const EventForm: React.FC<EventFormProps> = ({ onClose, onSubmit }) => {
             attendees,
             venue: location,
             startDate: startDate ? dayjs(startDate).format("MM/DD/YYYY") : "",
-            endDate: endDate ? dayjs(endDate).format("MM/DD/YYYY") : "",
             startTime: startTime ? dayjs(startTime).format("HH:mm") : "",
-            endTime: endTime ? dayjs(endTime).format("HH:mm") : "",
             description,
             status: "Scheduled",
         };
@@ -66,9 +65,11 @@ const EventForm: React.FC<EventFormProps> = ({ onClose, onSubmit }) => {
         onClose();
     };
 
-    const handleAttendeesChange = (event: SelectChangeEvent<string[]>) => {
-        const value = event.target.value as string[];
-        setAttendees(value);
+    const handleAttendeeChange = (event: SelectChangeEvent<string[]>) => {
+        const {
+            target: { value },
+        } = event;
+        setAttendees(typeof value === 'string' ? value.split(',') : value);
     };
 
     return (
@@ -138,28 +139,34 @@ const EventForm: React.FC<EventFormProps> = ({ onClose, onSubmit }) => {
                         {/* Required Attendees Input with Dropdown */}
                         <Grid item xs={12}>
 
-                            <Select
-                                fullWidth
-                                multiple
-                                label="Add Attendees"
-                                variant="outlined"
-                                displayEmpty
-                                value={attendees}
-                                onChange={handleAttendeesChange}
-                                input={<OutlinedInput startAdornment={
-                                    <InputAdornment position="start">
-                                        <PeopleIcon />
-                                    </InputAdornment>
-                                } />}
-                                renderValue={(selected) => (selected as string[]).join(", ")}
-                            >
-                                {attendeesOptions.map((name) => (
-                                    <MenuItem key={name} value={name}>
-                                        <Checkbox checked={attendees.indexOf(name) > -1} />
-                                        <ListItemText primary={name} />
-                                    </MenuItem>
-                                ))}
-                            </Select>
+                            <FormControl fullWidth variant="outlined">
+                                <InputLabel id="attendees-label" shrink>Attendees</InputLabel>
+                                <Select
+                                    labelId="attendees-label"
+                                    startAdornment={
+                                        <InputAdornment position="start">
+                                            <PeopleIcon />
+                                        </InputAdornment>
+                                    }
+                                    label="Attendees"
+                                    multiple
+                                    value={attendees}
+                                    onChange={handleAttendeeChange}
+                                    renderValue={(selected) => (
+                                        <div>
+                                            {selected.map((value) => (
+                                                <Chip key={value} label={value} />
+                                            ))}
+                                        </div>
+                                    )}
+                                >
+                                    {attendeesOptions.map((name) => (
+                                        <MenuItem key={name} value={name}>
+                                            {name}
+                                        </MenuItem>
+                                    ))}
+                                </Select>
+                            </FormControl>
                         </Grid>
 
                         <Grid item xs={12}>
@@ -182,7 +189,7 @@ const EventForm: React.FC<EventFormProps> = ({ onClose, onSubmit }) => {
                         <Grid item xs={6}>
                             <LocalizationProvider dateAdapter={AdapterDayjs}>
                                 <DatePicker
-                                    label="Start Date"
+                                    label="Date"
                                     value={startDate}
                                     onChange={(newValue) => setStartDate(newValue)}
                                     slotProps={{
@@ -197,43 +204,13 @@ const EventForm: React.FC<EventFormProps> = ({ onClose, onSubmit }) => {
                         <Grid item xs={6}>
                             <LocalizationProvider dateAdapter={AdapterDayjs}>
                                 <TimePicker
-                                    label="Start Time"
+                                    label="Time"
                                     value={startTime}
                                     onChange={(newValue) => setStartTime(newValue)}
                                     slotProps={{
                                         textField: {
                                             fullWidth: true,
                                             variant: "outlined",
-                                        },
-                                    }}
-                                />
-                            </LocalizationProvider>
-                        </Grid>
-
-                        <Grid item xs={6}>
-                            <LocalizationProvider dateAdapter={AdapterDayjs}>
-                                <DatePicker
-                                    label="End Date"
-                                    value={endDate}
-                                    onChange={(newValue) => setEndDate(newValue)}
-                                    slotProps={{
-                                        textField: {
-                                            fullWidth: true,
-                                        },
-                                    }}
-                                />
-                            </LocalizationProvider>
-                        </Grid>
-
-                        <Grid item xs={6}>
-                            <LocalizationProvider dateAdapter={AdapterDayjs}>
-                                <TimePicker
-                                    label="End Time"
-                                    value={endTime}
-                                    onChange={(newValue) => setEndTime(newValue)}
-                                    slotProps={{
-                                        textField: {
-                                            fullWidth: true,
                                         },
                                     }}
                                 />
@@ -256,31 +233,6 @@ const EventForm: React.FC<EventFormProps> = ({ onClose, onSubmit }) => {
                                         </InputAdornment>
                                     ),
                                 }}
-                            />
-                        </Grid>
-
-                        <Grid item xs={6}>
-                            <Box
-                                sx={{
-                                    border: "1px dashed grey",
-                                    height: 120,
-                                    display: "flex",
-                                    alignItems: "center",
-                                    justifyContent: "center",
-                                }}
-                            >
-                                <ImageIcon />
-                                <Typography>Add Image</Typography>
-                            </Box>
-                        </Grid>
-
-                        <Grid item xs={6}>
-                            <TextField
-                                fullWidth
-                                variant="outlined"
-                                label="Add People to Invite"
-                                multiline
-                                rows={4}
                             />
                         </Grid>
                     </Grid>

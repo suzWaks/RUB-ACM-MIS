@@ -5,6 +5,14 @@ import users from "../../../../models/users";
 import { connectToDB } from "../../../../utils/database";
 
 const handler = NextAuth({
+  session: {
+    strategy: "jwt",
+  },
+
+  pages: {
+    signIn: "authentication/login",
+  },
+
   providers: [
     credentials({
       name: "Credentials",
@@ -15,44 +23,56 @@ const handler = NextAuth({
       },
       async authorize(credentials) {
         await connectToDB();
-
         const user = await users
           .findOne({
             email: credentials?.email,
           })
           .select("+password");
+
         if (!user) {
-          return new Response(JSON.stringify({ message: "Incorrect Email" }), {
-            status: 401,
-          });
+          console.log("Incorrect Email");
+          return null;
         }
 
         const passwordMatch = await bcrypt.compare(
-          credentials.password,
+          credentials.password.trim(),
           user.password
         );
-
         if (!passwordMatch) {
-          return new Response(JSON.stringify({ message: "Wrong Password" }), {
-            status: 401,
-          });
+          console.log("Wrong Password");
+          return null;
         }
-        return {
+        const userObject = {
           id: user._id.toString(),
           email: user.email,
           role: user.role,
+          // Add any other properties from the user object you want in the session
         };
+        console.log("User Object: ", JSON.stringify(userObject));
+        return userObject;
       },
     }),
   ],
   callbacks: {
-    async session({ session }) {
-      const sessionUser = await users.findOne({
-        email: session.user.email,
-      });
+    async jwt({ token, user }) {
+      // Store user data in the token when they log in
+      if (user) {
+        token.id = user.id; // Store user id in token
+        token.email = user.email; // Store user email in token
+        token.role = user.role; // Store user role in token
+        // Add any other properties from the user object you want in the token
+      }
+      return token;
+    },
 
-      session.user.id = sessionUser._id.toString();
-      session.user.role = sessionUser.role;
+    async session({ session, token }) {
+      // Populate session object with user data from token
+      if (token) {
+        session.user.id = token.id; // Assign user id to session
+        session.user.email = token.email; // Assign user email to session
+        session.user.role = token.role; // Assign user role to session
+        // Assign any other properties from the token you want in the session
+      }
       return session;
     },
   },

@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Typography, Grid, Box, Paper } from "@mui/material";
 import PageContainer from "@/app/(DashboardLayout)/components/container/PageContainer";
 import DashboardCard from "@/app/(DashboardLayout)/components/shared/DashboardCard";
@@ -9,12 +9,32 @@ import RecentActivity from "./RecentActivityProp";
 import FinancialOverview from "@/app/(DashboardLayout)/pages/dashboard/OverviewProp";
 import EventCalendar from "./Eventsprop";
 import NotificationCard from "./AnnouncementProp";
+import { useSession } from "next-auth/react";
+import { redirect } from "next/dist/server/api-utils";
+
+interface MemberStat {
+  label: string;
+  data: number[];
+}
+
+interface AnnouncementDataFormat {
+  description: string;
+  time: string;
+  date: string;
+  postedBy: string;
+}
+
+interface Activity {
+  date: string;
+  title: string;
+}
 
 const Dashboard = () => {
   const activities = [
     { date: "2024-09-26", title: "Joined the ACM chapter" },
     { date: "2024-09-25", title: "Attended the Workshop" },
     { date: "2024-09-24", title: "Completed a Project" },
+    { date: "2024-10-24", title: "Programming contest" },
   ];
 
   const events = [
@@ -30,6 +50,72 @@ const Dashboard = () => {
     theme.palette.secondary_teal.main,
   ];
 
+  const { data: session } = useSession();
+
+  //For fetching data
+  const [memberStats, setMemberStats] = useState<MemberStat[] | null>(null);
+  const [latestAnnouncement, setLatestAnnouncement] =
+    useState<AnnouncementDataFormat | null>(null);
+  const [recentActivity, setRecentActivity] = useState<Activity[]>([]);
+  const [error, setError] = useState("");
+
+  const fetchMemberStats = async () => {
+    try {
+      const response = await fetch("/api/members/fetchMemberStats");
+
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
+      const result = await response.json();
+      setMemberStats(result);
+    } catch (error) {
+      setError("Some Error Occured");
+    }
+  };
+
+  const fetchAnnouncement = async () => {
+    try {
+      const response = await fetch("/api/announcements/lastestAnnouncement");
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
+      const result = await response.json();
+      setLatestAnnouncement(result);
+    } catch (error) {
+      setError("Some Error Occured");
+    }
+  };
+
+  const fetchRecentActivity = async () => {
+    try {
+      const response = await fetch("/api/events/fetchRecentActivities");
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
+      const result = await response.json();
+      setRecentActivity(result);
+    } catch (error) {
+      setError("Some Error Occured");
+    }
+  };
+
+  //Calling Use Effect to fetch data
+  useEffect(() => {
+    const fetchData = async () => {
+      await fetchMemberStats();
+      await fetchAnnouncement();
+      await fetchRecentActivity();
+    };
+    fetchData();
+  }, []);
+
+  //Test Code
+  if (session) {
+    console.log(session);
+  } else {
+    console.log("Not Signed In");
+  }
+
   return (
     <PageContainer description="Home of RUB ACM MIS">
       <DashboardCard>
@@ -43,10 +129,10 @@ const Dashboard = () => {
                 Announcements
               </Typography>
               <NotificationCard
-                message="The ACM club coordinator wants to meet all the first years"
-                time="8pm"
-                date="26th Sept"
-                postedBy="Admin"
+                message={latestAnnouncement?.description ?? ""}
+                time={latestAnnouncement?.time ?? ""}
+                date={latestAnnouncement?.date ?? ""}
+                postedBy={latestAnnouncement?.postedBy ?? ""}
               />
             </Paper>
           </Box>
@@ -60,12 +146,7 @@ const Dashboard = () => {
                 Member Statistics
               </Typography>
               <Grid container spacing={1} mt={2}>
-                {[
-                  { label: "Male Count", data: [20, 30, 40, 50, 40] },
-                  { label: "Female Count", data: [40, 50, 55, 60, 20] },
-                  { label: "Others", data: [3, 4, 5, 6, 33] },
-                  { label: "Total Members", data: [50, 70, 80, 90, 105] },
-                ].map((stat, index) => (
+                {memberStats?.map((stat, index) => (
                   <Grid item xs={6} md={3} key={index}>
                     <Paper sx={{ padding: 0 }} elevation={2}>
                       <Typography variant="h6" padding={1}>
@@ -75,7 +156,7 @@ const Dashboard = () => {
 
                       <StudentGraph
                         data={stat.data}
-                        color={graphColors[index]} 
+                        color={graphColors[index]}
                       />
                     </Paper>
                   </Grid>
@@ -87,7 +168,7 @@ const Dashboard = () => {
           <Grid container spacing={2} alignItems="stretch">
             <Grid item xs={12} md={3}>
               <Box>
-                <RecentActivity activities={activities} />
+                <RecentActivity activities={recentActivity} />
               </Box>
             </Grid>
 
@@ -96,7 +177,7 @@ const Dashboard = () => {
             </Grid>
 
             <Grid item xs={12} md={3}>
-              <Box >
+              <Box>
                 <FinancialOverview budgetUsed={15000} budgetRemaining={35000} />
               </Box>
             </Grid>

@@ -50,16 +50,46 @@ interface Member {
 const MembersPage = () => {
   // State to manage members data
   const [members, setMembers] = useState<Member[]>([
-    { name: "Jigme Phuntsho", studentNo: "02210200", department: "Information Technology", email: "jigme@gmail.com", year: "4", gender: "Male" },
-    { name: "Suzal Wakhley", studentNo: "02210233", department: "Geology", email: "suzal@gmail.com", year: "4", gender: "Female" },
-    { name: "Tashi Kuenga", studentNo: "02210228", department: "Civil", email: "tashi@gmail.com", year: "4", gender: "Male" },
-    { name: "Pema Lhamo", studentNo: "02210221", department: "Civil", email: "pema@gmail.com", year: "4", gender: "Female" },
-    { name: "Depashna", studentNo: "02210196", department: "Electrical", email: "depashna@gmail.com", year: "4", gender: "Female" },
-    { name: "John Doe", studentNo: "02210234", department: "Mechanical", email: "john@gmail.com", year: "3", gender: "Male" },
-    { name: "Jane Smith", studentNo: "02210235", department: "Geology", email: "jane@gmail.com", year: "2", gender: "Female" },
-    { name: "Bob Lee", studentNo: "02210236", department: "Electrical", email: "bob@gmail.com", year: "1", gender: "Others" },
-    { name: "Alice Brown", studentNo: "02210237", department: "Civil", email: "alice@gmail.com", year: "1", gender: "Female" },
-    { name: "Charlie Johnson", studentNo: "02210238", department: "Civil", email: "charlie@gmail.com", year: "2", gender: "Male" },
+    {
+      name: "Jigme Phuntsho",
+      studentNo: "02210200",
+      department: "Information Technology",
+      email: "jigme@gmail.com",
+      year: "4",
+      gender: "Male",
+    },
+    {
+      name: "Suzal Wakhley",
+      studentNo: "02210233",
+      department: "Geology",
+      email: "suzal@gmail.com",
+      year: "4",
+      gender: "Female",
+    },
+    {
+      name: "Tashi Kuenga",
+      studentNo: "02210228",
+      department: "Civil",
+      email: "tashi@gmail.com",
+      year: "4",
+      gender: "Male",
+    },
+    {
+      name: "Pema Lhamo",
+      studentNo: "02210221",
+      department: "Civil",
+      email: "pema@gmail.com",
+      year: "4",
+      gender: "Female",
+    },
+    {
+      name: "Depashna",
+      studentNo: "02210196",
+      department: "Electrical",
+      email: "depashna@gmail.com",
+      year: "4",
+      gender: "Female",
+    },
   ]);
 
   // State for the search input and filters
@@ -81,11 +111,48 @@ const MembersPage = () => {
   const [showAttendance, setShowAttendance] = useState(false);
 
   // Filtered members based on search term, year, and department
-  const filteredMembers = members.filter(member => 
-    member.name.toLowerCase().includes(searchTerm.toLowerCase()) &&
-    (selectedYear ? member.year === selectedYear : true) &&
-    (selectedDepartment ? member.department === selectedDepartment : true)
+  const filteredMembers = members.filter(
+    (member) =>
+      member.name.toLowerCase().includes(searchTerm.toLowerCase()) &&
+      (selectedYear ? member.year === selectedYear : true) &&
+      (selectedDepartment ? member.department === selectedDepartment : true)
   );
+
+  // Available years and departments (customize as needed)
+  const years = ["1", "2", "3", "4"];
+  const departments = [
+    "Information Technology",
+    "Geology",
+    "Civil",
+    "Electrical",
+  ];
+
+  // Calculations for member statistics
+  const totalMembers = members.length;
+  const maleMembers = members.filter(
+    (member) => member.gender === "Male"
+  ).length;
+  const femaleMembers = members.filter(
+    (member) => member.gender === "Female"
+  ).length;
+  const othersMembers = members.filter(
+    (member) => member.gender === "Others"
+  ).length;
+
+  // Data for graphs (you can modify the data structure as needed)
+  const statistics = [
+    { label: "Male Members", data: [10, 15, 20, maleMembers] }, // Example data
+    { label: "Female Members", data: [12, 13, 14, femaleMembers] }, // Example data
+    { label: "Others", data: [5, 7, 3, othersMembers] }, // Example data
+    { label: "Total Members", data: [totalMembers, 100, 110, 120] }, // Example data
+  ];
+
+  const graphColors = [
+    theme.palette.primary.main,
+    theme.palette.primary_blue.main,
+    theme.palette.secondary_blue.main,
+    theme.palette.secondary_teal.main,
+  ];
 
   // Reset filters function
   const handleResetFilters = () => {

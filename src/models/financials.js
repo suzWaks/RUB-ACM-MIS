@@ -29,7 +29,7 @@ const FinancialSchema = new Schema(
     },
     createdBy: {
       type: Schema.Types.ObjectId,
-      ref: "members",
+      ref: "users",
     },
   },
   { timestamps: true }
