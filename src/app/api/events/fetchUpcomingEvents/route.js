@@ -7,20 +7,17 @@ export const GET = async () => {
     await connectToDB();
 
     const currentDate = new Date(); // Get the current date
-    const upcomingActivities = await events.find({
-      start_date: { $gt: currentDate },
-    }); // Filter for events before the current date
+    const upcomingEvents = await events
+      .find({ start_date: { $gt: currentDate } })
+      .sort({ start_date: 1 }) // Sort by start date in ascending order
+      .limit(3); // Limit to the three soonest events
 
-    // Transform the events into activities
-    const activities = upcomingActivities.map((event) => ({
-      date: event.end_date.toISOString().split("T")[0], // Format the date as YYYY-MM-DD
-      title: event.event_name,
-    }));
+    console.log("The upcoming date: ", upcomingEvents);
 
     // Check if there are any events
-    if (!upcomingActivities || upcomingActivities.length === 0) {
+    if (!upcomingEvents) {
       return new Response(
-        JSON.stringify({ message: "No Recent Activities found" }),
+        JSON.stringify({ message: "No Upcoming Events found" }),
         {
           status: 404,
           headers: { "Content-Type": "application/json" },
@@ -28,12 +25,18 @@ export const GET = async () => {
       );
     }
 
-    return new Response(JSON.stringify(activities), {
+    // Transform the events into the required format
+    const formattedEvents = upcomingEvents.map((event) => ({
+      name: event.event_name,
+      date: event.start_date,
+    }));
+
+    return new Response(JSON.stringify(formattedEvents), {
       status: 200,
       headers: { "Content-Type": "application/json" },
     });
   } catch (error) {
-    console.error("Error fetching events: ", error);
+    console.error("Error fetching Upcomming events: ", error);
     return new Response("Failed to fetch events", { status: 500 });
   }
 };

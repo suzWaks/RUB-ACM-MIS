@@ -11,6 +11,7 @@ import EventCalendar from "./Eventsprop";
 import NotificationCard from "./AnnouncementProp";
 import { useSession } from "next-auth/react";
 import { redirect } from "next/dist/server/api-utils";
+import Loading from "../../loading";
 
 interface MemberStat {
   label: string;
@@ -29,20 +30,17 @@ interface Activity {
   title: string;
 }
 
+interface UpcomingEvents {
+  name: string;
+  date: Date;
+}
+
+interface budgetStats {
+  balanceUsed: number;
+  balanceRemaining: number;
+}
+
 const Dashboard = () => {
-  const activities = [
-    { date: "2024-09-26", title: "Joined the ACM chapter" },
-    { date: "2024-09-25", title: "Attended the Workshop" },
-    { date: "2024-09-24", title: "Completed a Project" },
-    { date: "2024-10-24", title: "Programming contest" },
-  ];
-
-  const events = [
-    { name: "Event 1", date: new Date(2024, 9, 1) },
-    { name: "Event 2", date: new Date(2024, 9, 5) },
-    { name: "Event 3", date: new Date(2024, 9, 10) },
-  ];
-
   const graphColors = [
     theme.palette.primary.main,
     theme.palette.primary_blue.main,
@@ -50,6 +48,7 @@ const Dashboard = () => {
     theme.palette.secondary_teal.main,
   ];
 
+  //For Session Data
   const { data: session } = useSession();
 
   //For fetching data
@@ -57,7 +56,10 @@ const Dashboard = () => {
   const [latestAnnouncement, setLatestAnnouncement] =
     useState<AnnouncementDataFormat | null>(null);
   const [recentActivity, setRecentActivity] = useState<Activity[]>([]);
-  const [error, setError] = useState("");
+  const [upcomingEvents, setUpcomingEvents] = useState<UpcomingEvents[]>([]);
+  const [budgetInfo, setBudgetInfo] = useState<budgetStats | null>(null);
+  const [errorType, setError] = useState("");
+  const [loading, setLoading] = useState(true);
 
   const fetchMemberStats = async () => {
     try {
@@ -88,7 +90,7 @@ const Dashboard = () => {
 
   const fetchRecentActivity = async () => {
     try {
-      const response = await fetch("/api/events/fetchRecentActivities");
+      const response = await fetch("../api/events/fetchRecentActivities");
       if (!response.ok) {
         throw new Error("Network response was not ok");
       }
@@ -99,22 +101,59 @@ const Dashboard = () => {
     }
   };
 
+  const fetchUpcomingEvents = async () => {
+    try {
+      const response = await fetch("../api/events/fetchUpcomingEvents");
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
+      const result = await response.json();
+      const formattedEvents = result.map(
+        (event: { name: any; date: string | number | Date }) => ({
+          name: event.name,
+          date: new Date(event.date), // Ensure this is a Date object
+        })
+      );
+      setUpcomingEvents(formattedEvents);
+    } catch (error) {
+      setError("Some Error Occured");
+    }
+  };
+
+  const fetchBudgetStats = async () => {
+    try {
+      const response = await fetch("../api/financials/dashboardStats");
+      if (!response.ok) {
+        throw new Error("Network reponse was not ok");
+      }
+      const result = await response.json();
+      console.log("Budget Info: ", result);
+      setBudgetInfo(result);
+    } catch (error) {
+      setError("Some error occured");
+    }
+  };
   //Calling Use Effect to fetch data
   useEffect(() => {
     const fetchData = async () => {
       await fetchMemberStats();
       await fetchAnnouncement();
       await fetchRecentActivity();
+      await fetchUpcomingEvents();
+      await fetchBudgetStats();
+      setLoading(false);
     };
     fetchData();
   }, []);
 
   //Test Code
-  if (session) {
-    console.log(session);
-  } else {
-    console.log("Not Signed In");
-  }
+  // if (session) {
+  //   console.log("Session data is: ", session);
+  // } else {
+  //   console.log("Not Signed In");
+  // }
+
+  if (loading) return <Loading />;
 
   return (
     <PageContainer description="Home of RUB ACM MIS">
@@ -173,12 +212,15 @@ const Dashboard = () => {
             </Grid>
 
             <Grid item xs={12} md={6}>
-              <EventCalendar events={events} />
+              <EventCalendar events={upcomingEvents} />
             </Grid>
 
             <Grid item xs={12} md={3}>
               <Box>
-                <FinancialOverview budgetUsed={15000} budgetRemaining={35000} />
+                <FinancialOverview
+                  budgetUsed={budgetInfo?.balanceUsed ?? 0}
+                  budgetRemaining={budgetInfo?.balanceRemaining ?? 0}
+                />
               </Box>
             </Grid>
           </Grid>

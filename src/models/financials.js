@@ -12,16 +12,14 @@ const FinancialSchema = new Schema(
       enum: ["Income", "Expense"],
       required: [true, "Type is required"],
     },
+    title: {
+      type: String,
+      required: true,
+    },
     description: {
       type: String,
       required: false,
     },
-    items: [
-      {
-        type: String,
-        required: false,
-      },
-    ],
     eventID: {
       type: Schema.Types.ObjectId,
       required: false,
