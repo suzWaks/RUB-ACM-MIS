@@ -12,9 +12,18 @@ const FinancialSchema = new Schema(
       enum: ["Income", "Expense"],
       required: [true, "Type is required"],
     },
-    title: {
+    category: {
       type: String,
-      required: true,
+      enum: [
+        "Event", //Income or Expense
+        "Lottery Sales", //Income
+        "Supplies", //Expense
+        "Donations", //Income
+        "ITS Service", //Income
+        "Miscellaneous Income", //Income
+        "Miscellaneous Expense", //Expense
+      ],
+      required: [true, "Category is required"],
     },
     description: {
       type: String,

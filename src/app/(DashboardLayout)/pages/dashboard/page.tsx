@@ -36,8 +36,8 @@ interface UpcomingEvents {
 }
 
 interface budgetStats {
-  balanceUsed: number;
-  balanceRemaining: number;
+  totalIncome: number;
+  totalExpense: number;
 }
 
 const Dashboard = () => {
@@ -122,7 +122,7 @@ const Dashboard = () => {
 
   const fetchBudgetStats = async () => {
     try {
-      const response = await fetch("../api/financials/dashboardStats");
+      const response = await fetch("/api/financials/summary");
       if (!response.ok) {
         throw new Error("Network reponse was not ok");
       }
@@ -146,12 +146,12 @@ const Dashboard = () => {
     fetchData();
   }, []);
 
-  //Test Code
-  // if (session) {
-  //   console.log("Session data is: ", session);
-  // } else {
-  //   console.log("Not Signed In");
-  // }
+  //  Test Code
+  if (session) {
+    console.log("Session data is: ", session);
+  } else {
+    console.log("Not Signed In");
+  }
 
   if (loading) return <Loading />;
 
@@ -218,8 +218,8 @@ const Dashboard = () => {
             <Grid item xs={12} md={3}>
               <Box>
                 <FinancialOverview
-                  budgetUsed={budgetInfo?.balanceUsed ?? 0}
-                  budgetRemaining={budgetInfo?.balanceRemaining ?? 0}
+                  totalIncome={budgetInfo?.totalIncome ?? 0}
+                  totalExpense={budgetInfo?.totalExpense ?? 0}
                 />
               </Box>
             </Grid>
