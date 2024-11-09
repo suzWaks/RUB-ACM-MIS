@@ -26,12 +26,12 @@ const EventSchema = new Schema(
     registeredMember: [
       {
         type: Schema.Types.ObjectId,
-        ref: "members", 
+        ref: "members",
       },
     ],
     createdBy: {
       type: Schema.Types.ObjectId,
-      ref: "users", 
+      ref: "users",
     },
   },
   { timestamps: true }

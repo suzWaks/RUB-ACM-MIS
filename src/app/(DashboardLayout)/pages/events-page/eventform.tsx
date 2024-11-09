@@ -32,7 +32,7 @@ import Loading from "@/app/loading";
 
 interface EventFormProps {
   onClose: () => void;
-  onSubmit: (eventData: any) => void;
+  // onSubmit: (eventData: any) => void;
 }
 
 const attendeesOptions = [
@@ -42,7 +42,7 @@ const attendeesOptions = [
   "Fourth Year",
 ];
 
-const AddEventForm = ({ onSubmit, onClose }: EventFormProps) => {
+const AddEventForm = ({ onClose }: EventFormProps) => {
   const [eventName, setEventName] = useState("");
   const [attendees, setAttendees] = useState<string[]>([]);
   const [location, setLocation] = useState("");
@@ -107,9 +107,9 @@ const AddEventForm = ({ onSubmit, onClose }: EventFormProps) => {
 
       const result = await response.json();
       console.log("Event added successfully:", result);
-      onSubmit(result);
       setLoading(false); // Set loading to false when done
       onClose();
+      window.location.reload();
     } catch (error: unknown) {
       if (error instanceof Error) {
         console.error("Error adding event:", error.message);
@@ -117,6 +117,7 @@ const AddEventForm = ({ onSubmit, onClose }: EventFormProps) => {
         console.error("Unexpected error:", error);
       }
       setLoading(false); // Set loading to false on error as well
+      window.location.reload();
     }
   };
 
@@ -165,7 +166,7 @@ const AddEventForm = ({ onSubmit, onClose }: EventFormProps) => {
         <Card
           sx={{
             width: "70%",
-            height: "80%",
+            height: "60%",
             position: "relative",
             boxShadow: "0px 0px 12px rgba(0, 0, 0, 0.2)",
             borderRadius: "10px",
@@ -210,7 +211,7 @@ const AddEventForm = ({ onSubmit, onClose }: EventFormProps) => {
                 />
               </Grid>
 
-              <Grid item xs={12}>
+              {/* <Grid item xs={12}>
                 <FormControl fullWidth variant="outlined">
                   <InputLabel id="attendees-label">Attendees</InputLabel>
                   <Select
@@ -244,7 +245,7 @@ const AddEventForm = ({ onSubmit, onClose }: EventFormProps) => {
                     ))}
                   </Select>
                 </FormControl>
-              </Grid>
+              </Grid> */}
 
               <Grid item xs={12}>
                 <TextField

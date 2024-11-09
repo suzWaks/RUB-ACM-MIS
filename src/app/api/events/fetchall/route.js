@@ -1,5 +1,5 @@
 import { connectToDB } from "../../../../utils/database";
-import events from "../../../../models/events";
+import events from "../../../models/events";
 
 // GET
 export const GET = async () => {

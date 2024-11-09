@@ -10,36 +10,19 @@ import "./calendar.css";
 import EventDetail from "./eventdetails";
 import Loading from "@/app/loading";
 import dayjs from "dayjs";
+import { Button } from "@mui/material";
+import theme from "@/utils/theme";
 
-interface CalendarEvent {
-  id: string;
-  title: string;
-  start: string;
-  end?: string;
-  allDay?: boolean;
-  venue?: string;
+interface Event {
+  event_id: string;
+  event_name: string;
+  event_date: string;
+  venue: string;
+  time: string;
+  year: string[];
 }
 
 const Calendar: React.FC = () => {
-  const [currentEvents, setCurrentEvents] = useState<CalendarEvent[]>([
-    {
-      id: "1",
-      title: "Sample Event 1",
-      start: new Date().toISOString(),
-      allDay: true,
-      venue: "ITS Hall",
-    },
-    {
-      id: "2",
-      title: "Sample Event 2",
-      start: new Date(
-        new Date().setDate(new Date().getDate() + 1)
-      ).toISOString(),
-      allDay: true,
-      venue: "ITS Halll",
-    },
-  ]);
-
   const [isFormOpen, setIsFormOpen] = useState<boolean>(false);
   const [selectedDate, setSelectedDate] = useState<DateSelectArg | null>(null);
   const [showEventTable, setShowEventTable] = useState(false); // Track event table visibility
@@ -50,35 +33,25 @@ const Calendar: React.FC = () => {
     setIsFormOpen(true);
   };
 
-  const handleEventClick = (selected: EventClickArg) => {
-    if (
-      window.confirm(
-        `Are you sure you want to delete the event "${selected.event.title}"?`
-      )
-    ) {
-      setCurrentEvents(
-        currentEvents.filter((event) => event.id !== selected.event.id)
-      );
-    }
+  const handleDateClickbtn = () => {
+    setIsFormOpen(true);
   };
+
+  // const handleEventClick = (selected: EventClickArg) => {
+  //   if (
+  //     window.confirm(
+  //       `Are you sure you want to delete the event "${selected.event.title}"?`
+  //     )
+  //   ) {
+  //     setCurrentEvents(
+  //       currentEvents.filter((event) => event.id !== selected.event.id)
+  //     );
+  //   }
+  // };
 
   const handleCloseForm = () => {
     setIsFormOpen(false);
     setSelectedDate(null);
-  };
-
-  const handleAddEvent = (eventData: any) => {
-    const newEvent: CalendarEvent = {
-      id: `${new Date().getTime()}`,
-      title: eventData.name,
-      start: selectedDate ? selectedDate.startStr : eventData.startDate,
-      end: eventData.endDate,
-      allDay: selectedDate ? selectedDate.allDay : false,
-      venue: eventData.venue,
-    };
-
-    setCurrentEvents([...currentEvents, newEvent]);
-    handleCloseForm();
   };
 
   const handleViewAllEvents = () => {
@@ -89,28 +62,8 @@ const Calendar: React.FC = () => {
     setShowEventTable(false); // Close event table and go back to the calendar view
   };
 
-  const handleEdit = (event: CalendarEvent) => {
-    // Open an edit form or perform any edit logic here
-    console.log("Editing event:", event);
-  };
-
-  const handleDelete = (eventId: string) => {
-    setCurrentEvents((prevEvents) =>
-      prevEvents.filter((event) => event.id !== eventId)
-    );
-  };
-
   //------------------------------------------------------------
   // Integration Code
-
-  interface Event {
-    event_id: string;
-    event_name: string;
-    event_date: string;
-    venue: string;
-    time: string;
-    year: string[];
-  }
 
   const [allEvent, setAllEvent] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
@@ -141,13 +94,22 @@ const Calendar: React.FC = () => {
   if (showEventTable) {
     return (
       <EventTable
-        events={currentEvents}
         onClose={handleCloseEventTable}
-        onEdit={handleEdit}
-        onDelete={handleDelete}
+        // onEdit={handleEdit}
+        // onDelete={handleDelete}
       />
     );
   }
+
+  const transformedEvents = allEvent.map((event) => ({
+    id: event.event_id,
+    title: event.event_name,
+    start: event.event_date, // Ensure this is an ISO string or Date object
+    allDay: true,
+    extendedProps: {
+      venue: event.venue,
+    },
+  }));
 
   return (
     <div className="calendar-container">
@@ -177,6 +139,9 @@ const Calendar: React.FC = () => {
       </div>
 
       <div className="calendar-card">
+        <button className="add-event-button" onClick={handleDateClickbtn}>
+          Add an Event +
+        </button>
         <FullCalendar
           height={"85vh"}
           plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
@@ -191,16 +156,13 @@ const Calendar: React.FC = () => {
           selectMirror={true}
           dayMaxEvents={true}
           select={handleDateClick}
-          eventClick={handleEventClick}
-          events={currentEvents}
+          events={transformedEvents}
           eventColor="#6F42C1"
           eventTextColor="#ffffff"
         />
       </div>
 
-      {isFormOpen && (
-        <EventForm onClose={handleCloseForm} onSubmit={handleAddEvent} />
-      )}
+      {isFormOpen && <EventForm onClose={handleCloseForm} />}
     </div>
   );
 };

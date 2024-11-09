@@ -1,8 +1,8 @@
 import { connectToDB } from "../../../../utils/database";
-import events from "../../../../models/events";
-import members from "../../../../models/members";
-import attendance from "../../../../models/attendance";
-import users from "../../../../models/users";
+import events from "../../../models/events";
+import members from "../../../models/members";
+import attendance from "../../../models/attendance";
+import users from "../../../models/users";
 
 export const POST = async (request) => {
   try {

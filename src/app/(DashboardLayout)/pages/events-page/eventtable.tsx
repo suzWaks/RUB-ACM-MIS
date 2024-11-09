@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Table,
   TableBody,
@@ -12,6 +12,11 @@ import {
   TextField,
   MenuItem,
   TablePagination,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -23,7 +28,6 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs, { Dayjs } from "dayjs";
 import EventForm from "./eventform";
 import EventDetail from "./eventdetails";
-import { useEffect } from "react";
 import Loading from "../../loading";
 
 const statusOptions = ["All", "Recent", "Upcoming", "Scheduled"];
@@ -43,24 +47,22 @@ interface Event {
 }
 
 interface EventTableProps {
-  events: Event[];
+  // events: Event[];
   onClose: () => void;
-  onEdit: (event: Event) => void;
-  onDelete: (eventId: string) => void;
 }
 
-const EventTable: React.FC<EventTableProps> = ({
-  events,
-  onClose,
-  onEdit,
-  onDelete,
-}) => {
+const EventTable: React.FC<EventTableProps> = ({ onClose }) => {
   const [startDate, setStartDate] = useState<Dayjs | null>(null);
   const [endDate, setEndDate] = useState<Dayjs | null>(null);
   const [status, setStatus] = useState<string>("All");
   const [showForm, setShowForm] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
   const [showDetails, setShowDetails] = useState(false);
+  const [allEvent, setAllEvent] = useState<Event[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
+  const [eventIdToDelete, setEventIdToDelete] = useState<string | null>(null);
 
   // Pagination state
   const [page, setPage] = useState(0);
@@ -112,26 +114,22 @@ const EventTable: React.FC<EventTableProps> = ({
     }
   };
 
-  const filteredEvents = events.filter((event) => {
-    const eventStartDate = dayjs(event.start);
-    const eventEndDate = event.end ? dayjs(event.end) : null;
-  });
+  // const filteredEvents = events.filter((event) => {
+  //   const eventStartDate = dayjs(event.start);
+  //   const eventEndDate = event.end ? dayjs(event.end) : null;
+  // });
 
   //------------------------------------------------------------
   //Integration Code//
 
   interface Event {
-    event_id: string;
+    _id: string;
     event_name: string;
     event_date: string;
     venue: string;
     time: string;
     year: string[];
   }
-
-  const [allEvent, setAllEvent] = useState<Event[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
 
   const fetchAllEvents = async () => {
     try {
@@ -159,6 +157,45 @@ const EventTable: React.FC<EventTableProps> = ({
   if (loading) {
     return <Loading />;
   }
+
+  const handleOpenDeleteDialog = (eventId: string) => {
+    setEventIdToDelete(eventId);
+    setOpenDeleteDialog(true);
+  };
+
+  const handleCloseDeleteDialog = () => {
+    setOpenDeleteDialog(false);
+    setEventIdToDelete(null);
+  };
+
+  const handleDeleteConfirmed = () => {
+    if (eventIdToDelete) {
+      onDelete(eventIdToDelete);
+    }
+    handleCloseDeleteDialog();
+  };
+
+  const onDelete = async (eventId: string) => {
+    try {
+      const response = await fetch(`/api/events/${eventId}`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to delete event with ID ${eventId}`);
+      }
+
+      // You might want to update the UI or notify the user of success
+      console.log(`Event with ID ${eventId} was successfully deleted.`);
+      window.location.reload();
+    } catch (error) {
+      console.error("Error deleting event:", error);
+      // Optionally show error to the user
+    }
+  };
 
   return (
     <div
@@ -221,15 +258,16 @@ const EventTable: React.FC<EventTableProps> = ({
           {showForm && (
             <EventForm
               onClose={handleCloseForm}
-              onSubmit={(eventData) => {
-                /* handle event creation here */
-              }}
+              // onSubmit={(eventData) => {
+              //   /* handle event creation here */
+              // }}
             />
           )}
 
           {showDetails && selectedEvent && (
             <EventDetail
               eventData={{
+                id: selectedEvent._id,
                 event_name: selectedEvent.event_name,
                 year: selectedEvent.year,
                 venue: selectedEvent.venue || "",
@@ -289,7 +327,7 @@ const EventTable: React.FC<EventTableProps> = ({
               <TableCell style={{ fontWeight: "bold" }}>Date</TableCell>
               <TableCell style={{ fontWeight: "bold" }}>Time</TableCell>
               <TableCell style={{ fontWeight: "bold" }}>Status</TableCell>
-              <TableCell style={{ fontWeight: "bold" }}>Year Invited</TableCell>
+              {/* <TableCell style={{ fontWeight: "bold" }}>Year Invited</TableCell> */}
               <TableCell style={{ fontWeight: "bold", textAlign: "center" }}>
                 Action
               </TableCell>
@@ -307,7 +345,7 @@ const EventTable: React.FC<EventTableProps> = ({
                 : "Today";
 
               return (
-                <TableRow key={event.event_id}>
+                <TableRow key={event._id}>
                   <TableCell>{event.event_name}</TableCell>
                   <TableCell>{event.venue}</TableCell>
                   <TableCell>
@@ -317,7 +355,7 @@ const EventTable: React.FC<EventTableProps> = ({
                   <TableCell>
                     <span style={getStatusStyle(status)}>{status}</span>
                   </TableCell>
-                  <TableCell>{" " + event.year}</TableCell>
+                  {/* <TableCell>{" " + event.year}</TableCell> */}
                   <TableCell style={{ textAlign: "center" }}>
                     <IconButton
                       onClick={() => handleEditClick(event)}
@@ -326,7 +364,7 @@ const EventTable: React.FC<EventTableProps> = ({
                       <EditIcon />
                     </IconButton>
                     <IconButton
-                      onClick={() => onDelete(event.event_id)}
+                      onClick={() => handleOpenDeleteDialog(event._id)}
                       style={{ color: "#e74c3c" }}
                     >
                       <DeleteIcon />
@@ -339,21 +377,44 @@ const EventTable: React.FC<EventTableProps> = ({
         </Table>
       </TableContainer>
 
-      <TablePagination
+      <Dialog
+        open={openDeleteDialog}
+        onClose={handleCloseDeleteDialog}
+        aria-labelledby="delete-dialog-title"
+        aria-describedby="delete-dialog-description"
+      >
+        <DialogTitle id="delete-dialog-title">Confirm Delete</DialogTitle>
+        <DialogContent>
+          <DialogContentText id="delete-dialog-description">
+            Are you sure you want to delete this event? This action cannot be
+            undone.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseDeleteDialog} color="primary">
+            Cancel
+          </Button>
+          <Button onClick={handleDeleteConfirmed} color="error" autoFocus>
+            Delete
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* <TablePagination
         component="div"
         count={filteredEvents.length}
         page={page}
         onPageChange={handlePageChange}
         rowsPerPage={rowsPerPage}
         labelRowsPerPage=""
-      />
+      /> */}
 
       {showForm && (
         <EventForm
           onClose={handleCloseForm}
-          onSubmit={(eventData) => {
-            /* handle event creation here */
-          }}
+          // onSubmit={(eventData) => {
+          //   /* handle event creation here */
+          // }}
         />
       )}
       {/* 

@@ -28,6 +28,7 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 
 interface EventDetailFormProps {
   eventData: {
+    id: string;
     event_name: string;
     start_date: string;
     venue: string;
@@ -59,7 +60,6 @@ const EventDetailForm: React.FC<EventDetailFormProps> = ({
   const [startTime, setStartTime] = useState<Dayjs | null>(
     dayjs(`1970-01-01 ${eventData.time}`)
   );
-//   const [description, setDescription] = useState(eventData.description);
 
   const handleAttendeeChange = (event: SelectChangeEvent<string[]>) => {
     const {
@@ -68,20 +68,36 @@ const EventDetailForm: React.FC<EventDetailFormProps> = ({
     setAttendees(typeof value === "string" ? value.split(",") : value);
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     const updatedEventData = {
-      name: eventName,
-      attendees,
+      event_name: eventName,
       venue,
-      startDate: startDate ? startDate.format("MM/DD/YYYY") : "",
-      startTime: startTime ? startTime.format("HH:mm") : "",
-    //   description,
-      status: "Scheduled",
+      event_date: startDate?.format("YYYY-MM-DD"),
+      time: startTime ? startTime.format("HH:mm") : "",
     };
 
-    console.log("Submitting updated event data:", updatedEventData);
-    onSubmit(updatedEventData);
-    onClose();
+    try {
+      const response = await fetch(`/api/events/${eventData.id}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(updatedEventData),
+      });
+      console.log("Chcek:", updatedEventData);
+      if (!response.ok) {
+        throw new Error("Failed to update event");
+      }
+
+      const updatedEvent = await response.json();
+      console.log("Event updated successfully:", updatedEvent);
+
+      onSubmit(updatedEvent);
+      onClose();
+      window.location.reload();
+    } catch (error) {
+      console.error("Error updating event:", error);
+    }
   };
 
   return (
@@ -103,7 +119,7 @@ const EventDetailForm: React.FC<EventDetailFormProps> = ({
       <Card
         sx={{
           width: "70%",
-          height: "80%",
+          height: "60%",
           position: "relative",
           boxShadow: "0px 0px 12px rgba(0, 0, 0, 0.2)",
           borderRadius: "10px",
@@ -153,39 +169,6 @@ const EventDetailForm: React.FC<EventDetailFormProps> = ({
             </Grid>
 
             <Grid item xs={12}>
-              <FormControl fullWidth variant="outlined">
-                <InputLabel id="attendees-label" shrink>
-                  Attendees
-                </InputLabel>
-                <Select
-                  labelId="attendees-label"
-                  startAdornment={
-                    <InputAdornment position="start">
-                      <PeopleIcon />
-                    </InputAdornment>
-                  }
-                  label="Attendees"
-                  multiple
-                  value={attendees}
-                  onChange={handleAttendeeChange}
-                  renderValue={(selected) => (
-                    <div>
-                      {selected.map((value) => (
-                        <Chip key={value} label={value} />
-                      ))}
-                    </div>
-                  )}
-                >
-                  {attendeesList.map((name) => (
-                    <MenuItem key={name} value={name}>
-                      {name}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-            </Grid>
-
-            <Grid item xs={12}>
               <TextField
                 fullWidth
                 variant="outlined"
@@ -218,35 +201,17 @@ const EventDetailForm: React.FC<EventDetailFormProps> = ({
             </Grid>
 
             <Grid item xs={6}>
-              <TextField
-                fullWidth
-                variant="outlined"
-                label="Start Time"
-                value={startTime ? startTime.format("HH:mm") : ""}
-                onChange={(e) =>
-                  setStartTime(dayjs(`1970-01-01 ${e.target.value}`))
-                }
-              />
+              <LocalizationProvider dateAdapter={AdapterDayjs}>
+                <TimePicker
+                  label="Time"
+                  value={startTime}
+                  onChange={(newValue) => setStartTime(newValue)}
+                  slotProps={{
+                    textField: { fullWidth: true, variant: "outlined" },
+                  }}
+                />
+              </LocalizationProvider>
             </Grid>
-
-            {/* <Grid item xs={12}>
-              <TextField
-                fullWidth
-                variant="outlined"
-                label="Description"
-                value={description}
-                multiline
-                rows={4}
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <DescriptionIcon />
-                    </InputAdornment>
-                  ),
-                }}
-                onChange={(e) => setDescription(e.target.value)}
-              />
-            </Grid> */}
           </Grid>
 
           <Box
