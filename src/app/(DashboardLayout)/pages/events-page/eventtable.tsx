@@ -121,11 +121,12 @@ const EventTable: React.FC<EventTableProps> = ({
   //Integration Code//
 
   interface Event {
+    event_id: string;
     event_name: string;
-    start_date: string;
+    event_date: string;
     venue: string;
     time: string;
-    year: number;
+    year: string[];
   }
 
   const [allEvent, setAllEvent] = useState<Event[]>([]);
@@ -217,26 +218,35 @@ const EventTable: React.FC<EventTableProps> = ({
               }}
             />
           </LocalizationProvider>
-            {showForm && <EventForm onClose={handleCloseForm} onSubmit={(eventData) => {/* handle event creation here */ }} />}
+          {showForm && (
+            <EventForm
+              onClose={handleCloseForm}
+              onSubmit={(eventData) => {
+                /* handle event creation here */
+              }}
+            />
+          )}
 
-            {showDetails && selectedEvent && (
-                <EventDetail
-                    eventData={{
-                        name: selectedEvent.title,
-                        attendees: selectedEvent.attendees ? selectedEvent.attendees.split(',') : [], // Convert to array
-                        venue: selectedEvent.venue || "",
-                        startDate: new Date(selectedEvent.start).toLocaleDateString(),
-                        startTime: selectedEvent.startTime || "",
-                        description: selectedEvent.description || "",
-                        status: selectedEvent.status || "Scheduled"
-                    }}
-                    onClose={handleCloseDetails}
-                    onSubmit={(eventData) => {
-                        console.log("Submitted event data:", eventData);
-                        handleCloseDetails();
-                    }}
-                />
-            )}
+          {showDetails && selectedEvent && (
+            <EventDetail
+              eventData={{
+                event_name: selectedEvent.event_name,
+                year: selectedEvent.year,
+                venue: selectedEvent.venue || "",
+                start_date: new Date(
+                  selectedEvent.event_date
+                ).toLocaleDateString(),
+                time: selectedEvent.time || "",
+                // description: selectedEvent.description || "",
+                // status: selectedEvent.status || "Scheduled",
+              }}
+              onClose={handleCloseDetails}
+              onSubmit={(eventData) => {
+                console.log("Submitted event data:", eventData);
+                handleCloseDetails();
+              }}
+            />
+          )}
           <TextField
             select
             value={status}
@@ -287,7 +297,7 @@ const EventTable: React.FC<EventTableProps> = ({
           </TableHead>
           <TableBody>
             {allEvent.map((event) => {
-              const eventStartDate = dayjs(event.start_date);
+              const eventStartDate = dayjs(event.event_date);
 
               // Determine status based on start_date
               const status = dayjs().isBefore(eventStartDate, "day")
@@ -297,11 +307,11 @@ const EventTable: React.FC<EventTableProps> = ({
                 : "Today";
 
               return (
-                <TableRow key={event.event_name}>
+                <TableRow key={event.event_id}>
                   <TableCell>{event.event_name}</TableCell>
                   <TableCell>{event.venue}</TableCell>
                   <TableCell>
-                    {new Date(event.start_date).toLocaleDateString()}
+                    {new Date(event.event_date).toLocaleDateString()}
                   </TableCell>
                   <TableCell>{event.time}</TableCell>
                   <TableCell>
@@ -316,7 +326,7 @@ const EventTable: React.FC<EventTableProps> = ({
                       <EditIcon />
                     </IconButton>
                     <IconButton
-                      onClick={() => onDelete(event.event_name)}
+                      onClick={() => onDelete(event.event_id)}
                       style={{ color: "#e74c3c" }}
                     >
                       <DeleteIcon />
