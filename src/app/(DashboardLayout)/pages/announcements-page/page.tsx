@@ -1,11 +1,11 @@
 "use client";
-
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Typography,
-  Button,
   Box,
-  Card,
+  Button,
+  Menu,
+  MenuItem,
   Table,
   TableBody,
   TableCell,
@@ -14,74 +14,59 @@ import {
   TableRow,
   Paper,
   Chip,
-  InputAdornment,
+  Card,
   IconButton,
-  Menu,
-  MenuItem,
-  TextField,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
 } from "@mui/material";
-import EditIcon from "@mui/icons-material/Edit";
-import DeleteIcon from "@mui/icons-material/Delete";
-import FilterListIcon from "@mui/icons-material/FilterList";
+import { DesktopDatePicker } from "@mui/x-date-pickers/DesktopDatePicker";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import theme from "@/utils/theme";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import ReplayIcon from "@mui/icons-material/Replay";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
-import AccountCircle from "@mui/icons-material/AccountCircle";
-import { DesktopDatePicker } from "@mui/x-date-pickers/DesktopDatePicker"; // Import DesktopDatePicker
-import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider"; // Import LocalizationProvider
-import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs"; // Import AdapterDayjs
-import dayjs, { Dayjs } from "dayjs"; // Import Day.js for date handling
-import CreateAnnouncementModal from "./CreateAnnouncementModal"; // Relative path
+import DeleteIcon from "@mui/icons-material/Delete";
+import CreateAnnouncementModal from "./CreateAnnouncementModal";
 import PageContainer from "@/app/(DashboardLayout)/components/container/PageContainer";
-import theme from "@/utils/theme";
-
-const initialAnnouncements = [
-  {
-    title: "The ACM club coordinator wants to meet all the first years at",
-    createdBy: "Admin",
-    createdOn: "10/10/2024",
-    time: "8pm on 26th November",
-    tags: ["Meeting"],
-  },
-  {
-    title: "Club meeting next week",
-    createdBy: "Admin",
-    createdOn: "12/10/2024",
-    time: "10am on 1st December",
-    tags: ["Meeting"],
-  },
-  {
-    title: "Guest speaker event on Friday",
-    createdBy: "Admin",
-    createdOn: "15/10/2024",
-    time: "5pm on 30th November",
-    tags: ["Event"],
-  },
-  {
-    title: "Programming Classes",
-    createdBy: "Admin",
-    createdOn: "12/11/2024",
-    time: "10am on 1st December",
-    tags: ["Event"],
-  },
-  {
-    title: "Seminar",
-    createdBy: "Admin",
-    createdOn: "15/11/2024",
-    time: "5pm on 30th November",
-    tags: ["Event"],
-  },
-];
+import dayjs, { Dayjs } from "dayjs";
+import EditAnnouncementModal from "./EditAnnouncement";
 
 const AnnouncementsPage: React.FC = () => {
-  const [openModal, setOpenModal] = useState(false);
-  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const [announcements, setAnnouncements] = useState<any[]>([]);
   const [filterOption, setFilterOption] = useState<string>("Filter By");
-  const [announcements, setAnnouncements] = useState(initialAnnouncements);
-  const [selectedDate, setSelectedDate] = useState<Dayjs | null>(null); // State for date picker
+  const [selectedDate, setSelectedDate] = useState<Dayjs | null>(null);
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const [openModal, setOpenModal] = useState(false);
+  const [openDeleteDialog, setOpenDeleteDialog] = useState(false); // For dialog visibility
+  const [announcementToDelete, setAnnouncementToDelete] = useState<
+    string | null
+  >(null); // Store the ID of the announcement to delete
+  const [openEditModal, setOpenEditModal] = useState(false); // State for the edit modal
+  const [announcementToEdit, setAnnouncementToEdit] = useState<any | null>(
+    null
+  ); // Announcement to edit
 
-  const handleOpenModal = () => setOpenModal(true);
-  const handleCloseModal = () => setOpenModal(false);
+  // Fetch announcements from the API
+  const fetchAnnouncements = async () => {
+    try {
+      const response = await fetch("/api/announcements");
+      if (!response.ok) {
+        throw new Error("Failed to fetch announcements");
+      }
+      const result = await response.json();
+      setAnnouncements(result);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  // Fetch data on component mount
+  useEffect(() => {
+    fetchAnnouncements();
+  }, []);
 
   const handleClick = (event: React.MouseEvent<HTMLElement>): void => {
     setAnchorEl(event.currentTarget);
@@ -92,70 +77,169 @@ const AnnouncementsPage: React.FC = () => {
     setAnchorEl(null);
   };
 
-  // Handle resetting the filter
   const handleResetFilter = () => {
     setFilterOption("Filter By");
-    setAnnouncements(initialAnnouncements); // Reset announcements
+    setAnnouncements([]); // Reset announcements
     setSelectedDate(null); // Reset selected date
+    fetchAnnouncements(); // Re-fetch all announcements
   };
 
-  // Handle filtering announcements based on the selected option
+  // Handle delete announcement
+  const handleDeleteAnnouncement = async () => {
+    if (!announcementToDelete) return;
+    try {
+      const response = await fetch(
+        `/api/announcements?id=${announcementToDelete}`,
+        {
+          method: "DELETE",
+        }
+      );
+
+      if (response.ok) {
+        // Remove the deleted announcement from the state
+        setAnnouncements(
+          announcements.filter(
+            (announcement) => announcement._id !== announcementToDelete
+          )
+        );
+        setOpenDeleteDialog(false); // Close the dialog after deletion
+      } else {
+        console.error("Failed to delete announcement");
+      }
+    } catch (error) {
+      console.error("Error deleting announcement:", error);
+    }
+  };
+
+  const handleOpenDeleteDialog = (id: string) => {
+    setAnnouncementToDelete(id);
+    setOpenDeleteDialog(true); // Open the delete confirmation dialog
+  };
+
+  const handleCloseDeleteDialog = () => {
+    setOpenDeleteDialog(false);
+    setAnnouncementToDelete(null);
+  };
+
+  const handleOpenEditModal = (announcement: any) => {
+    setAnnouncementToEdit(announcement);
+    setOpenEditModal(true);
+  };
+
+  const handleCloseEditModal = () => {
+    setOpenEditModal(false);
+    setAnnouncementToEdit(null);
+  };
+
+  // Filter announcements based on filter option (tags and date)
   const filteredAnnouncements = announcements.filter((announcement) => {
-    if (filterOption === "Events") return announcement.tags.includes("Event");
-    if (filterOption === "Meeting") return announcement.tags.includes("Meeting");
-    if (selectedDate) return dayjs(announcement.createdOn).isSame(selectedDate, "day");
-    return true; // If "Filter By" or "All", return all
+    if (
+      filterOption !== "Filter By" &&
+      !announcement.tags.some(
+        (tag: string) => tag.toLowerCase() === filterOption.toLowerCase()
+      )
+    ) {
+      return false;
+    }
+    if (selectedDate) {
+      return dayjs(announcement.createdAt).isSame(selectedDate, "day");
+    }
+    return true;
   });
 
-  const handleAddAnnouncement = (newAnnouncement: { title: string; createdBy: string; createdOn: string; time: string; tags: string[] }) => {
-    setAnnouncements((prevAnnouncements) => [...prevAnnouncements, newAnnouncement]);
-    handleCloseModal();
-  };
+  // Get the latest announcement (most recent by createdAt)
+  const latestAnnouncement =
+    announcements.length > 0
+      ? announcements.sort((a, b) =>
+          dayjs(b.createdAt).isBefore(dayjs(a.createdAt)) ? 1 : -1
+        )[0]
+      : null;
 
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
-      <PageContainer title="Announcements" description="Manage your announcements effectively.">
+      <PageContainer
+        title="Announcements"
+        description="Manage your announcements effectively."
+      >
         <Box display="flex" flexDirection="column" mb={2}>
-          <Typography variant="h4" sx={{ color: theme.palette.primary.main }} mb={2}>
+          <Typography
+            variant="h4"
+            sx={{ color: theme.palette.primary.main }}
+            mb={2}
+          >
             Announcements
           </Typography>
 
-          <Card variant="outlined" sx={{ mb: 6 }}>
-            <Box display="flex" alignItems="center" justifyContent="space-between" p={2}>
-              <Box display="flex" alignItems="center">
-                <AccountCircle sx={{ color: theme.palette.primary.main, marginRight: 1, fontSize: "30px" }} />
-                <Box>
-                  <Typography variant="subtitle1" fontWeight="600" fontSize="1rem">
-                    The ACM club coordinator wants to meet all the first years at
-                  </Typography>
-                  <Typography variant="subtitle2" fontWeight="400" fontSize="0.75rem">8pm on 26th November</Typography>
-                </Box>
-              </Box>
-              <Box display="flex" alignItems="center">
-                <Typography variant="subtitle2" fontWeight="400" fontSize="0.75rem" sx={{ marginRight: 2 }}>
-                  Admin | Posted on 26th Sept
+          {/* Display the latest announcement in a Card */}
+          {latestAnnouncement && (
+            <Card variant="outlined" sx={{ mb: 4 }}>
+              <Box display="flex" flexDirection="column" p={2}>
+                <Typography variant="h6" sx={{ fontWeight: "bold", mb: 1 }}>
+                  {latestAnnouncement.announcement_title}
                 </Typography>
-                <IconButton>
-                  <MoreVertIcon />
-                </IconButton>
+                <Typography
+                  variant="body2"
+                  color="textSecondary"
+                  sx={{ mb: 1 }}
+                >
+                  {latestAnnouncement.description || "No description available"}
+                </Typography>
+                <Box display="flex" alignItems="center" sx={{ gap: 1 }}>
+                  {latestAnnouncement.tags.map((tag: string, index: number) => (
+                    <Chip
+                      key={index}
+                      label={tag}
+                      variant="outlined"
+                      color="primary"
+                    />
+                  ))}
+                </Box>
+                <Typography
+                  variant="caption"
+                  color="textSecondary"
+                  sx={{ mt: 2 }}
+                >
+                  Created on:{" "}
+                  {dayjs(latestAnnouncement.createdAt).format("MMM D, YYYY")}
+                </Typography>
               </Box>
-            </Box>
-          </Card>
+            </Card>
+          )}
 
           <Box display="flex" alignItems="center" mb={2} sx={{ gap: 1 }}>
-            <Box display="flex" alignItems="center" sx={{ border: "1px solid #ccc", borderRadius: "4px", padding: "4px 8px" }}>
-              <InputAdornment position="start">
-                <FilterListIcon />
-              </InputAdornment>
-              <Button onClick={handleClick} sx={{ textTransform: 'none', padding: 1 }}>
-                <Typography variant="subtitle1" sx={{ marginRight: 1, color: theme.palette.text.secondary }}>
+            <Box
+              display="flex"
+              alignItems="center"
+              sx={{
+                border: "1px solid #ccc",
+                borderRadius: "4px",
+                padding: "4px 8px",
+              }}
+            >
+              <Button
+                onClick={handleClick}
+                sx={{ textTransform: "none", padding: 1 }}
+              >
+                <Typography
+                  variant="subtitle1"
+                  sx={{ marginRight: 1, color: theme.palette.text.secondary }}
+                >
                   {filterOption}
                 </Typography>
-                <ArrowDropDownIcon sx={{ color: theme.palette.text.secondary }} />
+                <ArrowDropDownIcon
+                  sx={{ color: theme.palette.text.secondary }}
+                />
               </Button>
-              <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={() => handleClose(filterOption)}>
-                <MenuItem onClick={() => handleClose("Events")}>Events</MenuItem>
-                <MenuItem onClick={() => handleClose("Meeting")}>Meeting</MenuItem>
+              <Menu
+                anchorEl={anchorEl}
+                open={Boolean(anchorEl)}
+                onClose={() => handleClose(filterOption)}
+              >
+                {["Event", "Meeting"].map((tag) => (
+                  <MenuItem key={tag} onClick={() => handleClose(tag)}>
+                    {tag}
+                  </MenuItem>
+                ))}
               </Menu>
             </Box>
 
@@ -163,15 +247,20 @@ const AnnouncementsPage: React.FC = () => {
             <DesktopDatePicker
               label="Date Created"
               value={selectedDate}
-              onChange={(newDate) => setSelectedDate(newDate)} // Set selected date
+              onChange={(newDate) => setSelectedDate(newDate)}
             />
 
             <Button
               variant="outlined"
               color="secondary"
-              sx={{ color: 'red', borderColor: '#ccc', borderRadius: '4px', padding: '14px 18px' }}
-              startIcon={<ReplayIcon sx={{ color: 'red' }} />}
-              onClick={handleResetFilter} // Reset Filter functionality
+              sx={{
+                color: "red",
+                borderColor: "#ccc",
+                borderRadius: "4px",
+                padding: "14px 18px",
+              }}
+              startIcon={<ReplayIcon sx={{ color: "red" }} />}
+              onClick={handleResetFilter}
             >
               Reset Filter
             </Button>
@@ -180,8 +269,8 @@ const AnnouncementsPage: React.FC = () => {
               <Button
                 variant="contained"
                 color="primary"
-                onClick={handleOpenModal}
-                sx={{ color: "#fff", fontSize: "rem" }}
+                onClick={() => setOpenModal(true)}
+                sx={{ color: "#fff" }}
               >
                 Create Announcement
               </Button>
@@ -202,10 +291,10 @@ const AnnouncementsPage: React.FC = () => {
               <TableBody>
                 {filteredAnnouncements.map((item, index) => (
                   <TableRow key={index}>
-                    <TableCell>{item.title}</TableCell>
-                    <TableCell>{item.createdBy}</TableCell>
+                    <TableCell>{item.announcement_title}</TableCell>
+                    <TableCell>{item.created_by?.role || "N/A"}</TableCell>
                     <TableCell>
-                      {item.tags.map((tag, tagIndex) => (
+                      {item.tags.map((tag: string, tagIndex: number) => (
                         <Chip
                           key={tagIndex}
                           label={tag}
@@ -215,11 +304,21 @@ const AnnouncementsPage: React.FC = () => {
                         />
                       ))}
                     </TableCell>
-                    <TableCell>{item.createdOn}</TableCell>
+                    <TableCell>
+                      {dayjs(item.createdAt).format("MMM D, YYYY")}
+                    </TableCell>
                     <TableCell>
                       <Box display="flex" alignItems="center">
-                        <EditIcon sx={{ marginRight: 1, cursor: "pointer", color: theme.palette.primary.main }} />
-                        <DeleteIcon sx={{ cursor: "pointer", color: 'red' }} />
+                        <IconButton onClick={() => handleOpenEditModal(item)}>
+                          <MoreVertIcon />
+                        </IconButton>
+
+                        <IconButton
+                          color="error"
+                          onClick={() => handleOpenDeleteDialog(item._id)}
+                        >
+                          <DeleteIcon />
+                        </IconButton>
                       </Box>
                     </TableCell>
                   </TableRow>
@@ -231,9 +330,33 @@ const AnnouncementsPage: React.FC = () => {
 
         <CreateAnnouncementModal
           open={openModal}
-          onClose={handleCloseModal}
-          onAddAnnouncement={handleAddAnnouncement}
+          onClose={() => setOpenModal(false)}
+          onAddAnnouncement={fetchAnnouncements}
         />
+        <EditAnnouncementModal
+          open={openEditModal}
+          onClose={handleCloseEditModal}
+          announcement={announcementToEdit}
+          onUpdateAnnouncement={fetchAnnouncements}
+        />
+
+        {/* Delete Confirmation Dialog */}
+        <Dialog open={openDeleteDialog} onClose={handleCloseDeleteDialog}>
+          <DialogTitle>Confirm Deletion</DialogTitle>
+          <DialogContent>
+            <Typography>
+              Are you sure you want to delete this announcement?
+            </Typography>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleCloseDeleteDialog} color="primary">
+              Cancel
+            </Button>
+            <Button onClick={handleDeleteAnnouncement} color="error">
+              Delete
+            </Button>
+          </DialogActions>
+        </Dialog>
       </PageContainer>
     </LocalizationProvider>
   );
