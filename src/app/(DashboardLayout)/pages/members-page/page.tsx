@@ -32,12 +32,12 @@ import FilterListIcon from "@mui/icons-material/FilterList";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import PageContainer from "@/app/(DashboardLayout)/components/container/PageContainer";
 import StudentGraph from "@/app/(DashboardLayout)/pages/dashboard/GraphProp";
-import theme from "@/utils/theme"; 
-import AddMemberForm from "./AddMemberForm"; 
+import theme from "@/utils/theme";
+import AddMemberForm from "./AddMemberForm";
 import Bulkupload from "./Bulkupload";
-import Attendance from "./Attendance"; // Import the Attendance component
+import Attendance from "./Attendance";
 
-// Define the Member interface
+// Define the Member interface here
 interface Member {
   name: string;
   studentNo: string;
@@ -47,7 +47,7 @@ interface Member {
   gender?: "Male" | "Female" | "Others";
 }
 
-const MembersPage = () => {
+const MembersPage: React.FC = () => {
   // State to manage members data
   const [members, setMembers] = useState<Member[]>([
     {
@@ -90,7 +90,35 @@ const MembersPage = () => {
       year: "4",
       gender: "Female",
     },
+    {
+      name: "Dechen Pelden",
+      studentNo: "02210195",
+      department: "Information Technology",
+      email: "jigme@gmail.com",
+      year: "2",
+      gender: "Male",
+    },
+    {
+      name: "Norphel",
+      studentNo: "02210233",
+      department: "Geology",
+      email: "suzal@gmail.com",
+      year: "3",
+      gender: "Female",
+    },
+    {
+      name: "Jimpa",
+      studentNo: "02210228",
+      department: "Civil",
+      email: "tashi@gmail.com",
+      year: "1",
+      gender: "Male",
+    },
   ]);
+
+  const handleUploadComplete = (newMembers: Member[]) => {
+    setMembers(newMembers); // Update members with the newly uploaded data
+  };
 
   // State for the search input and filters
   const [searchTerm, setSearchTerm] = useState("");
@@ -187,7 +215,6 @@ const MembersPage = () => {
               </Typography>
               {/* Statistic cards with graphs */}
               <Grid container spacing={1} mt={2}>
-                {/* Male, Female, Others, Total counts */}
                 {[ 
                   { label: "Male Count", data: [20, 30, 40, 50], icon: <MaleIcon /> },
                   { label: "Female Count", data: [40, 50, 55, 60], icon: <FemaleIcon /> },
@@ -233,7 +260,7 @@ const MembersPage = () => {
                   startAdornment={<InputAdornment position="start"><FilterListIcon /></InputAdornment>}
                 >
                   <MenuItem value=""><em>Year</em></MenuItem>
-                  {["1", "2", "3", "4"].map((year) => (
+                  {years.map((year) => (
                     <MenuItem key={year} value={year}>{year}</MenuItem>
                   ))}
                 </Select>
@@ -248,47 +275,44 @@ const MembersPage = () => {
                   startAdornment={<InputAdornment position="start"><FilterListIcon /></InputAdornment>}
                 >
                   <MenuItem value=""><em>Department</em></MenuItem>
-                  {["Information Technology", "Geology", "Civil", "Electrical", "Mechanical"].map((dept) => (
+                  {departments.map((dept) => (
                     <MenuItem key={dept} value={dept}>{dept}</MenuItem>
                   ))}
                 </Select>
 
                 <TextField
-                  placeholder="Search by name"
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
+                  label="Search by Name"
                   variant="outlined"
                   size="small"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
                   sx={{ mr: 2 }}
                   InputProps={{
-                    startAdornment: (
-                      <InputAdornment position="start">
-                        <SearchIcon />
-                      </InputAdornment>
-                    ),
+                    startAdornment: <InputAdornment position="start"><SearchIcon /></InputAdornment>,
                   }}
                 />
+
                 <Button
-                  variant="outlined"
+                  variant="contained"
                   color="primary"
-                  onClick={handleResetFilters}
                   startIcon={<RefreshIcon />}
+                  onClick={handleResetFilters}
                 >
                   Reset Filters
                 </Button>
               </Box>
 
-              {/* Action buttons for adding member and bulk upload */}
-              <Box>
-                <Button
-                   variant="contained"
-                   color="primary"
-                   sx={{ mr: 1 }}
-                   onClick={() => setOpenBulkUpload(true)}
-                 >
-                   Bulk Upload
-                </Button>
-                <Button
+              {/* Bulk Upload Button */}
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={() => setOpenBulkUpload(true)}
+                startIcon={<AddIcon />}
+              >
+                Bulk Upload
+              </Button>
+
+              <Button
                  variant="contained"
                  color="primary"
                  sx={{ mr: 1 }}
@@ -304,73 +328,67 @@ const MembersPage = () => {
                 >
                   Attendance
                 </Button>
-              </Box>
             </Box>
 
-            {/* Members Table */}
+            {/* Table displaying the list of members */}
             <TableContainer component={Paper}>
               <Table>
                 <TableHead>
                   <TableRow>
-                    <TableCell>Student Number</TableCell>
                     <TableCell>Name</TableCell>
+                    <TableCell>Student No</TableCell>
                     <TableCell>Department</TableCell>
-                    <TableCell>Year</TableCell>
                     <TableCell>Email</TableCell>
+                    <TableCell>Year</TableCell>
                     <TableCell>Gender</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {filteredMembers.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((member) => (
-                    <TableRow key={member.studentNo}>
-                      <TableCell>{member.studentNo}</TableCell>
-                      <TableCell>{member.name}</TableCell>
-                      <TableCell>{member.department}</TableCell>
-                      <TableCell>{member.year}</TableCell>
-                      <TableCell>{member.email}</TableCell>
-                      <TableCell>{member.gender}</TableCell>
-                    </TableRow>
-                  ))}
+                  {filteredMembers
+                    .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                    .map((member, index) => (
+                      <TableRow key={index}>
+                        <TableCell>{member.name}</TableCell>
+                        <TableCell>{member.studentNo}</TableCell>
+                        <TableCell>{member.department}</TableCell>
+                        <TableCell>{member.email}</TableCell>
+                        <TableCell>{member.year}</TableCell>
+                        <TableCell>{member.gender}</TableCell>
+                      </TableRow>
+                    ))}
                 </TableBody>
               </Table>
             </TableContainer>
 
+            {/* Pagination */}
             <TablePagination
-              rowsPerPageOptions={[]}
+              rowsPerPageOptions={[ ]}
               component="div"
               count={filteredMembers.length}
               rowsPerPage={rowsPerPage}
               page={page}
               onPageChange={handleChangePage}
               sx={{ justifyContent: "flex-end" }} // Align pagination to the right
-          
             />
           </Box>
 
-          {/* Add Member Dialog */}
+          {/* Add Member Form Dialog */}
           <Dialog open={open} onClose={() => setOpen(false)}>
-            <DialogTitle>Add Member</DialogTitle>
+            <DialogTitle>Add New Member</DialogTitle>
             <DialogContent>
               <AddMemberForm onAddMember={handleAddMember} onClose={() => setOpen(false)} />
             </DialogContent>
-            <DialogActions>
-              <Button onClick={() => setOpen(false)} color="primary">Close</Button>
-            </DialogActions>
           </Dialog>
 
           {/* Bulk Upload Dialog */}
           <Dialog open={openBulkUpload} onClose={() => setOpenBulkUpload(false)}>
             <DialogTitle>Bulk Upload Members</DialogTitle>
             <DialogContent>
-              <Bulkupload />
+              <Bulkupload onUploadComplete={handleUploadComplete} />
             </DialogContent>
-            <DialogActions>
-              <Button onClick={() => setOpenBulkUpload(false)} color="primary">Close</Button>
-            </DialogActions>
           </Dialog>
         </>
       ) : (
-        // Render the Attendance component if showAttendance is true
         <Attendance />
       )}
     </PageContainer>
