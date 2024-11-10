@@ -1,6 +1,6 @@
 import { connectToDB } from "../../../../utils/database";
-import financials from "../../../../models/financials";
-import members from "../../../../models/members";
+import financials from "../../../models/financials";
+import members from "../../../models/members";
 
 export const GET = async () => {
   try {

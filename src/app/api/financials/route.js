@@ -1,7 +1,6 @@
 import { connectToDB } from "../../../utils/database";
-import financials from "../../../models/financials";
+import financials from "../../models/financials";
 import mongoose from "mongoose";
-import { NextResponse } from "next/server";
 
 const { ObjectId } = mongoose.Types;
 

@@ -1,5 +1,5 @@
 import { connectToDB } from "../../../../utils/database";
-import financials from "../../../../models/financials";
+import financials from "../../../models/financials";
 import { NextResponse } from "next/server";
 
 export const PATCH = async (req, { params }) => {
