@@ -1,14 +1,13 @@
 import { connectToDB } from "../../../../utils/database";
-import members from "../../../../models/members";
-import attendance from "../../../../models/attendance";
-import users from "../../../../models/users";
+import members from "../../../models/members";
+import attendance from "../../../models/attendance";
+import users from "../../../models/users";
 
 //GET (READ)
 export const GET = async (request, { params }) => {
   try {
     await connectToDB();
-
-    const member = await members.findById(params.id).populate("attendance");
+    const member = await members.findOne({ userID: params.id });
 
     if (!member) {
       return new Response(

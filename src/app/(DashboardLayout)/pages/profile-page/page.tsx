@@ -1,5 +1,5 @@
 "use client";
-
+import React, { useState, useEffect } from "react";
 import {
   Avatar,
   Box,
@@ -12,22 +12,27 @@ import {
   Paper,
 } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
-import * as React from "react";
 import EditIcon from "@mui/icons-material/Edit";
+import { useSession } from "next-auth/react";
+import Loading from "../../loading";
 
 const ProfilePage: React.FC = () => {
   const theme = useTheme();
   const [isEditing, setIsEditing] = React.useState(false);
-  const [userProfile, setUserProfile] = React.useState({
-    name: "Tashi Kuenga Phuntsho",
-    studentNumber: "CST2020153",
-    email: "tashi.phuntsho@cst.edu.bt",
-    department: "Information Technology",
-    year: "4th Year",
-    contactNumber: "123-456-7890",
-    gender: "Male",
-    designation: "Student",
+  const [userProfile, setUserProfile] = useState({
+    name: "",
+    studentNumber: "",
+    email: "",
+    department: "",
+    programme: "",
+    year: "",
+    contactNumber: "",
+    gender: "",
+    designation: "",
   });
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const { data: session, status } = useSession(); // Fetch session data
 
   const handleEditToggle = () => {
     setIsEditing(!isEditing);
@@ -46,6 +51,65 @@ const ProfilePage: React.FC = () => {
     setIsEditing(false);
   };
 
+  //------------------------------------------------------------
+  // Integration Code //
+  interface Member {
+    name: string;
+    std_id: string;
+    programme: string;
+    contact_number: number;
+    year: number;
+    email: string;
+    department: string;
+    gender: string;
+    designation: string;
+  }
+
+  const fetchUserDetails = async () => {
+    try {
+      if (session?.user?.id) {
+        setLoading(true);
+        const response = await fetch(`/api/members/${session.user.id}`);
+        if (!response.ok) {
+          throw new Error("Fetch error");
+        }
+        const result = await response.json();
+
+        // Update userProfile with fetched data
+        setUserProfile({
+          name: result.name,
+          studentNumber: result.std_id,
+          email: result.email,
+          department: result.department,
+          programme: result.programme,
+          year: result.year.toString(),
+          contactNumber: result.contact_number.toString(),
+          gender: result.gender,
+          designation: result.designation,
+        });
+      } else {
+        setError("User not logged in");
+      }
+    } catch (error) {
+      setError("Some Error Occurred");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (session?.user?.id) {
+      fetchUserDetails();
+    }
+  }, [session?.user?.id]);
+
+  if (loading) {
+    return <Loading />;
+  }
+
+  if (error) {
+    return <Typography>{error}</Typography>;
+  }
   return (
     <Container
       sx={{
@@ -71,7 +135,7 @@ const ProfilePage: React.FC = () => {
       >
         <Avatar
           alt={userProfile.name}
-          src="https://via.placeholder.com/130"
+          src="https://thumbs.dreamstime.com/b/generic-person-gray-photo-placeholder-man-silhouette-white-background-144511705.jpg"
           sx={{
             width: 130,
             height: 130,
@@ -136,84 +200,92 @@ const ProfilePage: React.FC = () => {
                   Contact Information
                 </Typography>
 
-                <TextField
-                  fullWidth
-                  label="Email"
-                  name="email"
-                  value={userProfile.email}
-                  onChange={handleChange}
-                  sx={{
-                    mb: 3,
-                    "& .MuiOutlinedInput-root": {
-                      height: "56px",
-                      paddingTop: "12px",
-                      paddingBottom: "12px",
-                    },
-                  }}
-                  InputProps={{
-                    readOnly: !isEditing,
-                    startAdornment: isEditing ? (
-                      <InputAdornment position="start">
-                        <EditIcon color="primary" />
-                      </InputAdornment>
-                    ) : null,
-                    sx: {
-                      "& input": {
-                        backgroundColor: isEditing ? "#ffffff" : "transparent",
-                        transition: "background-color 0.3s ease-in-out",
-                      },
-                    },
-                  }}
-                  InputLabelProps={{
-                    sx: {
-                      color: isEditing
-                        ? theme.palette.primary.main
-                        : theme.palette.text.secondary,
-                      fontSize: "1rem",
-                      transition: "0.2s ease-in-out",
-                    },
-                    shrink: isEditing || userProfile.email !== "",
-                  }}
-                />
+                <Grid container spacing={3}>
+                  <Grid item xs={12} sm={6}>
+                    <TextField
+                      fullWidth
+                      label="Email"
+                      name="email"
+                      value={userProfile.email}
+                      onChange={handleChange}
+                      sx={{
+                        "& .MuiOutlinedInput-root": {
+                          height: "56px",
+                          paddingTop: "12px",
+                          paddingBottom: "12px",
+                        },
+                      }}
+                      InputProps={{
+                        readOnly: !isEditing,
+                        startAdornment: isEditing ? (
+                          <InputAdornment position="start">
+                            <EditIcon color="primary" />
+                          </InputAdornment>
+                        ) : null,
+                        sx: {
+                          "& input": {
+                            backgroundColor: isEditing
+                              ? "#ffffff"
+                              : "transparent",
+                            transition: "background-color 0.3s ease-in-out",
+                          },
+                        },
+                      }}
+                      InputLabelProps={{
+                        sx: {
+                          color: isEditing
+                            ? theme.palette.primary.main
+                            : theme.palette.text.secondary,
+                          fontSize: "1rem",
+                          transition: "0.2s ease-in-out",
+                        },
+                        shrink: isEditing || userProfile.email !== "",
+                      }}
+                    />
+                  </Grid>
 
-                <TextField
-                  fullWidth
-                  label="Contact Number"
-                  name="contactNumber"
-                  value={userProfile.contactNumber}
-                  onChange={handleChange}
-                  sx={{
-                    mb: 3,
-                    "& .MuiOutlinedInput-root": {
-                      height: "56px",
-                      paddingTop: "12px",
-                      paddingBottom: "12px",
-                    },
-                  }}
-                  InputProps={{
-                    readOnly: !isEditing,
-                    startAdornment: isEditing ? (
-                      <InputAdornment position="start">
-                        <EditIcon color="primary" />
-                      </InputAdornment>
-                    ) : null,
-                    sx: {
-                      "& input": {
-                        backgroundColor: isEditing ? "#ffffff" : "transparent",
-                      },
-                    },
-                  }}
-                  InputLabelProps={{
-                    sx: {
-                      color: isEditing
-                        ? theme.palette.primary.main
-                        : theme.palette.text.secondary,
-                      fontSize: "1rem",
-                      transition: "0.2s ease-in-out",
-                    },
-                    shrink: isEditing || userProfile.contactNumber !== "",
-                  }}
-                />
+                  <Grid item xs={12} sm={6}>
+                    <TextField
+                      fullWidth
+                      label="Contact Number"
+                      name="contactNumber"
+                      value={userProfile.contactNumber}
+                      onChange={handleChange}
+                      sx={{
+                        "& .MuiOutlinedInput-root": {
+                          height: "56px",
+                          paddingTop: "12px",
+                          paddingBottom: "12px",
+                        },
+                      }}
+                      InputProps={{
+                        readOnly: !isEditing,
+                        startAdornment: isEditing ? (
+                          <InputAdornment position="start">
+                            <EditIcon color="primary" />
+                          </InputAdornment>
+                        ) : null,
+                        sx: {
+                          "& input": {
+                            backgroundColor: isEditing
+                              ? "#ffffff"
+                              : "transparent",
+                          },
+                        },
+                      }}
+                      InputLabelProps={{
+                        sx: {
+                          color: isEditing
+                            ? theme.palette.primary.main
+                            : theme.palette.text.secondary,
+                          fontSize: "1rem",
+                          transition: "0.2s ease-in-out",
+                        },
+                        shrink: isEditing || userProfile.contactNumber !== "",
+                      }}
+                    />
+                  </Grid>
+                </Grid>
               </Box>
             </Grid>
 
@@ -242,53 +314,99 @@ const ProfilePage: React.FC = () => {
                   Academic Details
                 </Typography>
 
-                <TextField
-                  fullWidth
-                  label="Department"
-                  name="department"
-                  value={userProfile.department}
-                  onChange={handleChange}
-                  sx={{
-                    mb: 3,
-                    "& .MuiOutlinedInput-root": {
-                      height: "56px",
-                      paddingTop: "12px",
-                      paddingBottom: "12px",
-                    },
-                  }}
-                  InputProps={{
-                    readOnly: !isEditing,
-                    startAdornment: isEditing ? (
-                      <InputAdornment position="start">
-                        <EditIcon color="primary" />
-                      </InputAdornment>
-                    ) : null,
-                    sx: {
-                      "& input": {
-                        backgroundColor: isEditing ? "#ffffff" : "transparent",
-                      },
-                    },
-                  }}
-                  InputLabelProps={{
-                    sx: {
-                      color: isEditing
-                        ? theme.palette.primary.main
-                        : theme.palette.text.secondary,
-                      fontSize: "1rem",
-                      transition: "0.2s ease-in-out",
-                    },
-                    shrink: isEditing || userProfile.department !== "",
-                  }}
-                />
+                <Grid container spacing={3}>
+                  <Grid item xs={12} sm={6}>
+                    <TextField
+                      fullWidth
+                      label="Department"
+                      name="department"
+                      value={userProfile.department}
+                      onChange={handleChange}
+                      sx={{
+                        "& .MuiOutlinedInput-root": {
+                          height: "56px",
+                          paddingTop: "12px",
+                          paddingBottom: "12px",
+                        },
+                      }}
+                      InputProps={{
+                        readOnly: !isEditing,
+                        startAdornment: isEditing ? (
+                          <InputAdornment position="start">
+                            <EditIcon color="primary" />
+                          </InputAdornment>
+                        ) : null,
+                        sx: {
+                          "& input": {
+                            backgroundColor: isEditing
+                              ? "#ffffff"
+                              : "transparent",
+                          },
+                        },
+                      }}
+                      InputLabelProps={{
+                        sx: {
+                          color: isEditing
+                            ? theme.palette.primary.main
+                            : theme.palette.text.secondary,
+                          fontSize: "1rem",
+                          transition: "0.2s ease-in-out",
+                        },
+                        shrink: isEditing || userProfile.department !== "",
+                      }}
+                    />
+                  </Grid>
 
+                  <Grid item xs={12} sm={6}>
+                    <TextField
+                      fullWidth
+                      label="Year"
+                      name="year"
+                      value={userProfile.year}
+                      onChange={handleChange}
+                      sx={{
+                        "& .MuiOutlinedInput-root": {
+                          height: "56px",
+                          paddingTop: "12px",
+                          paddingBottom: "12px",
+                        },
+                      }}
+                      InputProps={{
+                        readOnly: !isEditing,
+                        startAdornment: isEditing ? (
+                          <InputAdornment position="start">
+                            <EditIcon color="primary" />
+                          </InputAdornment>
+                        ) : null,
+                        sx: {
+                          "& input": {
+                            backgroundColor: isEditing
+                              ? "#ffffff"
+                              : "transparent",
+                          },
+                        },
+                      }}
+                      InputLabelProps={{
+                        sx: {
+                          color: isEditing
+                            ? theme.palette.primary.main
+                            : theme.palette.text.secondary,
+                          fontSize: "1rem",
+                          transition: "0.2s ease-in-out",
+                        },
+                        shrink: isEditing || userProfile.year !== "",
+                      }}
+                    />
+                  </Grid>
+                </Grid>
                 <TextField
                   fullWidth
-                  label="Year"
-                  name="year"
-                  value={userProfile.year}
+                  label="Programme"
+                  name="Programme"
+                  value={userProfile.programme}
                   onChange={handleChange}
                   sx={{
-                    mb: 3,
+                    marginTop: "14px",
                     "& .MuiOutlinedInput-root": {
                       height: "56px",
                       paddingTop: "12px",
@@ -319,6 +437,119 @@ const ProfilePage: React.FC = () => {
                     shrink: isEditing || userProfile.year !== "",
                   }}
                 />
+              </Box>
+            </Grid>
+
+            <Grid item xs={12}>
+              <Box
+                sx={{
+                  padding: "2rem",
+                  borderRadius: "15px",
+                  backgroundColor: "#f9f9f9",
+                  boxShadow: "0 4px 20px rgba(0, 0, 0, 0.1)",
+                  transition: "0.3s",
+                  "&:hover": {
+                    boxShadow: "0 8px 40px rgba(0, 0, 0, 0.15)",
+                  },
+                }}
+              >
+                <Typography
+                  variant="h5"
+                  sx={{
+                    fontWeight: "600",
+                    color: theme.palette.primary.main,
+                    mb: 3,
+                    textAlign: "left",
+                  }}
+                >
+                  Details
+                </Typography>
+
+                <Grid container spacing={3}>
+                  <Grid item xs={12} sm={6}>
+                    <TextField
+                      fullWidth
+                      label="Gender"
+                      name="Gender"
+                      value={userProfile.gender}
+                      onChange={handleChange}
+                      sx={{
+                        "& .MuiOutlinedInput-root": {
+                          height: "56px",
+                          paddingTop: "12px",
+                          paddingBottom: "12px",
+                        },
+                      }}
+                      InputProps={{
+                        readOnly: !isEditing,
+                        startAdornment: isEditing ? (
+                          <InputAdornment position="start">
+                            <EditIcon color="primary" />
+                          </InputAdornment>
+                        ) : null,
+                        sx: {
+                          "& input": {
+                            backgroundColor: isEditing
+                              ? "#ffffff"
+                              : "transparent",
+                          },
+                        },
+                      }}
+                      InputLabelProps={{
+                        sx: {
+                          color: isEditing
+                            ? theme.palette.primary.main
+                            : theme.palette.text.secondary,
+                          fontSize: "1rem",
+                          transition: "0.2s ease-in-out",
+                        },
+                        shrink: isEditing || userProfile.department !== "",
+                      }}
+                    />
+                  </Grid>
+
+                  <Grid item xs={12} sm={6}>
+                    <TextField
+                      fullWidth
+                      label="Designation"
+                      name="Designation"
+                      value={userProfile.designation}
+                      onChange={handleChange}
+                      sx={{
+                        "& .MuiOutlinedInput-root": {
+                          height: "56px",
+                          paddingTop: "12px",
+                          paddingBottom: "12px",
+                        },
+                      }}
+                      InputProps={{
+                        readOnly: !isEditing,
+                        startAdornment: isEditing ? (
+                          <InputAdornment position="start">
+                            <EditIcon color="primary" />
+                          </InputAdornment>
+                        ) : null,
+                        sx: {
+                          "& input": {
+                            backgroundColor: isEditing
+                              ? "#ffffff"
+                              : "transparent",
+                          },
+                        },
+                      }}
+                      InputLabelProps={{
+                        sx: {
+                          color: isEditing
+                            ? theme.palette.primary.main
+                            : theme.palette.text.secondary,
+                          fontSize: "1rem",
+                          transition: "0.2s ease-in-out",
+                        },
+                        shrink: isEditing || userProfile.year !== "",
+                      }}
+                    />
+                  </Grid>
+                </Grid>
               </Box>
             </Grid>
           </Grid>

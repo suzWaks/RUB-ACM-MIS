@@ -28,7 +28,7 @@ const MemberSchema = new Schema(
     },
     email: {
       type: String,
-      required: [true, "email is reqx uired"],
+      required: [true, "email is required"],
     },
     department: {
       type: String,
