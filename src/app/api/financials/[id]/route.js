@@ -2,15 +2,18 @@ import { connectToDB } from "../../../../utils/database";
 import financials from "../../../../models/financials";
 import { NextResponse } from "next/server";
 
-export const PUT = async (req, { params }) => {
+export const PATCH = async (req, { params }) => {
   try {
     const { id } = params; // Access id from params
     const {
-      newAmount: amount,
-      newType: type,
-      newDescription: description,
-      newItems: items,
+      userId,
+      amount,
+      type,
+      category,
+      description = "",
     } = await req.json();
+
+    const createdBy = userId; // We extract the user ID from token/session.
 
     await connectToDB();
 
@@ -18,31 +21,37 @@ export const PUT = async (req, { params }) => {
     const updatedRecord = await financials.findByIdAndUpdate(id, {
       amount,
       type,
+      category,
       description,
-      items,
+      createdBy,
     });
 
     // Ensure the updatedRecord exists before trying to respond
     if (!updatedRecord) {
-      return NextResponse.json(
-        { message: "Financial record not found" },
-        { status: 404 }
+      return new Response(
+        JSON.stringify(
+          { message: "could not update financital record" },
+          { headers: { "Content-Type": "application/json", status: 404 } }
+        )
       );
     }
-
-    return NextResponse.json(
-      { message: `Financial Record with id ${id} is successfully updated` },
-      { status: 200 }
+    return new Response(
+      JSON.stringify({ message: "Record Updated", updatedRecord }),
+      {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      }
     );
   } catch (error) {
-    return NextResponse.json(
-      { error: error.message, message: "Error updating finance records" },
-      { status: 500 }
-    );
+    console.log("Error while updating transactions: ", error);
+    return new Response(JSON.stringify({ message: "Internal Server Error" }), {
+      status: 500,
+      headers: { "Content-Type": "application/json" },
+    });
   }
 };
 
-export async function GET(req) {
+export async function GET(req, { params }) {
   try {
     // Connect to the database
     await connectToDB();
@@ -81,64 +90,35 @@ export async function GET(req) {
   }
 }
 
-export async function DELETE(req) {
+export async function DELETE(req, { params }) {
   try {
     // Connect to the database
     await connectToDB();
 
-    // Extract the ID from query parameters
-    const url = new URL(req.url);
-    const id = url.searchParams.get("id");
+    const deletedRecord = await financials.findByIdAndDelete(params.id);
 
-    if (id) {
-      // Delete a specific financial record by ID
-      const deletedRecord = await financials.findByIdAndDelete({
-        _id: new ObjectId(id),
+    console.log(params.id);
+
+    if (!deletedRecord) {
+      return new Response(JSON.stringify({ message: "Record not found" }), {
+        status: 404,
+        headers: { "Content-Type": "application/json" },
       });
-
-      if (!deletedRecord) {
-        return NextResponse.json(
-          { message: "Record not found" },
-          { status: 404 }
-        );
-      }
-
-      const overallBudget = await OverallBudget.findOne();
-      if (overallBudget) {
-        if (deletedRecord.type == "Expense") {
-          overallBudget.balanceUsed -= deletedRecord.amount;
-        } else if ((deletedRecord.type = "Income")) {
-          overallBudget.totalBudget -= deletedRecord.amount;
-        }
-        // Save the updated overall budget document
-        await overallBudget.save();
-      } else {
-        console.error("Overall budget document not found.");
-      }
-
-      return NextResponse.json({ message: "Record deleted" }, deletedRecord, {
-        status: 200,
-      });
-    } else {
-      // Delete all financial records
-      const financeRecords = await financials.deleteMany();
-      // Assuming you want to reset the overall budget as well
-      const overallBudget = await OverallBudget.findOne();
-      if (overallBudget) {
-        overallBudget.balanceUsed = 0;
-        overallBudget.totalBudget = 20000; // Reset total budget if needed
-        await overallBudget.save(); // Save the reset overall budget
-      }
-      // Return all financial records
-      return NextResponse.json(
-        { message: "All financial records deleted" },
-        { status: 200 }
-      );
     }
-  } catch (error) {
-    return NextResponse.json(
-      { error: error.message, message: "Error deleting the finance record" },
-      { status: 500 }
+
+    // Successfully deleted record, return status 200 with message
+    return new Response(
+      JSON.stringify({ message: "Record deleted", deletedRecord }),
+      {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      }
     );
+  } catch (error) {
+    console.log("Error while deleting transactions: ", error);
+    return new Response(JSON.stringify({ message: "Internal Server Error" }), {
+      status: 500,
+      headers: { "Content-Type": "application/json" },
+    });
   }
 }

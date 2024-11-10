@@ -1,5 +1,6 @@
 "use client";
 import React, { useState } from "react";
+import { useSession } from "next-auth/react";
 import {
   Box,
   Card,
@@ -19,42 +20,93 @@ import CloseIcon from "@mui/icons-material/Close";
 import AttachMoneyIcon from "@mui/icons-material/AttachMoney";
 import CategoryIcon from "@mui/icons-material/Category";
 import DescriptionIcon from "@mui/icons-material/Description";
+import ShopIcon from "@mui/icons-material/Shop";
+import { Session, User } from "next-auth";
 
 interface TransactionFormProps {
   onClose: () => void;
   onSubmit: (transactionData: any) => void;
+  initialData?: {
+    id: number;
+    amount: number;
+    type: "Income" | "Expense";
+    category: string;
+    createdBy: string;
+    createdOn: string;
+    description: string;
+  } | null;
 }
 
 const TransactionForm: React.FC<TransactionFormProps> = ({
   onClose,
   onSubmit,
+  initialData,
 }) => {
-  const [amount, setAmount] = useState("");
-  const [type, setType] = useState("");
-  const [description, setDescription] = useState("");
-  const [items, setItems] = useState("");
-  const [event, setEvent] = useState(""); // New state for event
+  const [amount, setAmount] = useState(initialData?.amount || "");
+  const [type, setType] = useState(initialData?.type || "");
+  const [description, setDescription] = useState(
+    initialData?.description || ""
+  );
+  const [category, setCategory] = useState(initialData?.category || "");
+
   const theme = useTheme();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const { data: session } = useSession();
+  const { email, id, role } = session?.user as {
+    email: string;
+    id: string;
+    role: string;
+  };
+
+  const incomeCategories = [
+    "Event",
+    "Lottery Sales",
+    "Donations",
+    "ITS Service",
+    "Miscellaneous Income",
+  ];
+
+  const expenseCategories = ["Event", "Supplies", "Miscellaneous Expense"];
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!amount || !type || !event) {
-      // Check for event as well
+    if (!amount || !type || !category) {
       alert("Please fill out all required fields.");
       return;
     }
     const transactionData = {
-      amount: parseFloat(amount) || 0,
+      amount: parseFloat(String(amount)) || 0,
       type,
+      category,
       description,
-      items: items
-        .split(",")
-        .map((item) => item.trim())
-        .filter(Boolean),
-      event, // Include event in transaction data
+      userId: id,
     };
-    onSubmit(transactionData);
-    onClose();
+    try {
+      const method = initialData ? "PATCH" : "POST";
+      const url = initialData
+        ? `/api/financials/${initialData.id}`
+        : `/api/financials/`;
+      const response = await fetch(url, {
+        method: method,
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(transactionData),
+      });
+      if (!response.ok) {
+        throw new Error("Failed to submit transaction data");
+      }
+
+      const responseData = await response.json();
+      console.log("Transaction processed successfully:", responseData);
+
+      // Handle success
+      onSubmit(transactionData);
+      onClose();
+    } catch (error) {
+      console.error("Error:", error);
+      alert("Failed to submit transaction data. Please try again.");
+    }
   };
 
   return (
@@ -123,13 +175,16 @@ const TransactionForm: React.FC<TransactionFormProps> = ({
               <Select
                 fullWidth
                 value={type}
-                onChange={(e) => setType(e.target.value)}
+                onChange={(e) => {
+                  setType(e.target.value);
+                  setCategory("");
+                }}
                 displayEmpty
                 input={<OutlinedInput />}
                 required
                 startAdornment={
                   <InputAdornment position="start">
-                    <CategoryIcon />
+                    <ShopIcon />
                   </InputAdornment>
                 }
               >
@@ -141,6 +196,38 @@ const TransactionForm: React.FC<TransactionFormProps> = ({
               </Select>
             </Grid>
             <Grid item xs={12}>
+              <Select
+                fullWidth
+                value={category}
+                onChange={(e) => setCategory(e.target.value)}
+                displayEmpty
+                input={<OutlinedInput />}
+                required
+                startAdornment={
+                  <InputAdornment position="start">
+                    <CategoryIcon />
+                  </InputAdornment>
+                }
+              >
+                <MenuItem value="" disabled>
+                  Select Category
+                </MenuItem>
+                {/* Conditionally render categories based on the type */}
+                {type === "Income" &&
+                  incomeCategories.map((categoryOption, index) => (
+                    <MenuItem key={index} value={categoryOption}>
+                      {categoryOption}
+                    </MenuItem>
+                  ))}
+                {type === "Expense" &&
+                  expenseCategories.map((categoryOption, index) => (
+                    <MenuItem key={index} value={categoryOption}>
+                      {categoryOption}
+                    </MenuItem>
+                  ))}
+              </Select>
+            </Grid>
+            <Grid item xs={12}>
               <TextField
                 fullWidth
                 variant="outlined"
@@ -149,39 +236,6 @@ const TransactionForm: React.FC<TransactionFormProps> = ({
                 onChange={(e) => setDescription(e.target.value)}
                 multiline
                 rows={3}
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <DescriptionIcon />
-                    </InputAdornment>
-                  ),
-                }}
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <TextField
-                fullWidth
-                variant="outlined"
-                label="Items (comma separated)"
-                value={items}
-                onChange={(e) => setItems(e.target.value)}
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <DescriptionIcon />
-                    </InputAdornment>
-                  ),
-                }}
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <TextField
-                fullWidth
-                variant="outlined"
-                label="Event"
-                value={event}
-                onChange={(e) => setEvent(e.target.value)}
-                required
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">
