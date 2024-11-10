@@ -1,6 +1,6 @@
 import { connectToDB } from "../../../../utils/database";
 import mongoose from "mongoose";
-import events from "../../../../models/events";
+import events from "../../../models/events";
 
 export const GET = async () => {
   try {

@@ -1,6 +1,6 @@
 import { connectToDB } from "../../../../utils/database";
-import events from "../../../../models/events";
-import attendance from "../../../../models/attendance";
+import events from "../../../models/events";
+import attendance from "../../../models/attendance";
 
 //GET (READ)
 export const GET = async (request, { params }) => {
@@ -31,8 +31,7 @@ export const PATCH = async (request, { params }) => {
     await connectToDB();
 
     const updates = await request.json();
-
-    const updatedEvent = await members.findByIdAndUpdate(
+    const updatedEvent = await events.findByIdAndUpdate(
       params.id,
       { $set: updates },
       {
@@ -40,6 +39,7 @@ export const PATCH = async (request, { params }) => {
         runValidators: true,
       }
     );
+
 
     if (!updatedEvent) {
       return new Response("No Event found", { status: 404 });
@@ -59,7 +59,6 @@ export const PATCH = async (request, { params }) => {
 export const DELETE = async (request, { params }) => {
   try {
     await connectToDB();
-
     // Find the event by ID
     const event = await events.findById(params.id);
     if (!event) {
@@ -71,7 +70,6 @@ export const DELETE = async (request, { params }) => {
 
     // Delete the event itself
     await events.findByIdAndDelete(params.id);
-
     return new Response(
       "Event and corresponding attendance deleted successfully",
       { status: 200 }
