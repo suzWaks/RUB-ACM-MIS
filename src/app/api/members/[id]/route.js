@@ -30,18 +30,17 @@ export const PATCH = async (request, { params }) => {
   try {
     await connectToDB();
 
+    console.log(params.id);
     // Parse JSON from the request body
     const updates = await request.json();
+    console.log(updates);
 
     // Find and update the member document by ID
     const updatedMember = await members.findOneAndUpdate(
-      { userID: params.id }, // Specify filter object
-      { $set: updates },
-      {
-        new: true,           // Return the updated document
-        runValidators: true, // Run schema validators
-      }
+      { _id: params.id }, // Specify filter object
+      { $set: updates }
     );
+    console.log(updatedMember);
 
     if (!updatedMember) {
       return new Response("Member not found", { status: 404 });
@@ -59,7 +58,6 @@ export const PATCH = async (request, { params }) => {
     return new Response("Failed to update member", { status: 500 });
   }
 };
-
 
 //DELETE (delete)
 export const DELETE = async (request, { params }) => {
