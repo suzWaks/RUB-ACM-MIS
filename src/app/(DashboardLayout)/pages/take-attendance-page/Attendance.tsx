@@ -95,53 +95,6 @@ const Attendance = () => {
 
   const years = ["1", "2", "3", "4"];
 
-  const attendanceData: AttendanceEntry[] = [
-    {
-      id: 1,
-      name: "Jigme Phuentsho",
-      department: "Information Technology",
-      studentId: "#2123123",
-      semester: "6th",
-      event: "ICPC",
-      status: "Present",
-    },
-    {
-      id: 2,
-      name: "Suzal Wakhley",
-      department: "Electrical",
-      studentId: "#2123124",
-      semester: "6th",
-      event: "Guest Lecture",
-      status: "Present",
-    },
-    {
-      id: 3,
-      name: "Tashi K Phuntsho",
-      department: "Civil",
-      studentId: "#2123125",
-      semester: "6th",
-      event: "Seminar",
-      status: "Present",
-    },
-    {
-      id: 4,
-      name: "Pema Lhamo",
-      department: "Mechanical",
-      studentId: "#2123126",
-      semester: "6th",
-      event: "Programming classes",
-      status: "Present",
-    },
-    {
-      id: 5,
-      name: "Depashna Pradhan",
-      department: "Information Technology",
-      studentId: "#2123127",
-      semester: "6th",
-      event: "ICPC",
-      status: "Present",
-    },
-  ];
   //Function to generate attendance record
   const createAttendanceRecord = async () => {
     setFilteredStudents([]);
@@ -225,6 +178,8 @@ const Attendance = () => {
       setYear(""); // Reset year
       setEvent(""); // Reset event
       setDate(""); // Reset date
+
+      alert("Attendance has been recorded");
     } catch (error) {
       console.error("Error updating attendance:", error);
       alert("An error occurred while updating attendance. Please try again.");
@@ -386,7 +341,7 @@ const Attendance = () => {
         color="primary"
         sx={{ mt: 3 }}
         onClick={handleAttendanceUpdate}
-        disabled={!department || !year || !date}
+        disabled={!department || !year || !date} // Disable if department or year is not selected
       >
         Confirm
       </Button>
