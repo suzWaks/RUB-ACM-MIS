@@ -4,16 +4,16 @@ import React from "react";
 import { Typography, Box } from "@mui/material";
 import PageContainer from "@/app/(DashboardLayout)/components/container/PageContainer";
 import theme from "@/utils/theme";
-// Import the Calendar component
+import Bar from "./barChart";
+import Pie from "./pieChart";
 
-const EventsPage: React.FC = () => {
+const AttendancePage: React.FC = () => {
   return (
     <PageContainer
       title="Attendance Page"
       description="Page to display attendance records"
     >
       <Box>
-        {/* Custom Title with Purple Color */}
         <Typography
           variant="h3"
           style={{
@@ -23,9 +23,24 @@ const EventsPage: React.FC = () => {
         >
           Attendance Records
         </Typography>
+
+        {/* Box containing Bar and Pie charts side by side */}
+        <Box
+          display="flex"
+          gap={theme.spacing(2)}
+          justifyContent="space-between"
+          flexWrap="wrap"
+        >
+          <Box flex={1} maxWidth="50%">
+            <Bar />
+          </Box>
+          <Box flex={1} maxWidth="50%">
+            <Pie />
+          </Box>
+        </Box>
       </Box>
     </PageContainer>
   );
 };
 
-export default EventsPage;
+export default AttendancePage;
