@@ -1,9 +1,8 @@
 import { connectToDB } from "../../../utils/database";
 import { NextResponse } from "next/server";
 import mongoose from "mongoose";
-import users from "../../../models/users";
-import announcments from "@/models/annoucements";
-import announcements from "@/models/annoucements"; 
+import users from "../../models/users";
+import announcements from "../../models/annoucements";
 
 
 const { ObjectId } = mongoose.Types;
@@ -48,7 +47,7 @@ export const POST = async (req, res) => {
       tags,
       created_by: createdByObjectId,
     });
-    
+
 
     // Save the announcement to the database
     const newAnnouncement = await announcment.save();
@@ -75,7 +74,7 @@ export async function GET(req) {
 
     if (id) {
       // Fetch a specific announcement by ID and populate the created_by field
-      const announcement = await announcments.findOne({
+      const announcement = await announcements.findOne({
         _id: new ObjectId(id),
       }).populate('created_by', 'role');  // Populate role field from the user collection
 
@@ -90,7 +89,7 @@ export async function GET(req) {
       return NextResponse.json(announcement, { status: 200 });
     } else {
       // Fetch all announcements and populate the created_by field
-      const announcementAll = await announcments.find().populate('created_by', 'role'); // Populate role field
+      const announcementAll = await announcements.find().populate('created_by', 'role'); // Populate role field
 
       // Return all announcements with user roles
       return NextResponse.json(announcementAll, { status: 200 });
@@ -115,7 +114,7 @@ export async function DELETE(req) {
 
     if (id) {
       // Delete a specific announcement record by ID
-      const deletedAnnouncement = await announcments.findByIdAndDelete({
+      const deletedAnnouncement = await announcements.findByIdAndDelete({
         _id: new ObjectId(id),
       });
 
@@ -133,7 +132,7 @@ export async function DELETE(req) {
       );
     } else {
       // Delete all announcement records
-      const announcementRecords = await announcments.deleteMany();
+      const announcementRecords = await announcements.deleteMany();
 
       // Return all announcement
       return NextResponse.json(
@@ -190,7 +189,7 @@ export const PUT = async (req) => {
     }
 
     // Update the announcement
-    const updatedAnnouncement = await announcments.findByIdAndUpdate(
+    const updatedAnnouncement = await announcements.findByIdAndUpdate(
       id,
       {
         announcement_title,

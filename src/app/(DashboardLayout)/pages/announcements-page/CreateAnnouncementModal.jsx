@@ -9,25 +9,33 @@ import {
   IconButton,
   Typography,
   Box,
+  Select,
+  MenuItem,
+  FormControl,
+  InputLabel
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
+import Loading from "@/app/loading";
 
 const CreateAnnouncementModal = ({ open, onClose, onAddAnnouncement }) => {
   const [title, setTitle] = useState("");
   const [tags, setTags] = useState("");
   const [description, setDescription] = useState("");
-  const [createdBy, setCreatedBy] = useState("");
+  const [createdBy, setCreatedBy] = useState("admin");
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async () => {
-    if (title && createdBy) {
+    if (title) {
       setLoading(true);
+      if (loading) {
+        return <Loading />
+      }
 
       const newAnnouncement = {
         announcement_title: title,
         description,
         tags: tags.split(",").map((tag) => tag.trim()),
-        created_by: createdBy,
+        created_by: "admin",
       };
 
       try {
@@ -55,24 +63,6 @@ const CreateAnnouncementModal = ({ open, onClose, onAddAnnouncement }) => {
       } finally {
         setLoading(false);
       }
-  const [time, setTime] = useState(""); // New state for time input
-
-  // Handle submission of the form
-  const handleSubmit = () => {
-    if (title) {
-      const newAnnouncement = {
-        title,
-        tags: tags.split(",").map(tag => tag.trim()), // Split tags by comma
-        description,
-        time, // Include the time field in the announcement
-      };
-      onAddAnnouncement(newAnnouncement); // Call the prop function to add the announcement
-      onClose(); // Close the modal
-      // Clear inputs
-      setTitle("");
-      setTags("");
-      setDescription("");
-      setTime(""); // Clear time input
     }
   };
 
@@ -98,15 +88,25 @@ const CreateAnnouncementModal = ({ open, onClose, onAddAnnouncement }) => {
           onChange={(e) => setTitle(e.target.value)}
           sx={{ borderRadius: "8px" }}
         />
-        <TextField
-          fullWidth
-          label="Add Tags"
-          variant="outlined"
-          margin="normal"
-          value={tags}
-          onChange={(e) => setTags(e.target.value)}
-          sx={{ borderRadius: "8px" }}
-        />
+        <FormControl fullWidth>
+          <InputLabel
+          >
+            Tags
+          </InputLabel>
+          <Select
+            fullWidth
+            label="Add Tags"
+            value={tags}
+            onChange={(e) => setTags(e.target.value)}
+            variant="outlined"
+            margin="normal"
+            sx={{ borderRadius: "8px" }}
+          >
+            <MenuItem value="" disabled>Select a tag...</MenuItem>
+            <MenuItem value="Event">Event</MenuItem>
+            <MenuItem value="Meeting">Meeting</MenuItem>
+          </Select>
+        </FormControl>
         <TextField
           fullWidth
           label="Enter Description"
@@ -118,20 +118,15 @@ const CreateAnnouncementModal = ({ open, onClose, onAddAnnouncement }) => {
           onChange={(e) => setDescription(e.target.value)}
           sx={{ borderRadius: "8px" }}
         />
-        <TextField
+        {/* <TextField
           fullWidth
-          label="Enter Time" // New field for time
+          label="Created By"
           variant="outlined"
           margin="normal"
-
           value={createdBy}
           onChange={(e) => setCreatedBy(e.target.value)}
-
-          value={time}
-          onChange={(e) => setTime(e.target.value)} // Update state on change
-
           sx={{ borderRadius: "8px" }}
-        />
+        /> */}
       </DialogContent>
       <DialogActions>
         <Button
