@@ -30,22 +30,6 @@ import EventForm from "./eventform";
 import EventDetail from "./eventdetails";
 import Loading from "../../loading";
 
-const statusOptions = ["All", "Recent", "Upcoming", "Scheduled"];
-
-interface Event {
-  id: string;
-  title: string;
-  start: string;
-  end?: string;
-  allDay?: boolean;
-  venue?: string;
-  attendees?: string;
-  startTime?: string;
-  endTime?: string;
-  description?: string;
-  status?: string;
-}
-
 interface EventTableProps {
   // events: Event[];
   onClose: () => void;
@@ -63,14 +47,9 @@ const EventTable: React.FC<EventTableProps> = ({ onClose }) => {
   const [error, setError] = useState("");
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const [eventIdToDelete, setEventIdToDelete] = useState<string | null>(null);
-
+  const [rowsPerPage, setRowsPerPage] = useState(10);
   // Pagination state
   const [page, setPage] = useState(0);
-  const rowsPerPage = 10; // Fixed number of rows per page
-
-  const handlePageChange = (event: unknown, newPage: number) => {
-    setPage(newPage);
-  };
 
   const handleCloseForm = () => {
     setShowForm(false);
@@ -114,10 +93,28 @@ const EventTable: React.FC<EventTableProps> = ({ onClose }) => {
     }
   };
 
-  // const filteredEvents = events.filter((event) => {
-  //   const eventStartDate = dayjs(event.start);
-  //   const eventEndDate = event.end ? dayjs(event.end) : null;
-  // });
+  const filteredEvents = allEvent.filter((event) => {
+    const eventStartDate = dayjs(event.event_date);
+    const eventStatus = dayjs().isBefore(eventStartDate, "day")
+      ? "Upcoming"
+      : dayjs().isAfter(eventStartDate, "day")
+      ? "Completed"
+      : "Today";
+
+    // Apply filtering based on status
+    if (status !== "All" && eventStatus !== status) return false;
+
+    // Apply filtering based on startDate if it is set
+    if (startDate && !eventStartDate.isSame(dayjs(startDate), "day"))
+      return false;
+
+    return true;
+  });
+
+  const paginatedEvents = filteredEvents.slice(
+    page * rowsPerPage,
+    page * rowsPerPage + rowsPerPage
+  );
 
   //------------------------------------------------------------
   //Integration Code//
@@ -188,9 +185,11 @@ const EventTable: React.FC<EventTableProps> = ({ onClose }) => {
         throw new Error(`Failed to delete event with ID ${eventId}`);
       }
 
-      // You might want to update the UI or notify the user of success
+      // Filter out the deleted event from allEvent state and update the state
+      setAllEvent((prevEvents) =>
+        prevEvents.filter((event) => event._id !== eventId)
+      );
       console.log(`Event with ID ${eventId} was successfully deleted.`);
-      window.location.reload();
     } catch (error) {
       console.error("Error deleting event:", error);
       // Optionally show error to the user
@@ -233,20 +232,9 @@ const EventTable: React.FC<EventTableProps> = ({ onClose }) => {
 
           <LocalizationProvider dateAdapter={AdapterDayjs}>
             <DesktopDatePicker
-              label="Start Date"
+              label="Date"
               value={startDate}
               onChange={(newValue) => setStartDate(newValue)}
-              slotProps={{
-                textField: {
-                  fullWidth: true,
-                  style: { maxWidth: "150px" },
-                },
-              }}
-            />
-            <DesktopDatePicker
-              label="End Date"
-              value={endDate}
-              onChange={(newValue) => setEndDate(newValue)}
               slotProps={{
                 textField: {
                   fullWidth: true,
@@ -287,13 +275,17 @@ const EventTable: React.FC<EventTableProps> = ({ onClose }) => {
           )}
           <TextField
             select
+            label="Status"
             value={status}
-            onChange={(e) => setStatus(e.target.value)}
+            onChange={(e) => {
+              setStatus(e.target.value); // Set the status value
+              console.log(e.target.value); // Log the value to ensure it's set correctly
+            }}
             style={{ maxWidth: "150px" }}
           >
-            {statusOptions.map((option) => (
-              <MenuItem key={option} value={option}>
-                {option}
+            {["All", "Upcoming", "Completed", "Today"].map((statusOption) => (
+              <MenuItem key={statusOption} value={statusOption}>
+                {statusOption}
               </MenuItem>
             ))}
           </TextField>
@@ -334,11 +326,9 @@ const EventTable: React.FC<EventTableProps> = ({ onClose }) => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {allEvent.map((event) => {
+            {paginatedEvents.map((event) => {
               const eventStartDate = dayjs(event.event_date);
-
-              // Determine status based on start_date
-              const status = dayjs().isBefore(eventStartDate, "day")
+              const eventStatus = dayjs().isBefore(eventStartDate, "day")
                 ? "Upcoming"
                 : dayjs().isAfter(eventStartDate, "day")
                 ? "Completed"
@@ -353,9 +343,10 @@ const EventTable: React.FC<EventTableProps> = ({ onClose }) => {
                   </TableCell>
                   <TableCell>{event.time}</TableCell>
                   <TableCell>
-                    <span style={getStatusStyle(status)}>{status}</span>
+                    <span style={getStatusStyle(eventStatus)}>
+                      {eventStatus}
+                    </span>
                   </TableCell>
-                  {/* <TableCell>{" " + event.year}</TableCell> */}
                   <TableCell style={{ textAlign: "center" }}>
                     <IconButton
                       onClick={() => handleEditClick(event)}
@@ -400,14 +391,17 @@ const EventTable: React.FC<EventTableProps> = ({ onClose }) => {
         </DialogActions>
       </Dialog>
 
-      {/* <TablePagination
+      <TablePagination
         component="div"
         count={filteredEvents.length}
         page={page}
-        onPageChange={handlePageChange}
+        onPageChange={(event, newPage) => setPage(newPage)}
         rowsPerPage={rowsPerPage}
-        labelRowsPerPage=""
-      /> */}
+        onRowsPerPageChange={(event) => {
+          setRowsPerPage(parseInt(event.target.value, 10));
+          setPage(0); // reset to first page when rows per page changes
+        }}
+      />
 
       {showForm && (
         <EventForm

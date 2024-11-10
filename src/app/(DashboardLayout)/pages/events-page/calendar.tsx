@@ -12,6 +12,7 @@ import Loading from "@/app/loading";
 import dayjs from "dayjs";
 import { Button } from "@mui/material";
 import theme from "@/utils/theme";
+import AddCircleIcon from "@mui/icons-material/AddCircle";
 
 interface Event {
   event_id: string;
@@ -140,7 +141,8 @@ const Calendar: React.FC = () => {
 
       <div className="calendar-card">
         <button className="add-event-button" onClick={handleDateClickbtn}>
-          Add an Event +
+          <AddCircleIcon style={{ marginRight: "8px" }} />
+          Add an Event
         </button>
         <FullCalendar
           height={"85vh"}
