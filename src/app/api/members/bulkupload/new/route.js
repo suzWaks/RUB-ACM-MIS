@@ -4,7 +4,7 @@ import path from "path";
 import { pipeline } from "stream";
 import { promisify } from "util";
 import csvParser from "csv-parser";
-import members from "../../../../../models/members";
+import members from "../../../../models/members";
 import { connectToDB } from "../../../../../utils/database";
 
 const pump = promisify(pipeline);
@@ -48,7 +48,6 @@ export async function POST(req, res) {
         membersData.push({
           name: row.name,
           std_id: row.std_id,
-          programme: row.programme,
           year: row.year,
           contact_number: row.contact_number,
           email: row.email,

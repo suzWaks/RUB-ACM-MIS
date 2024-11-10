@@ -1,6 +1,6 @@
 import { connectToDB } from "../../../../utils/database";
-import members from "../../../../models/members";
-import users from "../../../../models/users";
+import members from "../../../models/members";
+import users from "../../../models/users";
 
 export const DELETE = async (requests) => {
   try {

@@ -1,7 +1,7 @@
 import { connectToDB } from "../../../../utils/database";
-import members from "../../../../models/members";
-import attendance from "../../../../models/attendance";
-import users from "../../../../models/users";
+import members from "../../../models/members";
+import attendance from "../../../models/attendance";
+import users from "../../../models/users";
 
 //GET (READ)
 export const GET = async (request, { params }) => {
@@ -63,20 +63,29 @@ export const DELETE = async (request, { params }) => {
 
     const member = await members.findById(params.id);
     if (!member) {
-      return new Response("Member not found", { status: 404 });
+      return new Response(
+        JSON.stringify({ message: "Member not found" }), // Return a JSON response
+        { status: 404, headers: { "Content-Type": "application/json" } }
+      );
     }
 
     const userID = member.userID;
 
-    //Deleteing data from members collection
+    // Deleting data from members collection
     await members.findByIdAndDelete(params.id);
 
-    //Deleting data from users collection
+    // Deleting data from users collection
     await users.findByIdAndDelete(userID);
 
-    return new Response("Member deleted successfully", { status: 200 });
+    return new Response(
+      JSON.stringify({ message: "Member deleted successfully" }), // Return a JSON response
+      { status: 200, headers: { "Content-Type": "application/json" } }
+    );
   } catch (error) {
     console.log(error);
-    return new Response("Failed to delete member", { status: 500 });
+    return new Response(
+      JSON.stringify({ message: "Failed to delete member" }), // Return a JSON response
+      { status: 500, headers: { "Content-Type": "application/json" } }
+    );
   }
 };

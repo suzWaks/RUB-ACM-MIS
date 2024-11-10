@@ -242,7 +242,10 @@ const RecentTrans = () => {
         <Button
           variant="contained"
           color="primary"
-          onClick={() => setOpenDialog(true)}
+          onClick={() => {
+            setTranasctionToEdit(null);
+            setOpenDialog(true);
+          }}
           sx={{}}
         >
           Add Transaction
