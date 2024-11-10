@@ -38,7 +38,7 @@ import StudentGraph from "@/app/(DashboardLayout)/pages/dashboard/GraphProp";
 import theme from "@/utils/theme";
 import AddMemberForm from "./AddMemberForm";
 import Bulkupload from "./Bulkupload";
-import Attendance from "./Attendance"; // Import the Attendance component
+
 import Loading from "../../loading";
 
 interface MemberStat {
@@ -46,7 +46,7 @@ interface MemberStat {
   data: number[];
 }
 
-// Define the Member interface
+// Define the Member interface here
 interface Member {
   _id?: string;
   name: string;
@@ -212,300 +212,287 @@ const MembersPage = () => {
       title="Members Page"
       description="Members statistics and list overview"
     >
-      {!showAttendance ? (
-        <>
-          {/* Member Statistics Section */}
-          {/**
-           *
-           */}
-          <Box mb={4}>
-            <Paper elevation={2} sx={{ padding: 2 }}>
-              <Typography
-                variant="h5"
-                sx={{ color: theme.palette.primary.main, mb: 2 }}
-              >
-                Member Statistics
-              </Typography>
-
-              {/**Member Stats Graph */}
-              <Grid container spacing={1} mt={2}>
-                {/* Dynamically rendering Male, Female, Others, Total counts from memberStats */}
-                {memberStats?.map((stat, index) => {
-                  // Icons are mapped based on the label
-                  let icon;
-                  switch (stat.label) {
-                    case "Male Count":
-                      icon = <MaleIcon />;
-                      break;
-                    case "Female Count":
-                      icon = <FemaleIcon />;
-                      break;
-                    case "Others":
-                      icon = <TransgenderIcon />;
-                      break;
-                    case "Total Members":
-                      icon = <GroupIcon />;
-                      break;
-                    default:
-                      icon = <GroupIcon />;
-                  }
-
-                  return (
-                    <Grid item xs={6} md={3} key={index}>
-                      <Paper elevation={2} sx={{ padding: 0 }}>
-                        <Box
-                          display="flex"
-                          justifyContent="space-between"
-                          alignItems="center"
-                          padding={1}
-                        >
-                          <Typography variant="h6">{stat.label}</Typography>
-                          {icon}
-                        </Box>
-                        <StudentGraph
-                          data={stat.data}
-                          color={graphColors[index]}
-                        />
-                      </Paper>
-                    </Grid>
-                  );
-                })}
-              </Grid>
-            </Paper>
-          </Box>
-
-          {/* Members List Section */}
-          <Box mb={2}>
-            <Typography
-              variant="h5"
-              sx={{ color: theme.palette.primary.main, mb: 2 }}
-            >
-              Members
-            </Typography>
-
-            {/* Search bar and filters for year and department */}
-            <Box
-              display="flex"
-              justifyContent="space-between"
-              mb={2}
-              alignItems="center"
-            >
-              {/* Filters Section */}
-              <Box display="flex" alignItems="center">
-                <Select
-                  value={selectedYear}
-                  onChange={(e) => setSelectedYear(e.target.value)}
-                  displayEmpty
-                  variant="outlined"
-                  size="small"
-                  sx={{ mr: 2 }}
-                  startAdornment={
-                    <InputAdornment position="start">
-                      <FilterListIcon />
-                    </InputAdornment>
-                  }
-                >
-                  <MenuItem value="">
-                    <em>Year</em>
-                  </MenuItem>
-                  {["1", "2", "3", "4"].map((year) => (
-                    <MenuItem key={year} value={year}>
-                      {year}
-                    </MenuItem>
-                  ))}
-                </Select>
-
-                <Select
-                  value={selectedDepartment}
-                  onChange={(e) => setSelectedDepartment(e.target.value)}
-                  displayEmpty
-                  variant="outlined"
-                  size="small"
-                  sx={{ mr: 2 }}
-                  startAdornment={
-                    <InputAdornment position="start">
-                      <FilterListIcon />
-                    </InputAdornment>
-                  }
-                >
-                  <MenuItem value="">
-                    <em>Department</em>
-                  </MenuItem>
-                  {[
-                    "Information Technology",
-                    "Geology",
-                    "Civil",
-                    "Electrical",
-                    "Electronic and Communication",
-                    "Water",
-                    "Mechanical",
-                    "Instrumentation and Control",
-                    "Architecture",
-                    "Software",
-                  ].map((dept) => (
-                    <MenuItem key={dept} value={dept}>
-                      {dept}
-                    </MenuItem>
-                  ))}
-                </Select>
-
-                <TextField
-                  placeholder="Search by name"
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  variant="outlined"
-                  size="small"
-                  sx={{ mr: 2 }}
-                  InputProps={{
-                    startAdornment: (
-                      <InputAdornment position="start">
-                        <SearchIcon />
-                      </InputAdornment>
-                    ),
-                  }}
-                />
-                <Button
-                  variant="outlined"
-                  color="primary"
-                  onClick={handleResetFilters}
-                  startIcon={<RefreshIcon />}
-                >
-                  Reset Filters
-                </Button>
-              </Box>
-
-              {/* Action buttons for adding member and bulk upload */}
-              <Box>
-                <Button
-                  variant="contained"
-                  color="primary"
-                  sx={{ mr: 1 }}
-                  onClick={() => setOpenBulkUpload(true)}
-                >
-                  Bulk Upload
-                </Button>
-                <Button
-                  variant="contained"
-                  color="primary"
-                  sx={{ mr: 1 }}
-                  startIcon={<AddIcon />}
-                  onClick={() => setOpen(true)}
-                >
-                  Add Member
-                </Button>
-                <Button
-                  variant="contained"
-                  color="primary"
-                  onClick={() => setShowAttendance(true)} // Switch to Attendance page
-                >
-                  Attendance
-                </Button>
-              </Box>
-            </Box>
-
-            {/* Members Table */}
-            <TableContainer component={Paper}>
-              <Table>
-                <TableHead>
-                  <TableRow>
-                    <TableCell>Student Number</TableCell>
-                    <TableCell>Name</TableCell>
-                    <TableCell>Gender</TableCell>
-                    <TableCell>Desgination</TableCell>
-                    <TableCell>Department</TableCell>
-                    <TableCell>Year</TableCell>
-                    <TableCell>Email</TableCell>
-                    <TableCell>Contact Number</TableCell>
-                    <TableCell>Action</TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {filteredMembers
-                    .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                    .map((member) => (
-                      <TableRow key={member._id}>
-                        <TableCell>{member.std_id}</TableCell>
-                        <TableCell>{member.name}</TableCell>
-                        <TableCell>{member.gender}</TableCell>
-                        <TableCell>{member.designation}</TableCell>
-                        <TableCell>{member.department}</TableCell>
-                        <TableCell>{member.year}</TableCell>
-                        <TableCell>{member.email}</TableCell>
-                        <TableCell>{member.contact_number}</TableCell>
-                        <TableCell>
-                          {/* Action buttons */}
-                          <IconButton
-                            color="primary"
-                            onClick={() => handleEditMember(member)} // Handle edit action
-                            sx={{ mr: 1 }}
-                          >
-                            <EditIcon />
-                          </IconButton>
-                          <IconButton
-                            color="error"
-                            onClick={() => handleDeleteMember(member)} // Handle delete action
-                          >
-                            <DeleteIcon />
-                          </IconButton>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                </TableBody>
-              </Table>
-            </TableContainer>
-
-            <TablePagination
-              rowsPerPageOptions={[]}
-              component="div"
-              count={filteredMembers.length}
-              rowsPerPage={rowsPerPage}
-              page={page}
-              onPageChange={handleChangePage}
-              sx={{ justifyContent: "flex-end" }} // Align pagination to the right
-            />
-          </Box>
-
-          {/* Add Member Dialog */}
-          <Dialog open={open} onClose={() => setOpen(false)}>
-            <DialogTitle>Add Member</DialogTitle>
-            <DialogContent>
-              <AddMemberForm
-                onAddMember={handleAddMember}
-                onClose={handleCloseDialog}
-                member={editMember}
-                onEditMember={handleRefresh}
-              />
-            </DialogContent>
-            <DialogActions>
-              <Button onClick={() => setOpen(false)} color="primary">
-                Close
-              </Button>
-            </DialogActions>
-          </Dialog>
-
-          {/* Bulk Upload Dialog */}
-          <Dialog
-            open={openBulkUpload}
-            onClose={() => setOpenBulkUpload(false)}
+      {/* Member Statistics Section */}
+      {/**
+       *
+       */}
+      <Box mb={4}>
+        <Paper elevation={2} sx={{ padding: 2 }}>
+          <Typography
+            variant="h5"
+            sx={{ color: theme.palette.primary.main, mb: 2 }}
           >
-            <DialogTitle>Bulk Upload Members</DialogTitle>
-            <DialogContent>
-              <Bulkupload
-                onClose={() => setOpenBulkUpload(false)}
-                handleRefresh={handleRefresh}
-              />
-            </DialogContent>
-            <DialogActions>
-              <Button onClick={() => setOpenBulkUpload(false)} color="primary">
-                Close
-              </Button>
-            </DialogActions>
-          </Dialog>
-        </>
-      ) : (
-        // Render the Attendance component if showAttendance is true
-        <Attendance />
-      )}
+            Member Statistics
+          </Typography>
+
+          {/**Member Stats Graph */}
+          <Grid container spacing={1} mt={2}>
+            {/* Dynamically rendering Male, Female, Others, Total counts from memberStats */}
+            {memberStats?.map((stat, index) => {
+              // Icons are mapped based on the label
+              let icon;
+              switch (stat.label) {
+                case "Male Count":
+                  icon = <MaleIcon />;
+                  break;
+                case "Female Count":
+                  icon = <FemaleIcon />;
+                  break;
+                case "Others":
+                  icon = <TransgenderIcon />;
+                  break;
+                case "Total Members":
+                  icon = <GroupIcon />;
+                  break;
+                default:
+                  icon = <GroupIcon />;
+              }
+
+              return (
+                <Grid item xs={6} md={3} key={index}>
+                  <Paper elevation={2} sx={{ padding: 0 }}>
+                    <Box
+                      display="flex"
+                      justifyContent="space-between"
+                      alignItems="center"
+                      padding={1}
+                    >
+                      <Typography variant="h6">{stat.label}</Typography>
+                      {icon}
+                    </Box>
+                    <StudentGraph data={stat.data} color={graphColors[index]} />
+                  </Paper>
+                </Grid>
+              );
+            })}
+          </Grid>
+        </Paper>
+      </Box>
+
+      {/* Members List Section */}
+      <Box mb={2}>
+        <Typography
+          variant="h5"
+          sx={{ color: theme.palette.primary.main, mb: 2 }}
+        >
+          Members
+        </Typography>
+
+        {/* Search bar and filters for year and department */}
+        <Box
+          display="flex"
+          justifyContent="space-between"
+          mb={2}
+          alignItems="center"
+        >
+          {/* Filters Section */}
+          <Box display="flex" alignItems="center">
+            <Select
+              value={selectedYear}
+              onChange={(e) => setSelectedYear(e.target.value)}
+              displayEmpty
+              variant="outlined"
+              size="small"
+              sx={{ mr: 2 }}
+              startAdornment={
+                <InputAdornment position="start">
+                  <FilterListIcon />
+                </InputAdornment>
+              }
+            >
+              <MenuItem value="">
+                <em>Year</em>
+              </MenuItem>
+              {["1", "2", "3", "4"].map((year) => (
+                <MenuItem key={year} value={year}>
+                  {year}
+                </MenuItem>
+              ))}
+            </Select>
+
+            <Select
+              value={selectedDepartment}
+              onChange={(e) => setSelectedDepartment(e.target.value)}
+              displayEmpty
+              variant="outlined"
+              size="small"
+              sx={{ mr: 2 }}
+              startAdornment={
+                <InputAdornment position="start">
+                  <FilterListIcon />
+                </InputAdornment>
+              }
+            >
+              <MenuItem value="">
+                <em>Department</em>
+              </MenuItem>
+              {[
+                "Information Technology",
+                "Geology",
+                "Civil",
+                "Electrical",
+                "Electronic and Communication",
+                "Water",
+                "Mechanical",
+                "Instrumentation and Control",
+                "Architecture",
+                "Software",
+              ].map((dept) => (
+                <MenuItem key={dept} value={dept}>
+                  {dept}
+                </MenuItem>
+              ))}
+            </Select>
+
+            <TextField
+              label="Search by Name"
+              variant="outlined"
+              size="small"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              sx={{ mr: 2 }}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <SearchIcon />
+                  </InputAdornment>
+                ),
+              }}
+            />
+
+            <Button
+              variant="contained"
+              color="primary"
+              startIcon={<RefreshIcon />}
+              onClick={handleResetFilters}
+            >
+              Reset Filters
+            </Button>
+          </Box>
+
+          {/* Action buttons for adding member and bulk upload */}
+          <Box>
+            <Button
+              variant="contained"
+              color="primary"
+              sx={{ mr: 1 }}
+              onClick={() => setOpenBulkUpload(true)}
+            >
+              Bulk Upload
+            </Button>
+            <Button
+              variant="contained"
+              color="primary"
+              sx={{ mr: 1 }}
+              startIcon={<AddIcon />}
+              onClick={() => setOpen(true)}
+            >
+              Add Member
+            </Button>
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={() => setShowAttendance(true)} // Switch to Attendance page
+            >
+              Attendance
+            </Button>
+          </Box>
+
+          {/* Table displaying the list of members */}
+          <TableContainer component={Paper}>
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableCell>Name</TableCell>
+                  <TableCell>Gender</TableCell>
+                  <TableCell>Desgination</TableCell>
+                  <TableCell>Department</TableCell>
+                  <TableCell>Email</TableCell>
+                  <TableCell>Contact Number</TableCell>
+                  <TableCell>Action</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {filteredMembers
+                  .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                  .map((member) => (
+                    <TableRow key={member._id}>
+                      <TableCell>{member.std_id}</TableCell>
+                      <TableCell>{member.name}</TableCell>
+                      <TableCell>{member.gender}</TableCell>
+                      <TableCell>{member.designation}</TableCell>
+                      <TableCell>{member.department}</TableCell>
+                      <TableCell>{member.year}</TableCell>
+                      <TableCell>{member.email}</TableCell>
+                      <TableCell>{member.contact_number}</TableCell>
+                      <TableCell>
+                        {/* Action buttons */}
+                        <IconButton
+                          color="primary"
+                          onClick={() => handleEditMember(member)} // Handle edit action
+                          sx={{ mr: 1 }}
+                        >
+                          <EditIcon />
+                        </IconButton>
+                        <IconButton
+                          color="error"
+                          onClick={() => handleDeleteMember(member)} // Handle delete action
+                        >
+                          <DeleteIcon />
+                        </IconButton>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+
+          {/* Pagination */}
+          <TablePagination
+            rowsPerPageOptions={[]}
+            component="div"
+            count={filteredMembers.length}
+            rowsPerPage={rowsPerPage}
+            page={page}
+            onPageChange={handleChangePage}
+            sx={{ justifyContent: "flex-end" }} // Align pagination to the right
+          />
+        </Box>
+      </Box>
+
+      {/* Add Member Form Dialog */}
+      <Dialog open={open} onClose={() => setOpen(false)}>
+        <DialogTitle>Add New Member</DialogTitle>
+        <DialogContent>
+          <AddMemberForm
+            onAddMember={handleAddMember}
+            onClose={handleCloseDialog}
+            member={editMember}
+            onEditMember={handleRefresh}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setOpen(false)} color="primary">
+            Close
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Bulk Upload Dialog */}
+      <Dialog open={openBulkUpload} onClose={() => setOpenBulkUpload(false)}>
+        <DialogTitle>Bulk Upload Members</DialogTitle>
+        <DialogContent>
+          <Bulkupload
+            onClose={() => setOpenBulkUpload(false)}
+            handleRefresh={handleRefresh}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setOpenBulkUpload(false)} color="primary">
+            Close
+          </Button>
+        </DialogActions>
+      </Dialog>
     </PageContainer>
   );
 };
