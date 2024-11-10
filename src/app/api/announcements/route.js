@@ -1,51 +1,64 @@
-import announcments from "../../../models/annoucements";
 import { connectToDB } from "../../../utils/database";
-import { getSession } from "next-auth/react";
 import { NextResponse } from "next/server";
 import mongoose from "mongoose";
+import users from "../../../models/users";
+import announcments from "@/models/annoucements";
+import announcements from "@/models/annoucements"; 
+
 
 const { ObjectId } = mongoose.Types;
 
 export const POST = async (req, res) => {
   try {
-    //Since we have session in the front end we can get the session ID from the front end
+    const { announcement_title, description, tags = [], created_by } = await req.json();
 
-    const {
-      announcement_title,
-      description,
-      tags = [],
-      created_by,
-    } = await req.json();
+    console.log("Received Data:", { announcement_title, description, tags, created_by });
 
     if (!announcement_title) {
-      return new Response(
-        JSON.stringify({ message: "Announcement is a required field" }),
+      return NextResponse.json(
+        { message: "Announcement title is a required field" },
         { status: 422 }
       );
     }
+
     // Connect to the database
     await connectToDB();
+    console.log("Database connected successfully.");
 
-    // Create a new announcement
-    const announcement = new announcments({
+    // Handle created_by (convert to ObjectId if necessary)
+    let createdByObjectId = null;
+    if (created_by) {
+      console.log("Looking up user by role:", created_by);
+      const user = await users.findOne({ role: created_by });
+      if (!user) {
+        console.log("User with the specified role not found.");
+        return NextResponse.json(
+          { message: "User with specified role not found" },
+          { status: 404 }
+        );
+      }
+      createdByObjectId = user._id;
+      console.log("User found:", user);
+    }
+
+    // Create a new announcement object
+    const announcment = new announcements({
       announcement_title,
       description,
       tags,
-      created_by,
+      created_by: createdByObjectId,
     });
+    
 
-    const newAnnouncement = await announcement.save();
+    // Save the announcement to the database
+    const newAnnouncement = await announcment.save();
+    console.log("Announcement created successfully:", newAnnouncement);
 
-    return new Response(JSON.stringify(newAnnouncement), {
-      headers: { "Content-Type": "application/json" },
-      status: 201,
-    });
+    return NextResponse.json(newAnnouncement, { status: 201 });
   } catch (error) {
-    return new Response(
-      JSON.stringify({
-        error: error.message,
-        message: "Error adding announcement",
-      }),
+    console.error("Error adding announcement:", error);
+    return NextResponse.json(
+      { error: error.message, message: "Error adding announcement" },
       { status: 500 }
     );
   }
@@ -61,10 +74,10 @@ export async function GET(req) {
     const id = url.searchParams.get("id");
 
     if (id) {
-      // Fetch a specific announcement by ID
+      // Fetch a specific announcement by ID and populate the created_by field
       const announcement = await announcments.findOne({
         _id: new ObjectId(id),
-      });
+      }).populate('created_by', 'role');  // Populate role field from the user collection
 
       if (!announcement) {
         return NextResponse.json(
@@ -73,13 +86,13 @@ export async function GET(req) {
         );
       }
 
-      // Return the specific announcement
+      // Return the specific announcement with the user's role
       return NextResponse.json(announcement, { status: 200 });
     } else {
-      // Fetch all announcement
-      const announcementAll = await announcments.find();
+      // Fetch all announcements and populate the created_by field
+      const announcementAll = await announcments.find().populate('created_by', 'role'); // Populate role field
 
-      // Return all announcement
+      // Return all announcements with user roles
       return NextResponse.json(announcementAll, { status: 200 });
     }
   } catch (error) {
@@ -89,6 +102,7 @@ export async function GET(req) {
     );
   }
 }
+
 
 export async function DELETE(req) {
   try {
@@ -134,3 +148,72 @@ export async function DELETE(req) {
     );
   }
 }
+export const PUT = async (req) => {
+  try {
+    // Extract the ID from the query parameters (not the request body)
+    const url = new URL(req.url);
+    const id = url.searchParams.get('id');
+
+    // Log the received data to ensure correctness
+    const { announcement_title, description, tags = [], created_by } = await req.json();
+    console.log("Received data to update:", { id, announcement_title, description, tags, created_by });
+
+    if (!id) {
+      return NextResponse.json(
+        { message: "Announcement ID is required" },
+        { status: 422 }
+      );
+    }
+
+    if (!announcement_title) {
+      return NextResponse.json(
+        { message: "Announcement title is a required field" },
+        { status: 422 }
+      );
+    }
+
+    // Connect to the database
+    await connectToDB();
+    console.log("Database connected successfully.");
+
+    // Handle created_by (convert to ObjectId if necessary)
+    let createdByObjectId = null;
+    if (created_by) {
+      const user = await users.findOne({ role: created_by.role });
+      if (!user) {
+        return NextResponse.json(
+          { message: "User with specified role not found" },
+          { status: 404 }
+        );
+      }
+      createdByObjectId = user._id;
+    }
+
+    // Update the announcement
+    const updatedAnnouncement = await announcments.findByIdAndUpdate(
+      id,
+      {
+        announcement_title,
+        description,
+        tags,
+        created_by: createdByObjectId,
+      },
+      { new: true }
+    );
+
+    if (!updatedAnnouncement) {
+      return NextResponse.json(
+        { message: "Announcement not found" },
+        { status: 404 }
+      );
+    }
+
+    return NextResponse.json(updatedAnnouncement, { status: 200 });
+  } catch (error) {
+    console.error("Error updating announcement:", error);
+    return NextResponse.json(
+      { error: error.message, message: "Error updating announcement" },
+      { status: 500 }
+    );
+  }
+};

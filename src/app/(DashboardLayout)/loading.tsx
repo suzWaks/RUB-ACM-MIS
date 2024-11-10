@@ -18,7 +18,7 @@ const Loading: React.FC = () => {
   }, []);
 
   return (
-    <div style={styles.loadingContainer}>
+    <div style={styles.loadingContainer}>å
       <div style={styles.spinner}></div>
       <p style={styles.text}>Loading, please wait...</p>
     </div>

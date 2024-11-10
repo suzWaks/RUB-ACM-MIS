@@ -571,6 +571,86 @@ const ProfilePage: React.FC = () => {
                     mb: 3,
                     textAlign: "left",
                   }}
+                />
+
+                <TextField
+                  fullWidth
+                  label="Gender"
+                  name="gender"
+                  value={userProfile.gender}
+                  onChange={handleChange}
+                  sx={{
+                    mb: 3,
+                    "& .MuiOutlinedInput-root": {
+                      height: "56px",
+                      paddingTop: "12px",
+                      paddingBottom: "12px",
+                    },
+                  }}
+                  InputProps={{
+                    readOnly: !isEditing,
+                    startAdornment: isEditing ? (
+                      <InputAdornment position="start">
+                        <EditIcon color="primary" />
+                      </InputAdornment>
+                    ) : null,
+                    sx: {
+                      "& input": {
+                        backgroundColor: isEditing ? "#ffffff" : "transparent",
+                      },
+                    },
+                  }}
+                  InputLabelProps={{
+                    sx: {
+                      color: isEditing
+                        ? theme.palette.primary.main
+                        : theme.palette.text.secondary,
+                      fontSize: "1rem",
+                      transition: "0.2s ease-in-out",
+                    },
+                    shrink: isEditing || userProfile.gender !== "",
+                  }}
+                />
+
+                <TextField
+                  fullWidth
+                  label="Designation"
+                  name="designation"
+                  value={userProfile.designation}
+                  onChange={handleChange}
+                  sx={{
+                    mb: 3,
+                    "& .MuiOutlinedInput-root": {
+                      height: "56px",
+                      paddingTop: "12px",
+                      paddingBottom: "12px",
+                    },
+                  }}
+                  InputProps={{
+                    readOnly: !isEditing,
+                    startAdornment: isEditing ? (
+                      <InputAdornment position="start">
+                        <EditIcon color="primary" />
+                      </InputAdornment>
+                    ) : null,
+                    sx: {
+                      "& input": {
+                        backgroundColor: isEditing ? "#ffffff" : "transparent",
+                      },
+                    },
+                  }}
+                  InputLabelProps={{
+                    sx: {
+                      color: isEditing
+                        ? theme.palette.primary.main
+                        : theme.palette.text.secondary,
+                      fontSize: "1rem",
+                      transition: "0.2s ease-in-out",
+                    },
+                    shrink: isEditing || userProfile.designation !== "",
+                  }}
+                />
+
                 >
                   Details
                 </Typography>
@@ -652,6 +732,7 @@ const ProfilePage: React.FC = () => {
                     />
                   </Grid>
                 </Grid>
+
               </Box>
             </Grid>
           </Grid>

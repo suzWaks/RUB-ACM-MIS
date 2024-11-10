@@ -11,13 +11,50 @@ import {
   Box,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
-import theme from "@/utils/theme";
 
 const CreateAnnouncementModal = ({ open, onClose, onAddAnnouncement }) => {
-  // State variables for form inputs
   const [title, setTitle] = useState("");
   const [tags, setTags] = useState("");
   const [description, setDescription] = useState("");
+  const [createdBy, setCreatedBy] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const handleSubmit = async () => {
+    if (title && createdBy) {
+      setLoading(true);
+
+      const newAnnouncement = {
+        announcement_title: title,
+        description,
+        tags: tags.split(",").map((tag) => tag.trim()),
+        created_by: createdBy,
+      };
+
+      try {
+        const response = await fetch(`/api/announcements`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(newAnnouncement),
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          onAddAnnouncement(data);
+          onClose();
+          setTitle("");
+          setTags("");
+          setDescription("");
+          setCreatedBy("");
+        } else {
+          console.error("Failed to add announcement:", response.statusText);
+        }
+      } catch (error) {
+        console.error("Error adding announcement:", error);
+      } finally {
+        setLoading(false);
+      }
   const [time, setTime] = useState(""); // New state for time input
 
   // Handle submission of the form
@@ -43,7 +80,7 @@ const CreateAnnouncementModal = ({ open, onClose, onAddAnnouncement }) => {
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm">
       <DialogTitle>
         <Box display="flex" justifyContent="space-between" alignItems="center">
-          <Typography variant="h6" sx={{ color: "primary.main", fontWeight: "600", fontSize: '1.125rem' }}>
+          <Typography variant="h6" sx={{ color: "primary.main", fontWeight: "600", fontSize: "1.125rem" }}>
             Create an Announcement
           </Typography>
           <IconButton onClick={onClose} sx={{ color: "error.main" }}>
@@ -58,7 +95,7 @@ const CreateAnnouncementModal = ({ open, onClose, onAddAnnouncement }) => {
           variant="outlined"
           margin="normal"
           value={title}
-          onChange={(e) => setTitle(e.target.value)} // Update state on change
+          onChange={(e) => setTitle(e.target.value)}
           sx={{ borderRadius: "8px" }}
         />
         <TextField
@@ -67,7 +104,7 @@ const CreateAnnouncementModal = ({ open, onClose, onAddAnnouncement }) => {
           variant="outlined"
           margin="normal"
           value={tags}
-          onChange={(e) => setTags(e.target.value)} // Update state on change
+          onChange={(e) => setTags(e.target.value)}
           sx={{ borderRadius: "8px" }}
         />
         <TextField
@@ -78,7 +115,7 @@ const CreateAnnouncementModal = ({ open, onClose, onAddAnnouncement }) => {
           multiline
           rows={4}
           value={description}
-          onChange={(e) => setDescription(e.target.value)} // Update state on change
+          onChange={(e) => setDescription(e.target.value)}
           sx={{ borderRadius: "8px" }}
         />
         <TextField
@@ -86,15 +123,21 @@ const CreateAnnouncementModal = ({ open, onClose, onAddAnnouncement }) => {
           label="Enter Time" // New field for time
           variant="outlined"
           margin="normal"
+
+          value={createdBy}
+          onChange={(e) => setCreatedBy(e.target.value)}
+
           value={time}
           onChange={(e) => setTime(e.target.value)} // Update state on change
+
           sx={{ borderRadius: "8px" }}
         />
       </DialogContent>
       <DialogActions>
         <Button
-          onClick={handleSubmit} // Call handleSubmit on click
+          onClick={handleSubmit}
           variant="contained"
+          disabled={loading}
           sx={{
             backgroundColor: "secondary_teal.main",
             color: "#fff",
@@ -102,7 +145,7 @@ const CreateAnnouncementModal = ({ open, onClose, onAddAnnouncement }) => {
             textTransform: "none",
           }}
         >
-          Add Announcement
+          {loading ? "Adding..." : "Add Announcement"}
         </Button>
       </DialogActions>
     </Dialog>
