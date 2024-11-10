@@ -18,7 +18,7 @@
     "-Wnull-dereference"
   ],
   "C_Cpp_Runner.msvcWarnings": [
-    "/W4",
+    "/W4",  
     "/permissive-",
     "/w14242",
     "/w14287",

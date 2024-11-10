@@ -17,7 +17,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Snackbar, Alert } from "@mui/material";
 import Loading from "@/app/loading";
-
+import loading from "../../loading";
 const Login2 = () => {
   const theme = useTheme();
   const { data: session, status } = useSession();
@@ -26,7 +26,7 @@ const Login2 = () => {
   const [password, setPassword] = useState("");
   const [error, setError] = useState(""); // State for error messages
   const [open, setOpen] = useState(false); // State for alert visibility
-
+  const [loading, setLoading] = useState(false);
   /*
    *Not needed Just for debugging purposes.
    */
@@ -39,9 +39,7 @@ const Login2 = () => {
     }
   }, [session, status]);
 
-  if (status === "loading") {
-    return <Loading/>;
-  }
+  if (loading) return <Loading />;
 
   const handleSignIn = async (e: { preventDefault: () => void }) => {
     e.preventDefault();
@@ -52,12 +50,14 @@ const Login2 = () => {
         email,
         password,
       });
-
+      setLoading(true);
       if (result?.error) {
         console.log("Sign-in failed:", result.error);
+        setLoading(false);
         setError("Incorrect Username or Password"); // Set the error message
         setOpen(true); // Open the alert
       } else {
+        setLoading(false);
         const session = await getSession(); // Fetch the session details
         console.log("Session details:", session);
 
@@ -65,6 +65,7 @@ const Login2 = () => {
       }
     } catch (error) {
       console.error("Error during sign-in:", error);
+      setLoading(false);
       setError("An unexpected error occurred."); // Set a generic error message
       setOpen(true); // Open the alert
     }

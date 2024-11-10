@@ -5,19 +5,19 @@ import DashboardCard from "@/app/(DashboardLayout)/components/shared/DashboardCa
 const Chart = dynamic(() => import("react-apexcharts"), { ssr: false });
 
 interface BudgetOverviewProps {
-  budgetUsed: number;
-  budgetRemaining: number;
+  totalIncome: number;
+  totalExpense: number;
 }
 
 const BudgetOverview: React.FC<BudgetOverviewProps> = ({
-  budgetUsed,
-  budgetRemaining,
+  totalIncome,
+  totalExpense,
 }) => {
   const titleColor = "#6f42c1";
   const primaryColor = "#007BFF";
   const secondaryColor = "#0DCAF0";
 
-  const seriesPieChart: any = [budgetUsed, budgetRemaining];
+  const seriesPieChart: any = [totalIncome, totalExpense];
 
   const optionsPieChart: any = {
     chart: {
@@ -50,7 +50,7 @@ const BudgetOverview: React.FC<BudgetOverviewProps> = ({
       theme: "light",
       fillSeriesColor: false,
       style: {
-        fontSize: '14px',
+        fontSize: "14px",
       },
     },
     dataLabels: {
@@ -118,8 +118,12 @@ const BudgetOverview: React.FC<BudgetOverviewProps> = ({
                     marginRight: 1,
                   }}
                 />
-                <Typography variant="body1" color={primaryColor} fontWeight={500}>
-                  Used: ${budgetUsed.toLocaleString()}
+                <Typography
+                  variant="body1"
+                  color={primaryColor}
+                  fontWeight={500}
+                >
+                  Total Income: Nu.{totalIncome.toLocaleString()}
                 </Typography>
               </Box>
               <Box display="flex" alignItems="center">
@@ -132,8 +136,12 @@ const BudgetOverview: React.FC<BudgetOverviewProps> = ({
                     marginRight: 1,
                   }}
                 />
-                <Typography variant="body1" color={secondaryColor} fontWeight={500}>
-                  Remaining: ${budgetRemaining.toLocaleString()}
+                <Typography
+                  variant="body1"
+                  color={secondaryColor}
+                  fontWeight={500}
+                >
+                  Total Expense: Nu.{totalExpense.toLocaleString()}
                 </Typography>
               </Box>
             </Stack>

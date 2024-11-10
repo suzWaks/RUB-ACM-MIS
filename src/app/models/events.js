@@ -6,13 +6,9 @@ const EventSchema = new Schema(
       type: String,
       required: [true, "Event Name is required"],
     },
-    start_date: {
+    event_date: {
       type: Date,
-      required: [true, "Start Date is required"],
-    },
-    end_date: {
-      type: Date,
-      required: [true, "End Date is required"],
+      required: [true, "Event Date is required"],
     },
     venue: {
       type: String,
@@ -22,6 +18,11 @@ const EventSchema = new Schema(
       type: String,
       required: [true, "Time is required"],
     },
+    year: [
+      {
+        type: String,
+      },
+    ],
     registeredMember: [
       {
         type: Schema.Types.ObjectId,

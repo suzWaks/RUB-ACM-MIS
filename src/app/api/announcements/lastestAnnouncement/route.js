@@ -1,5 +1,5 @@
-import announcments from "../../../../models/annoucements";
-import members from "../../../../models/members";
+import announcments from "../../../models/annoucements";
+import members from "../../../models/members";
 import { connectToDB } from "../../../../utils/database";
 import mongoose from "mongoose";
 

@@ -1,6 +1,6 @@
 import { connectToDB } from "../../../../utils/database";
 import mongoose from "mongoose";
-import events from "../../../../models/events";
+import events from "../../../models/events";
 
 export const GET = async () => {
   try {
@@ -13,7 +13,7 @@ export const GET = async () => {
 
     // Transform the events into activities
     const activities = recenActivities.map((event) => ({
-      date: event.end_date.toISOString().split("T")[0], // Format the date as YYYY-MM-DD
+      date: event.start_date.toISOString().split("T")[0], // Format the date as YYYY-MM-DD
       title: event.event_name,
     }));
 

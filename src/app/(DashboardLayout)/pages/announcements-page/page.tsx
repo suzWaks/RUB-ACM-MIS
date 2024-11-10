@@ -20,6 +20,10 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
+  Menu,
+  MenuItem,
+  TextField,
+  TablePagination,
 } from "@mui/material";
 import { DesktopDatePicker } from "@mui/x-date-pickers/DesktopDatePicker";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
@@ -29,6 +33,11 @@ import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import ReplayIcon from "@mui/icons-material/Replay";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import DeleteIcon from "@mui/icons-material/Delete";
+import AccountCircle from "@mui/icons-material/AccountCircle";
+import { DesktopDatePicker } from "@mui/x-date-pickers/DesktopDatePicker";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import dayjs, { Dayjs } from "dayjs";
 import CreateAnnouncementModal from "./CreateAnnouncementModal";
 import PageContainer from "@/app/(DashboardLayout)/components/container/PageContainer";
 import dayjs, { Dayjs } from "dayjs";
@@ -67,6 +76,20 @@ const AnnouncementsPage: React.FC = () => {
   useEffect(() => {
     fetchAnnouncements();
   }, []);
+  const [announcements, setAnnouncements] = useState(initialAnnouncements);
+  const [selectedDate, setSelectedDate] = useState<Dayjs | null>(null);
+  const [editAnnouncement, setEditAnnouncement] = useState<{ title: string; createdBy: string; createdOn: string; time: string; tags: string[] } | null>(null);
+
+  // Pagination states
+  const [page, setPage] = useState(0);
+  const [rowsPerPage] = useState(5); // Fixed number of rows per page
+  const [currentAnnouncementIndex, setCurrentAnnouncementIndex] = useState(0); // Current announcement index
+
+  const handleOpenModal = () => setOpenModal(true);
+  const handleCloseModal = () => {
+    setOpenModal(false);
+    setEditAnnouncement(null); // Reset edit state when closing modal
+  };
 
   const handleClick = (event: React.MouseEvent<HTMLElement>): void => {
     setAnchorEl(event.currentTarget);
@@ -154,6 +177,57 @@ const AnnouncementsPage: React.FC = () => {
           dayjs(b.createdAt).isBefore(dayjs(a.createdAt)) ? 1 : -1
         )[0]
       : null;
+    setAnnouncements(initialAnnouncements);
+    setSelectedDate(null);
+  };
+
+  const filteredAnnouncements = announcements.filter((announcement) => {
+    if (filterOption === "Events") return announcement.tags.includes("Event");
+    if (filterOption === "Meeting") return announcement.tags.includes("Meeting");
+    if (selectedDate) return dayjs(announcement.createdOn).isSame(selectedDate, "day");
+    return true;
+  });
+
+  const handleAddAnnouncement = (newAnnouncement: { title: string; createdBy: string; createdOn: string; time: string; tags: string[] }) => {
+    if (editAnnouncement) {
+      setAnnouncements((prevAnnouncements) =>
+        prevAnnouncements.map((announcement) =>
+          announcement.title === editAnnouncement.title ? newAnnouncement : announcement
+        )
+      );
+    } else {
+      setAnnouncements((prevAnnouncements) => [...prevAnnouncements, newAnnouncement]);
+    }
+    handleCloseModal();
+  };
+
+  const handleEditAnnouncement = (announcement: { title: string; createdBy: string; createdOn: string; time: string; tags: string[] }) => {
+    setEditAnnouncement(announcement);
+    handleOpenModal();
+  };
+
+  const handleDeleteAnnouncement = (title: string) => {
+    setAnnouncements((prevAnnouncements) =>
+      prevAnnouncements.filter((announcement) => announcement.title !== title)
+    );
+  };
+
+  // Handle pagination change
+  const handleChangePage = (event: unknown, newPage: number) => {
+    setPage(newPage);
+  };
+
+  const handleNextAnnouncement = () => {
+    if (currentAnnouncementIndex < filteredAnnouncements.length - 1) {
+      setCurrentAnnouncementIndex((prevIndex) => prevIndex + 1);
+    }
+  };
+
+  const handlePreviousAnnouncement = () => {
+    if (currentAnnouncementIndex > 0) {
+      setCurrentAnnouncementIndex((prevIndex) => prevIndex - 1);
+    }
+  };
 
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
@@ -202,6 +276,29 @@ const AnnouncementsPage: React.FC = () => {
                   Created on:{" "}
                   {dayjs(latestAnnouncement.createdAt).format("MMM D, YYYY")}
                 </Typography>
+          <Card variant="outlined" sx={{ mb: 6 }}>
+            <Box display="flex" alignItems="center" justifyContent="space-between" p={2}>
+              <Box display="flex" alignItems="center">
+                <AccountCircle sx={{ color: theme.palette.primary.main, marginRight: 1, fontSize: "30px" }} />
+                <Box>
+                  <Typography variant="subtitle1" fontWeight="600" fontSize="1rem">
+                    {filteredAnnouncements[currentAnnouncementIndex]?.title}
+                  </Typography>
+                  <Typography variant="subtitle2" fontWeight="400" fontSize="0.75rem">
+                    {filteredAnnouncements[currentAnnouncementIndex]?.time}
+                  </Typography>
+                </Box>
+              </Box>
+              <Box display="flex" alignItems="center">
+                <Typography variant="subtitle2" fontWeight="400" fontSize="0.75rem" sx={{ marginRight: 2 }}>
+                  {filteredAnnouncements[currentAnnouncementIndex]?.createdBy} | Posted on {filteredAnnouncements[currentAnnouncementIndex]?.createdOn}
+                </Typography>
+                <IconButton onClick={handlePreviousAnnouncement} disabled={currentAnnouncementIndex === 0}>
+                  <Typography variant="h6">&lt;</Typography>
+                </IconButton>
+                <IconButton onClick={handleNextAnnouncement} disabled={currentAnnouncementIndex === filteredAnnouncements.length - 1}>
+                  <Typography variant="h6">&gt;</Typography>
+                </IconButton>
               </Box>
             </Card>
           )}
@@ -243,7 +340,6 @@ const AnnouncementsPage: React.FC = () => {
               </Menu>
             </Box>
 
-            {/* Date Picker for "Date Created" */}
             <DesktopDatePicker
               label="Date Created"
               value={selectedDate}
@@ -260,50 +356,76 @@ const AnnouncementsPage: React.FC = () => {
                 padding: "14px 18px",
               }}
               startIcon={<ReplayIcon sx={{ color: "red" }} />}
+              sx={{ color: 'red', borderColor: '#ccc', borderRadius: '4px', padding: '14px 18px' }}
+              startIcon={<ReplayIcon sx={{ color: 'red' }} />}
               onClick={handleResetFilter}
             >
               Reset Filter
             </Button>
 
             <Box sx={{ marginLeft: "auto" }}>
+
               <Button
                 variant="contained"
                 color="primary"
                 onClick={() => setOpenModal(true)}
                 sx={{ color: "#fff" }}
               >
+
+              <Button variant="contained" color="primary" onClick={handleOpenModal}>
+
                 Create Announcement
               </Button>
             </Box>
           </Box>
 
+          <CreateAnnouncementModal
+            open={openModal}
+            onClose={handleCloseModal}
+            onAddAnnouncement={handleAddAnnouncement}
+          />
+
           <TableContainer component={Paper}>
             <Table>
               <TableHead>
                 <TableRow>
-                  <TableCell sx={{ fontWeight: "600" }}>Title</TableCell>
-                  <TableCell sx={{ fontWeight: "600" }}>Created By</TableCell>
-                  <TableCell sx={{ fontWeight: "600" }}>Tags</TableCell>
-                  <TableCell sx={{ fontWeight: "600" }}>Created On</TableCell>
-                  <TableCell sx={{ fontWeight: "600" }}>Actions</TableCell>
+                  <TableCell>Title</TableCell>
+                  <TableCell>Created By</TableCell>
+                  <TableCell>Created On</TableCell>
+                  <TableCell>Time</TableCell>
+                  <TableCell>Tags</TableCell>
+                  <TableCell>Actions</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
+
                 {filteredAnnouncements.map((item, index) => (
                   <TableRow key={index}>
                     <TableCell>{item.announcement_title}</TableCell>
                     <TableCell>{item.created_by?.role || "N/A"}</TableCell>
                     <TableCell>
                       {item.tags.map((tag: string, tagIndex: number) => (
+
+                {filteredAnnouncements.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((announcement) => (
+                  <TableRow key={announcement.title}>
+                    <TableCell>{announcement.title}</TableCell>
+                    <TableCell>{announcement.createdBy}</TableCell>
+                    <TableCell>{announcement.createdOn}</TableCell>
+                    <TableCell>{announcement.time}</TableCell>
+                    <TableCell>
+                      {announcement.tags.map((tag) => (
+
                         <Chip
-                          key={tagIndex}
+                          key={tag}
                           label={tag}
                           variant="outlined"
                           color="primary"
-                          sx={{ marginRight: 1 }}
+                          size="small"
+                          sx={{ marginRight: 1}} // Margin between tags
                         />
                       ))}
                     </TableCell>
+
                     <TableCell>
                       {dayjs(item.createdAt).format("MMM D, YYYY")}
                     </TableCell>
@@ -320,13 +442,22 @@ const AnnouncementsPage: React.FC = () => {
                           <DeleteIcon />
                         </IconButton>
                       </Box>
+
+                    <TableCell>
+                      <IconButton onClick={() => handleEditAnnouncement(announcement)}>
+                        <EditIcon sx={{ color: theme.palette.secondary.main }} /> {/* Reverted to secondary color */}
+                      </IconButton>
+                      <IconButton onClick={() => handleDeleteAnnouncement(announcement.title)}>
+                        <DeleteIcon sx={{ color: theme.palette.error.main }} /> {/* Reverted to error color */}
+                      </IconButton>
+
                     </TableCell>
                   </TableRow>
                 ))}
               </TableBody>
             </Table>
           </TableContainer>
-        </Box>
+
 
         <CreateAnnouncementModal
           open={openModal}
@@ -357,6 +488,17 @@ const AnnouncementsPage: React.FC = () => {
             </Button>
           </DialogActions>
         </Dialog>
+
+          <TablePagination
+            rowsPerPageOptions={[]}
+            component="div"
+            count={filteredAnnouncements.length}
+            rowsPerPage={rowsPerPage}
+            page={page}
+            onPageChange={handleChangePage}
+          />
+        </Box>
+
       </PageContainer>
     </LocalizationProvider>
   );

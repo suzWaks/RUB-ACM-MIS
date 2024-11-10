@@ -55,6 +55,24 @@ const CreateAnnouncementModal = ({ open, onClose, onAddAnnouncement }) => {
       } finally {
         setLoading(false);
       }
+  const [time, setTime] = useState(""); // New state for time input
+
+  // Handle submission of the form
+  const handleSubmit = () => {
+    if (title) {
+      const newAnnouncement = {
+        title,
+        tags: tags.split(",").map(tag => tag.trim()), // Split tags by comma
+        description,
+        time, // Include the time field in the announcement
+      };
+      onAddAnnouncement(newAnnouncement); // Call the prop function to add the announcement
+      onClose(); // Close the modal
+      // Clear inputs
+      setTitle("");
+      setTags("");
+      setDescription("");
+      setTime(""); // Clear time input
     }
   };
 
@@ -102,11 +120,16 @@ const CreateAnnouncementModal = ({ open, onClose, onAddAnnouncement }) => {
         />
         <TextField
           fullWidth
-          label="Created By"
+          label="Enter Time" // New field for time
           variant="outlined"
           margin="normal"
+
           value={createdBy}
           onChange={(e) => setCreatedBy(e.target.value)}
+
+          value={time}
+          onChange={(e) => setTime(e.target.value)} // Update state on change
+
           sx={{ borderRadius: "8px" }}
         />
       </DialogContent>

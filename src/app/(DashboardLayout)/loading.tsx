@@ -32,7 +32,7 @@ const styles: { [key: string]: CSSProperties } = {
     alignItems: "center",
     justifyContent: "center",
     height: "100vh",
-    backgroundColor: "#f0f2f5",
+    backgroundColor: "#f8f9fa",
     color: "#333",
   },
   spinner: {

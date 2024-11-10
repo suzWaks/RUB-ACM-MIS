@@ -1,5 +1,5 @@
 import { connectToDB } from "../../../../utils/database";
-import members from "../../../../models/members";
+import members from "../../../models/members";
 
 export const GET = async (req, res) => {
   try {
