@@ -153,6 +153,19 @@ const Dashboard = () => {
     console.log("Not Signed In");
   }
 
+  // if (session && session.user) {
+  // const { email, id, role } = session.user as {
+  //   email: string;
+  //   id: string;
+  //   role: string;
+  // };
+  //   console.log("Email:", email);
+  //   console.log("ID:", id);
+  //   console.log("Role:", role);
+  // } else {
+  //   console.log("Session or user data not found");
+  // }
+
   if (loading) return <Loading />;
 
   return (

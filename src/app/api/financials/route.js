@@ -1,7 +1,6 @@
 import { connectToDB } from "../../../utils/database";
-import financials from "../../../models/financials";
+import financials from "../../models/financials";
 import mongoose from "mongoose";
-import { NextResponse } from "next/server";
 
 const { ObjectId } = mongoose.Types;
 
@@ -14,7 +13,6 @@ export const POST = async (req) => {
       type,
       category,
       description = "",
-      eventID = null,
     } = await req.json();
 
     // Connect to the database
@@ -28,7 +26,6 @@ export const POST = async (req) => {
       type,
       category,
       description,
-      eventID, // Optional field; it can be `null`
       createdBy, // Automatically set from authenticated user
     });
 
@@ -40,6 +37,7 @@ export const POST = async (req) => {
       headers: { "Content-Type": "application/json" },
     });
   } catch (error) {
+    console.log("Error: ", error);
     return new Response(
       JSON.stringify({
         error: error.message,

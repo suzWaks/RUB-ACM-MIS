@@ -29,11 +29,6 @@ const FinancialSchema = new Schema(
       type: String,
       required: false,
     },
-    eventID: {
-      type: Schema.Types.ObjectId,
-      required: false,
-      ref: "events",
-    },
     createdBy: {
       type: Schema.Types.ObjectId,
       ref: "users",
