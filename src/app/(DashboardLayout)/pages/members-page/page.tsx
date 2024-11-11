@@ -40,6 +40,8 @@ import AddMemberForm from "./AddMemberForm";
 import Bulkupload from "./Bulkupload"; // Import the Attendance component
 import Loading from "../../loading";
 
+import Link from "next/link";
+
 interface MemberStat {
   label: string;
   data: number[];
@@ -393,13 +395,15 @@ const MembersPage = () => {
                 >
                   Add Member
                 </Button>
-                <Button
-                  variant="contained"
-                  color="primary"
-                  onClick={() => setShowAttendance(true)} // Switch to Attendance page
-                >
-                  Attendance
-                </Button>
+                <Link href="/pages/attendance-page">
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    onClick={() => {}} // Switch to Attendance page
+                  >
+                    Attendance
+                  </Button>
+                </Link>
               </Box>
             </Box>
 
