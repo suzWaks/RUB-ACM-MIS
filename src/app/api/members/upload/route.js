@@ -1,11 +1,10 @@
-import members from "../../../../models/members";
+import members from "../../../models/members";
 import { connectToDB } from "../../../../utils/database";
 
 export const POST = async (req, res) => {
   const {
     name,
     std_id,
-    programme,
     year,
     contact_number,
     email,
@@ -17,7 +16,6 @@ export const POST = async (req, res) => {
   if (
     !name ||
     !std_id ||
-    !programme ||
     !year ||
     !contact_number ||
     !email ||
@@ -45,7 +43,6 @@ export const POST = async (req, res) => {
   const newMember = new members({
     name: name,
     std_id: std_id,
-    programme: programme,
     year: year,
     contact_number: contact_number,
     email: email,
@@ -59,11 +56,11 @@ export const POST = async (req, res) => {
     return new Response(
       JSON.stringify(
         { message: newMember },
-        { status: 201 },
-        { headers: { "Content-Type": "application/json" } }
+        { status: 201, headers: { "Content-Type": "application/json" } }
       )
     );
   } catch (error) {
+    console.log(error);
     return new Response(
       JSON.stringify({ message: "Error uploading member" }, { status: 500 })
     );

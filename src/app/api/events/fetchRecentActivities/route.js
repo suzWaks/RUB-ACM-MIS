@@ -8,12 +8,12 @@ export const GET = async () => {
 
     const currentDate = new Date(); // Get the current date
     const recenActivities = await events.find({
-      start_date: { $lt: currentDate },
+      event_date: { $lt: currentDate },
     }); // Filter for events before the current date
 
     // Transform the events into activities
     const activities = recenActivities.map((event) => ({
-      date: event.start_date.toISOString().split("T")[0], // Format the date as YYYY-MM-DD
+      date: event.event_date.toISOString().split("T")[0], // Format the date as YYYY-MM-DD
       title: event.event_name,
     }));
 

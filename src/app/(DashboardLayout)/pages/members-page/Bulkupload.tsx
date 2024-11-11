@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import {
   Box,
   Typography,
@@ -14,6 +14,10 @@ import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { useTheme } from "@mui/material/styles";
 
+interface BulkuploadProps {
+  onClose: () => void; // The type of onClose should be a function that takes no arguments and returns void
+  handleRefresh: () => void;
+}
 interface Member {
   name: string;
   studentNo: string;
@@ -27,13 +31,20 @@ interface BulkuploadProps {
   onUploadComplete: (newMembers: Member[]) => void; // Callback to pass data to MembersPage
 }
 
-const Bulkupload: React.FC<BulkuploadProps> = ({ onUploadComplete }) => {
+const Bulkupload: React.FC<BulkuploadProps> = ({
+  onClose,
+  handleRefresh,
+  onUploadComplete,
+}) => {
   const theme = useTheme();
-  const [uploadedFiles, setUploadedFiles] = useState<File | null>(null); // Single uploaded file
-  const [uploadingFiles, setUploadingFiles] = useState<File[]>([]); // Files being uploaded
-  const [uploadProgress, setUploadProgress] = useState<{ [key: string]: number }>({});
+  const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
+  const [uploadingFiles, setUploadingFiles] = useState<File[]>([]);
+  const [uploadProgress, setUploadProgress] = useState<{
+    [key: string]: number;
+  }>({});
   const [completedUploads, setCompletedUploads] = useState<string[]>([]);
-  const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const fileInputRef = useRef<HTMLInputElement | null>(null); // Create a reference for the file input
+  const [statusMessage, setStatusMessage] = useState("");
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(event.target.files || []);
@@ -52,55 +63,80 @@ const Bulkupload: React.FC<BulkuploadProps> = ({ onUploadComplete }) => {
     }
   };
 
-  const handleRemoveFile = () => {
-    setUploadingFiles([]);
-    setUploadedFiles(null);
-    setCompletedUploads([]);
+  const handleRemoveFile = (fileToRemove: File) => {
+    setUploadingFiles((prevFiles) =>
+      prevFiles.filter((file) => file !== fileToRemove)
+    );
+    setUploadedFiles((prevFiles) =>
+      prevFiles.filter((file) => file !== fileToRemove)
+    );
+    setCompletedUploads((prev) =>
+      prev.filter((name) => name !== fileToRemove.name)
+    );
   };
+
+  const uploadFile = async () => {
+    if (uploadedFiles.length === 0) {
+      console.log(uploadedFiles.length);
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append("files", uploadedFiles[0]);
+
+    try {
+      const response = await fetch("/api/members/bulkupload/new/", {
+        method: "POST",
+        body: formData,
+      });
+      const result = await response.json();
+      if (response.ok) {
+        setStatusMessage(result.message || "File uploaded successfully.");
+        console.log("Uploaded Successfully");
+        handleRefresh();
+        alert("Uploaded Successfully");
+        onClose();
+      } else {
+        setStatusMessage(result.message || "File upload failed.");
+        alert("File upload failed.");
+        console.log("File Upload Failed");
+      }
+    } catch (error) {
+      setStatusMessage("An error occurred while uploading the file.");
+      console.log("An error occurred while uploading the file.");
+      alert("File upload failed.");
+    }
+  };
+
+  // For Debugging Purposes
+  useEffect(() => {
+    console.log("Uploaded files: ", uploadedFiles);
+    console.log("Uploading files: ", uploadingFiles);
+    console.log("Completed Uploads ", completedUploads);
+  }, [uploadedFiles]); // This will trigger when uploadedFiles changes
 
   const simulateUploadProgress = (files: File[]) => {
     files.forEach((file) => {
-      setUploadProgress((prevProgress) => ({ ...prevProgress, [file.name]: 0 }));
+      setUploadProgress((prevProgress) => ({
+        ...prevProgress,
+        [file.name]: 0,
+      }));
       const interval = setInterval(() => {
         setUploadProgress((prevProgress) => {
           const progress = Math.min((prevProgress[file.name] || 0) + 20, 100);
           if (progress === 100) {
             clearInterval(interval);
-            setUploadingFiles([]);
-            setUploadedFiles(file); // Set the single uploaded file
+            setUploadingFiles((prevFiles) =>
+              prevFiles.filter((f) => f !== file)
+            );
+            // Move the file to the uploadedFiles array only when upload is completed
+            setUploadedFiles((prevFiles) => [...prevFiles, file]);
+            setCompletedUploads((prev) => [...prev, file.name]);
           }
           return { ...prevProgress, [file.name]: progress };
         });
       }, 500);
     });
-  };
-
-  const handleUploadFiles = async () => {
-    if (uploadingFiles.length === 0) return;
-
-    const formData = new FormData();
-    formData.append("file", uploadingFiles[0]); // Append single file
-
-    try {
-      const response = await fetch("YOUR_SERVER_ENDPOINT", {
-        method: "POST",
-        body: formData,
-      });
-
-      if (!response.ok) {
-        throw new Error("Network response was not ok");
-      }
-
-      const data = await response.json();
-      console.log("File uploaded successfully:", data);
-
-      setUploadedFiles(uploadingFiles[0]);
-      setUploadingFiles([]);
-      setCompletedUploads([uploadingFiles[0].name]);
-      setUploadProgress({});
-    } catch (error) {
-      console.error("Error uploading file:", error);
-    }
   };
 
   const handleButtonClick = () => {
@@ -112,7 +148,7 @@ const Bulkupload: React.FC<BulkuploadProps> = ({ onUploadComplete }) => {
   const handleDone = async () => {
     if (uploadedFiles) {
       // Here you need to parse the CSV file and map it to the Member format
-      const newMembers = await parseCSV(uploadedFiles); // Wait for CSV parsing to finish
+      const newMembers = await parseCSV(uploadedFiles[0]); // Wait for CSV parsing to finish
       onUploadComplete(newMembers); // Pass the data to MembersPage
     }
   };
@@ -128,7 +164,8 @@ const Bulkupload: React.FC<BulkuploadProps> = ({ onUploadComplete }) => {
 
         // Skip header row (optional)
         for (let i = 1; i < lines.length; i++) {
-          const [name, studentNo, department, email, year, gender] = lines[i].split(",");
+          const [name, studentNo, department, email, year, gender] =
+            lines[i].split(",");
           members.push({
             name,
             studentNo,
@@ -151,8 +188,20 @@ const Bulkupload: React.FC<BulkuploadProps> = ({ onUploadComplete }) => {
   };
 
   return (
-    <Box display="flex" flexDirection="column" alignItems="center" p={4} sx={{ backgroundColor: "#f2f4ff", minHeight: "100vh" }}>
-      <Typography variant="h5" mb={2} fontWeight="bold" color="primary" sx={{ color: "#7a5df1" }}>
+    <Box
+      display="flex"
+      flexDirection="column"
+      alignItems="center"
+      p={4}
+      sx={{ backgroundColor: "#f2f4ff", minHeight: "100" }}
+    >
+      <Typography
+        variant="h5"
+        mb={2}
+        fontWeight="bold"
+        color="primary"
+        sx={{ color: "#7a5df1" }}
+      >
         Upload
       </Typography>
 
@@ -172,11 +221,21 @@ const Bulkupload: React.FC<BulkuploadProps> = ({ onUploadComplete }) => {
       >
         <IconButton component="label" sx={{ color: "#7a5df1", fontSize: 60 }}>
           <CloudUploadIcon fontSize="large" />
-          <input type="file" hidden onChange={handleFileUpload} accept=".csv" ref={fileInputRef} />
+          <input
+            type="file"
+            hidden
+            multiple
+            onChange={handleFileUpload}
+            accept=".csv"
+            ref={fileInputRef} // Attach the ref to the file input
+          />
         </IconButton>
         <Typography variant="body1" color="textPrimary" mt={1}>
-          Drag & drop a CSV file or{" "}
-          <span style={{ color: "#7a5df1", cursor: "pointer" }} onClick={handleButtonClick}>
+          Drag & drop files or{" "}
+          <span
+            style={{ color: "#7a5df1", cursor: "pointer" }}
+            onClick={handleButtonClick}
+          >
             Browse
           </span>
         </Typography>
@@ -185,16 +244,30 @@ const Bulkupload: React.FC<BulkuploadProps> = ({ onUploadComplete }) => {
         </Typography>
       </Paper>
 
+      {/* Uploading Section My Code*/}
       {uploadingFiles.length > 0 && (
         <Box mt={3} sx={{ width: "100%", maxWidth: 600 }}>
-          <Typography variant="subtitle1" color="textSecondary" mb={1} sx={{ color: "#7a5df1" }}>
-            Uploading - 1 file
+          <Typography
+            variant="subtitle1"
+            color="textSecondary"
+            mb={1}
+            sx={{ color: "#7a5df1" }}
+          >
+            Bulk Uploading - {uploadingFiles.length}/
+            {uploadedFiles.length + uploadingFiles.length} files
           </Typography>
           {uploadingFiles.map((file) => (
             <Box key={file.name} mb={2} display="flex" alignItems="center">
               <Typography sx={{ flex: 1 }}>{file.name}</Typography>
-              <LinearProgress variant="determinate" value={uploadProgress[file.name] || 0} sx={{ flex: 1, color: "#7a5df1" }} />
-              <IconButton onClick={handleRemoveFile} sx={{ color: "#ff6b6b", ml: 1 }}>
+              <LinearProgress
+                variant="determinate"
+                value={uploadProgress[file.name] || 0}
+                sx={{ flex: 1, color: "#7a5df1" }}
+              />
+              <IconButton
+                onClick={() => handleRemoveFile(file)}
+                sx={{ color: "#ff6b6b", ml: 1 }}
+              >
                 <DeleteIcon />
               </IconButton>
             </Box>
@@ -202,14 +275,22 @@ const Bulkupload: React.FC<BulkuploadProps> = ({ onUploadComplete }) => {
         </Box>
       )}
 
-      {uploadedFiles && (
+      {/* Uploaded Section */}
+
+      {uploadedFiles.length > 0 && (
         <Box mt={3} sx={{ width: "100%", maxWidth: 600 }}>
-          <Typography variant="subtitle1" color="textSecondary" mb={1} sx={{ color: "#7a5df1" }}>
+          <Typography
+            variant="subtitle1"
+            color="textSecondary"
+            mb={1}
+            sx={{ color: "#7a5df1" }}
+          >
             Uploaded
           </Typography>
           <List>
+            {/* Render only the first file */}
             <ListItem
-              key={uploadedFiles.name}
+              key={`${uploadedFiles[0].name}-0`}
               sx={{
                 border: "2px solid #4caf50",
                 borderRadius: "4px",
@@ -218,10 +299,17 @@ const Bulkupload: React.FC<BulkuploadProps> = ({ onUploadComplete }) => {
               }}
             >
               <ListItemText
-                primary={uploadedFiles.name}
-                sx={{ color: completedUploads.includes(uploadedFiles.name) ? "#4caf50" : "textPrimary" }}
+                primary={uploadedFiles[0].name}
+                sx={{
+                  color: completedUploads.includes(uploadedFiles[0].name)
+                    ? "#4caf50"
+                    : "textPrimary",
+                }}
               />
-              <IconButton onClick={handleRemoveFile} sx={{ color: "#ff6b6b" }}>
+              <IconButton
+                onClick={() => handleRemoveFile(uploadedFiles[0])}
+                sx={{ color: "#ff6b6b" }}
+              >
                 <DeleteIcon />
               </IconButton>
             </ListItem>
@@ -231,7 +319,7 @@ const Bulkupload: React.FC<BulkuploadProps> = ({ onUploadComplete }) => {
 
       <Button
         variant="contained"
-        onClick={handleButtonClick}
+        onClick={uploadFile} // Call the button click handler
         sx={{
           mt: 4,
           backgroundColor: "#7a5df1",
@@ -249,7 +337,7 @@ const Bulkupload: React.FC<BulkuploadProps> = ({ onUploadComplete }) => {
         UPLOAD FILE
       </Button>
 
-      {uploadedFiles && (
+      {/* {uploadedFiles && (
         <Button
           variant="contained"
           color="secondary"
@@ -269,9 +357,12 @@ const Bulkupload: React.FC<BulkuploadProps> = ({ onUploadComplete }) => {
         >
           DONE
         </Button>
-      )}
+      )} */}
     </Box>
   );
 };
 
 export default Bulkupload;
+function onUploadComplete(newMembers: Member[]) {
+  throw new Error("Function not implemented.");
+}

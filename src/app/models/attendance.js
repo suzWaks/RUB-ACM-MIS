@@ -10,6 +10,10 @@ const AttendanceSchema = new Schema(
       type: Schema.Types.ObjectId,
       ref: "members",
     },
+    date: {
+      type: Date,
+      required: [true, "Date is required"],
+    },
     status: {
       type: Boolean,
       default: true,

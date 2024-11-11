@@ -30,18 +30,17 @@ export const PATCH = async (request, { params }) => {
   try {
     await connectToDB();
 
+    console.log(params.id);
     // Parse JSON from the request body
     const updates = await request.json();
+    console.log(updates);
 
     // Find and update the member document by ID
     const updatedMember = await members.findOneAndUpdate(
-      { userID: params.id }, // Specify filter object
-      { $set: updates },
-      {
-        new: true,           // Return the updated document
-        runValidators: true, // Run schema validators
-      }
+      { _id: params.id }, // Specify filter object
+      { $set: updates }
     );
+    console.log(updatedMember);
 
     if (!updatedMember) {
       return new Response("Member not found", { status: 404 });
@@ -60,7 +59,6 @@ export const PATCH = async (request, { params }) => {
   }
 };
 
-
 //DELETE (delete)
 export const DELETE = async (request, { params }) => {
   try {
@@ -68,20 +66,29 @@ export const DELETE = async (request, { params }) => {
 
     const member = await members.findById(params.id);
     if (!member) {
-      return new Response("Member not found", { status: 404 });
+      return new Response(
+        JSON.stringify({ message: "Member not found" }), // Return a JSON response
+        { status: 404, headers: { "Content-Type": "application/json" } }
+      );
     }
 
     const userID = member.userID;
 
-    //Deleteing data from members collection
+    // Deleting data from members collection
     await members.findByIdAndDelete(params.id);
 
-    //Deleting data from users collection
+    // Deleting data from users collection
     await users.findByIdAndDelete(userID);
 
-    return new Response("Member deleted successfully", { status: 200 });
+    return new Response(
+      JSON.stringify({ message: "Member deleted successfully" }), // Return a JSON response
+      { status: 200, headers: { "Content-Type": "application/json" } }
+    );
   } catch (error) {
     console.log(error);
-    return new Response("Failed to delete member", { status: 500 });
+    return new Response(
+      JSON.stringify({ message: "Failed to delete member" }), // Return a JSON response
+      { status: 500, headers: { "Content-Type": "application/json" } }
+    );
   }
 };

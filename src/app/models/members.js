@@ -16,7 +16,7 @@ const MemberSchema = new Schema(
     },
     programme: {
       type: String,
-      required: [true, "Programme name is required"],
+      required: false,
     },
     year: {
       type: String,

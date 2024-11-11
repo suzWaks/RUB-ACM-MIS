@@ -1,6 +1,6 @@
 import bcrypt from "bcryptjs";
-import users from "../../../../models/users";
-import members from "../../../../models/members";
+import users from "../../../models/users";
+import members from "../../../models/members";
 import { connectToDB } from "../../../../utils/database";
 
 export const POST = async (req, res) => {

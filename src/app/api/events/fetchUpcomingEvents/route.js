@@ -8,8 +8,8 @@ export const GET = async () => {
 
     const currentDate = new Date(); // Get the current date
     const upcomingEvents = await events
-      .find({ start_date: { $gt: currentDate } })
-      .sort({ start_date: 1 }) // Sort by start date in ascending order
+      .find({ event_date: { $gt: currentDate } })
+      .sort({ event_date: 1 }) // Sort by start date in ascending order
       .limit(3); // Limit to the three soonest events
 
     console.log("The upcoming date: ", upcomingEvents);
@@ -28,7 +28,7 @@ export const GET = async () => {
     // Transform the events into the required format
     const formattedEvents = upcomingEvents.map((event) => ({
       name: event.event_name,
-      date: event.start_date,
+      date: event.event_date,
     }));
 
     return new Response(JSON.stringify(formattedEvents), {
