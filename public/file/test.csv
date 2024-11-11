@@ -1,4 +1,7 @@
 name,std_id,year,contact_number,email,department,gender,designation
-John Doe,12345,2023,9876543210,johndoe@example.com,Civil,Male,Member
-Jane Smith,67890,2022,9123456789,janesmith@example.com,Electrical,Female,Member
-Alice Johnson,54321,2024,9879879876,alice.johnson@example.com,Mechanical,Female,Member
+Pema Wangmo,02220140,1,7774001234,02220140.cst@rub.edu.bt,Information Technology,Others,Student
+Jigme Yangzom,02220141,2,7774112345,02220141.cst@rub.edu.bt,Geology,Others,Student
+Dorji Wangchuk,02220142,3,7774223456,02220142.cst@rub.edu.bt,Civil,Others,Student
+Sonam Choden,02220143,4,7774334567,02220143.cst@rub.edu.bt,Electrical,Others,Student
+Tandin Lhamo,02220144,1,7774445678,02220144.cst@rub.edu.bt,Electronic and Communication,Others,Student
+Ugyen Wangmo,02220145,2,7774556789,02220145.cst@rub.edu.bt,Mechanical,Others,Student
