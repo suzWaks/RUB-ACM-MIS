@@ -180,10 +180,10 @@ const Login2 = () => {
                 startIcon={<GoogleIcon />}
                 sx={{ mb: 3, color: "inherit" }}
               >
-                Sign in with Google
+                Sign in 
               </Button> */}
             </Box>
-            {/* <Typography variant="body2" color="textSecondary">
+            <Typography variant="body2" color="textSecondary">
               Don&apos;t have an account?{" "}
               <Link href="/authentication/register" passHref>
                 <Typography
@@ -192,10 +192,10 @@ const Login2 = () => {
                   fontWeight="500"
                   sx={{ cursor: "pointer", textDecoration: "none" }}
                 >
-                  Sign up for free
+                  Sign up
                 </Typography>
               </Link>
-            </Typography> */}
+            </Typography>
           </Box>
         </Grid>
         <Grid

@@ -467,7 +467,7 @@ const ProfilePage: React.FC = () => {
                   </Grid>
                 </Grid>
                 <Grid>
-                  <FormControl fullWidth sx={{ marginTop: "14px" }}>
+                  {/* <FormControl fullWidth sx={{ marginTop: "14px" }}>
                     <InputLabel
                       sx={{
                         color: isEditing
@@ -545,7 +545,7 @@ const ProfilePage: React.FC = () => {
                         Bachelor of Engineering in Water Resource Engineering
                       </MenuItem>
                     </Select>
-                  </FormControl>
+                  </FormControl> */}
                 </Grid>
               </Box>
             </Grid>
