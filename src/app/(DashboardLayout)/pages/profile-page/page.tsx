@@ -69,13 +69,16 @@ const ProfilePage: React.FC = () => {
       if (session?.user?.id) {
         setLoading(true);
         console.log("Session id: ", session.user.id);
-        const response = await fetch(`/api/members/${session.user.id}`, {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(editableProfile),
-        });
+        const response = await fetch(
+          `/api/members/${session.user.id}/profile`,
+          {
+            method: "PATCH",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(editableProfile),
+          }
+        );
 
         if (!response.ok) {
           throw new Error("Update error");
@@ -96,6 +99,7 @@ const ProfilePage: React.FC = () => {
       setError("Failed to update profile.");
     } finally {
       setLoading(false);
+      window.location.reload();
     }
   };
 
