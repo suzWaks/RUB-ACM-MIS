@@ -2,7 +2,35 @@ import * as React from "react";
 import { PieChart } from "@mui/x-charts/PieChart";
 import { Box, Typography } from "@mui/material";
 import theme from "@/utils/theme";
+import { useState, useEffect } from "react";
+
 const Pie = () => {
+  const [totalPresent, setTotalPresent] = useState<number>(0);
+  const [totalAbsent, setTotalAbsent] = useState<number>(0);
+
+  const fetchData = async () => {
+    try {
+      const response = await fetch("/api/attendance/dash/absentVsPresent", {
+        method: "GET",
+      });
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
+      const result = await response.json();
+      setTotalAbsent(result.totalAbsent);
+      setTotalPresent(result.totalPresent);
+    } catch (error) {
+      console.log("Error while fetching data: ", error);
+    }
+  };
+
+  useEffect(() => {
+    const fetchGraphData = async () => {
+      await fetchData();
+    };
+    fetchGraphData();
+  }, []);
+
   return (
     <>
       <Typography variant="h6" align="center" gutterBottom>
@@ -15,13 +43,13 @@ const Pie = () => {
               data: [
                 {
                   id: 0,
-                  value: 10,
+                  value: totalAbsent,
                   label: "Total absent",
                   color: theme.palette.primary.main,
                 },
                 {
                   id: 1,
-                  value: 15,
+                  value: totalPresent,
                   label: "Total present",
                   color: theme.palette.secondary_teal.main,
                 },

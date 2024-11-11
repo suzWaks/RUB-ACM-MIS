@@ -42,7 +42,10 @@ const Menuitems = [
     title: "Finance",
     icon: IconCoins,
     href: "/pages/finance-page",
+    adminOnly: true,
   },
 ];
 
 export default Menuitems;
+
+///

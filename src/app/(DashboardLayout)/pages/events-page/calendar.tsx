@@ -13,6 +13,7 @@ import dayjs from "dayjs";
 import { Button } from "@mui/material";
 import theme from "@/utils/theme";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
+import { useSession } from "next-auth/react";
 
 interface Event {
   event_id: string;
@@ -24,12 +25,20 @@ interface Event {
 }
 
 const Calendar: React.FC = () => {
+  //User Session
+  const { data: session } = useSession();
+  const showComponent = session?.user?.role === "admin";
+  console.log(showComponent);
+
   const [isFormOpen, setIsFormOpen] = useState<boolean>(false);
   const [selectedDate, setSelectedDate] = useState<DateSelectArg | null>(null);
   const [showEventTable, setShowEventTable] = useState(false); // Track event table visibility
   const [selectedEvent, setSelectedEvent] = useState<any | null>(null);
 
   const handleDateClick = (selected: DateSelectArg) => {
+    if (!showComponent) {
+      return;
+    }
     setSelectedDate(selected);
     setIsFormOpen(true);
   };
@@ -140,10 +149,13 @@ const Calendar: React.FC = () => {
       </div>
 
       <div className="calendar-card">
-        <button className="add-event-button" onClick={handleDateClickbtn}>
-          <AddCircleIcon style={{ marginRight: "8px" }} />
-          Add an Event
-        </button>
+        {showComponent && (
+          <button className="add-event-button" onClick={handleDateClickbtn}>
+            <AddCircleIcon style={{ marginRight: "8px" }} />
+            Add an Event
+          </button>
+        )}
+
         <FullCalendar
           height={"85vh"}
           plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}

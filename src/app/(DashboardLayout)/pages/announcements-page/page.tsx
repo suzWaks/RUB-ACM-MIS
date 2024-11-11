@@ -34,8 +34,15 @@ import PageContainer from "@/app/(DashboardLayout)/components/container/PageCont
 import dayjs, { Dayjs } from "dayjs";
 import EditAnnouncementModal from "./EditAnnouncement";
 import Loading from "@/app/loading";
+import { useSession } from "next-auth/react";
 
 const AnnouncementsPage: React.FC = () => {
+  //-----Session
+  const { data: session } = useSession();
+  const showComponent = session?.user?.role === "admin";
+
+  //-----
+
   const [announcements, setAnnouncements] = useState<any[]>([]);
   const [filterOption, setFilterOption] = useState<string>("Filter By");
   const [selectedDate, setSelectedDate] = useState<Dayjs | null>(null);
@@ -268,16 +275,18 @@ const AnnouncementsPage: React.FC = () => {
               Reset Filter
             </Button>
 
-            <Box sx={{ marginLeft: "auto" }}>
-              <Button
-                variant="contained"
-                color="primary"
-                onClick={() => setOpenModal(true)}
-                sx={{ color: "#fff" }}
-              >
-                Create Announcement
-              </Button>
-            </Box>
+            {showComponent && (
+              <Box sx={{ marginLeft: "auto" }}>
+                <Button
+                  variant="contained"
+                  color="primary"
+                  onClick={() => setOpenModal(true)}
+                  sx={{ color: "#fff" }}
+                >
+                  Create Announcement
+                </Button>
+              </Box>
+            )}
           </Box>
 
           <TableContainer component={Paper}>
@@ -288,7 +297,9 @@ const AnnouncementsPage: React.FC = () => {
                   <TableCell sx={{ fontWeight: "600" }}>Created By</TableCell>
                   <TableCell sx={{ fontWeight: "600" }}>Tags</TableCell>
                   <TableCell sx={{ fontWeight: "600" }}>Created On</TableCell>
-                  <TableCell sx={{ fontWeight: "600" }}>Actions</TableCell>
+                  {showComponent && (
+                    <TableCell sx={{ fontWeight: "600" }}>Actions</TableCell>
+                  )}
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -317,23 +328,25 @@ const AnnouncementsPage: React.FC = () => {
                       <TableCell>
                         {dayjs(item.createdAt).format("MMM D, YYYY")}
                       </TableCell>
-                      <TableCell>
-                        <Box display="flex" alignItems="center">
-                          <IconButton
-                            color="primary"
-                            onClick={() => handleOpenEditModal(item)}
-                          >
-                            <EditIcon />
-                          </IconButton>
+                      {showComponent && (
+                        <TableCell>
+                          <Box display="flex" alignItems="center">
+                            <IconButton
+                              color="primary"
+                              onClick={() => handleOpenEditModal(item)}
+                            >
+                              <EditIcon />
+                            </IconButton>
 
-                          <IconButton
-                            color="error"
-                            onClick={() => handleOpenDeleteDialog(item._id)}
-                          >
-                            <DeleteIcon />
-                          </IconButton>
-                        </Box>
-                      </TableCell>
+                            <IconButton
+                              color="error"
+                              onClick={() => handleOpenDeleteDialog(item._id)}
+                            >
+                              <DeleteIcon />
+                            </IconButton>
+                          </Box>
+                        </TableCell>
+                      )}
                     </TableRow>
                   ))
                 )}

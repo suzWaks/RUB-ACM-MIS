@@ -2,7 +2,44 @@ import * as React from "react";
 import { BarChart } from "@mui/x-charts/BarChart";
 import { Box, Typography } from "@mui/material";
 import theme from "@/utils/theme";
+import { useState, useEffect } from "react";
+
+interface presentData {
+  present: number[];
+}
+
+interface absentData {
+  absent: number[];
+}
 const Bar = () => {
+  const [absentData, setAbsentData] = useState<absentData>({ absent: [] });
+  const [presentData, setPresentData] = useState<presentData>({
+    present: [],
+  });
+
+  const fetchData = async () => {
+    try {
+      const response = await fetch("/api/attendance/dash/AttendanceByYear", {
+        method: "GET",
+      });
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
+      const result = await response.json();
+      setAbsentData({ absent: result.absent });
+      setPresentData({ present: result.present });
+    } catch (error) {
+      console.log("Error while fetching data: ", error);
+    }
+  };
+
+  useEffect(() => {
+    const fetchGraphData = async () => {
+      await fetchData();
+    };
+    fetchGraphData();
+  }, []);
+
   return (
     <>
       <Typography variant="h6" align="center" gutterBottom>
@@ -17,13 +54,13 @@ const Bar = () => {
         ]}
         series={[
           {
-            data: [4, 2, 5, 4],
+            data: absentData.absent,
             stack: "A",
             label: "Absent",
             color: theme.palette.primary.main,
           },
           {
-            data: [14, 6, 5, 8],
+            data: presentData.present,
             label: "Present",
             color: theme.palette.secondary_teal.main,
           },

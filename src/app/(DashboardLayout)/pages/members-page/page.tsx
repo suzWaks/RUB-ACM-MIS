@@ -39,7 +39,7 @@ import theme from "@/utils/theme";
 import AddMemberForm from "./AddMemberForm";
 import Bulkupload from "./Bulkupload"; // Import the Attendance component
 import Loading from "../../loading";
-
+import { useSession } from "next-auth/react";
 import Link from "next/link";
 
 interface MemberStat {
@@ -61,6 +61,11 @@ interface Member {
 }
 
 const MembersPage = () => {
+  //Session
+  const { data: session } = useSession();
+  const showComponent = session?.user?.role === "admin";
+  console.log(showComponent);
+
   const graphColors = [
     theme.palette.primary.main,
     theme.palette.primary_blue.main,
@@ -376,35 +381,37 @@ const MembersPage = () => {
                 </Button>
               </Box>
 
-              {/* Action buttons for adding member and bulk upload */}
-              <Box>
-                <Button
-                  variant="contained"
-                  color="primary"
-                  sx={{ mr: 1 }}
-                  onClick={() => setOpenBulkUpload(true)}
-                >
-                  Bulk Upload
-                </Button>
-                <Button
-                  variant="contained"
-                  color="primary"
-                  sx={{ mr: 1 }}
-                  startIcon={<AddIcon />}
-                  onClick={() => setOpen(true)}
-                >
-                  Add Member
-                </Button>
-                <Link href="/pages/attendance-page">
+              {/* Action buttons for adding member and bulk upload. Render if only admin */}
+              {showComponent && (
+                <Box>
                   <Button
                     variant="contained"
                     color="primary"
-                    onClick={() => {}} // Switch to Attendance page
+                    sx={{ mr: 1 }}
+                    onClick={() => setOpenBulkUpload(true)}
                   >
-                    Attendance
+                    Bulk Upload
                   </Button>
-                </Link>
-              </Box>
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    sx={{ mr: 1 }}
+                    startIcon={<AddIcon />}
+                    onClick={() => setOpen(true)}
+                  >
+                    Add Member
+                  </Button>
+                  <Link href="/pages/attendance-page">
+                    <Button
+                      variant="contained"
+                      color="primary"
+                      onClick={() => {}} // Switch to Attendance page
+                    >
+                      Attendance
+                    </Button>
+                  </Link>
+                </Box>
+              )}
             </Box>
 
             {/* Table displaying the list of members */}
@@ -420,7 +427,7 @@ const MembersPage = () => {
                     <TableCell>Year</TableCell>
                     <TableCell>Email</TableCell>
                     <TableCell>Contact Number</TableCell>
-                    <TableCell>Action</TableCell>
+                    {showComponent && <TableCell>Action</TableCell>}
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -436,22 +443,24 @@ const MembersPage = () => {
                         <TableCell>{member.year}</TableCell>
                         <TableCell>{member.email}</TableCell>
                         <TableCell>{member.contact_number}</TableCell>
-                        <TableCell>
-                          {/* Action buttons */}
-                          <IconButton
-                            color="primary"
-                            onClick={() => handleEditMember(member)} // Handle edit action
-                            sx={{ mr: 1 }}
-                          >
-                            <EditIcon />
-                          </IconButton>
-                          <IconButton
-                            color="error"
-                            onClick={() => handleDeleteMember(member)} // Handle delete action
-                          >
-                            <DeleteIcon />
-                          </IconButton>
-                        </TableCell>
+                        {showComponent && (
+                          <TableCell>
+                            {/* Action buttons */}
+                            <IconButton
+                              color="primary"
+                              onClick={() => handleEditMember(member)} // Handle edit action
+                              sx={{ mr: 1 }}
+                            >
+                              <EditIcon />
+                            </IconButton>
+                            <IconButton
+                              color="error"
+                              onClick={() => handleDeleteMember(member)} // Handle delete action
+                            >
+                              <DeleteIcon />
+                            </IconButton>
+                          </TableCell>
+                        )}
                       </TableRow>
                     ))}
                 </TableBody>
