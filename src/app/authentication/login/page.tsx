@@ -16,8 +16,8 @@ import { signIn, useSession, getSession } from "next-auth/react";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Snackbar, Alert } from "@mui/material";
-import Loading from "@/app/loading";
-import loading from "../../loading";
+
+import Loading from "../../loading";
 const Login2 = () => {
   const theme = useTheme();
   const { data: session, status } = useSession();
@@ -43,14 +43,13 @@ const Login2 = () => {
 
   const handleSignIn = async (e: { preventDefault: () => void }) => {
     e.preventDefault();
-
+    setLoading(true);
     try {
       const result = await signIn("credentials", {
         redirect: false,
         email,
         password,
       });
-      setLoading(true);
       if (result?.error) {
         console.log("Sign-in failed:", result.error);
         setLoading(false);
@@ -172,7 +171,7 @@ const Login2 = () => {
               >
                 Log in
               </Button>
-              <Typography variant="body2" color="textSecondary" mb={2}>
+              {/* <Typography variant="body2" color="textSecondary" mb={2}>
                 or
               </Typography>
               <Button
@@ -182,9 +181,9 @@ const Login2 = () => {
                 sx={{ mb: 3, color: "inherit" }}
               >
                 Sign in with Google
-              </Button>
+              </Button> */}
             </Box>
-            <Typography variant="body2" color="textSecondary">
+            {/* <Typography variant="body2" color="textSecondary">
               Don&apos;t have an account?{" "}
               <Link href="/authentication/register" passHref>
                 <Typography
@@ -196,7 +195,7 @@ const Login2 = () => {
                   Sign up for free
                 </Typography>
               </Link>
-            </Typography>
+            </Typography> */}
           </Box>
         </Grid>
         <Grid

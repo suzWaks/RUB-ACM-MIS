@@ -29,6 +29,7 @@ import dayjs, { Dayjs } from "dayjs";
 import EventForm from "./eventform";
 import EventDetail from "./eventdetails";
 import Loading from "../../loading";
+import { useSession } from "next-auth/react";
 
 interface EventTableProps {
   // events: Event[];
@@ -36,6 +37,11 @@ interface EventTableProps {
 }
 
 const EventTable: React.FC<EventTableProps> = ({ onClose }) => {
+  //-----Session
+  const { data: session } = useSession();
+  const showComponent = session?.user?.role === "admin";
+
+  //-----
   const [startDate, setStartDate] = useState<Dayjs | null>(null);
   const [endDate, setEndDate] = useState<Dayjs | null>(null);
   const [status, setStatus] = useState<string>("All");
@@ -320,9 +326,11 @@ const EventTable: React.FC<EventTableProps> = ({ onClose }) => {
               <TableCell style={{ fontWeight: "bold" }}>Time</TableCell>
               <TableCell style={{ fontWeight: "bold" }}>Status</TableCell>
               {/* <TableCell style={{ fontWeight: "bold" }}>Year Invited</TableCell> */}
-              <TableCell style={{ fontWeight: "bold", textAlign: "center" }}>
-                Action
-              </TableCell>
+              {showComponent && (
+                <TableCell style={{ fontWeight: "bold", textAlign: "center" }}>
+                  Action
+                </TableCell>
+              )}
             </TableRow>
           </TableHead>
           <TableBody>
@@ -347,20 +355,22 @@ const EventTable: React.FC<EventTableProps> = ({ onClose }) => {
                       {eventStatus}
                     </span>
                   </TableCell>
-                  <TableCell style={{ textAlign: "center" }}>
-                    <IconButton
-                      onClick={() => handleEditClick(event)}
-                      style={{ color: "#6c63ff" }}
-                    >
-                      <EditIcon />
-                    </IconButton>
-                    <IconButton
-                      onClick={() => handleOpenDeleteDialog(event._id)}
-                      style={{ color: "#e74c3c" }}
-                    >
-                      <DeleteIcon />
-                    </IconButton>
-                  </TableCell>
+                  {showComponent && (
+                    <TableCell style={{ textAlign: "center" }}>
+                      <IconButton
+                        onClick={() => handleEditClick(event)}
+                        style={{ color: "#6c63ff" }}
+                      >
+                        <EditIcon />
+                      </IconButton>
+                      <IconButton
+                        onClick={() => handleOpenDeleteDialog(event._id)}
+                        style={{ color: "#e74c3c" }}
+                      >
+                        <DeleteIcon />
+                      </IconButton>
+                    </TableCell>
+                  )}
                 </TableRow>
               );
             })}

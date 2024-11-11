@@ -2,8 +2,38 @@ import * as React from "react";
 import { LineChart } from "@mui/x-charts/LineChart";
 import { Typography, Box } from "@mui/material";
 import theme from "@/utils/theme";
+import { useState, useEffect } from "react";
+
+interface graphdata {
+  data: number[];
+}
 
 const LineGraph = () => {
+  const [data, setData] = useState<graphdata>({ data: [] });
+
+  const fetchData = async () => {
+    try {
+      const response = await fetch("/api/attendance/dash/monthlytrends", {
+        method: "GET",
+      });
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
+      const result = await response.json();
+      setData(result);
+    } catch (error) {
+      console.log("Error while fetching data: ", error);
+    }
+  };
+
+  //useEffect to fetch data
+  useEffect(() => {
+    const fetchGraphData = async () => {
+      await fetchData();
+    };
+    fetchGraphData();
+  }, []);
+
   return (
     <Box sx={{ p: 2 }}>
       <Typography variant="h6" align="center" gutterBottom color="black">
@@ -27,7 +57,7 @@ const LineGraph = () => {
           ]}
           series={[
             {
-              data: [95, 88, 70, 75, 90, 85, 60, 70, 65, 80, 95, 100],
+              data: data.data,
               color: theme.palette.primary.main,
             },
           ]}

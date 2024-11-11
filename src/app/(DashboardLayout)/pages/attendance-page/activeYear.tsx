@@ -1,6 +1,49 @@
 import { Box, LinearProgress, Typography } from "@mui/material";
+import { useState, useEffect } from "react";
+
+interface AttendanceData {
+  year: string;
+  attendancePercentage: string;
+}
 
 const ActiveYear = () => {
+  const [data, setData] = useState<number[] | null>(null);
+
+  const fetchData = async () => {
+    try {
+      const response = await fetch(
+        "/api/attendance/dash/attendancePercentage",
+        {
+          method: "GET",
+        }
+      );
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
+      const result = await response.json();
+
+      console.log("Result is", result);
+      const allYears = [1, 2, 3, 4];
+      const attendancePercentage = allYears.map((year) => {
+        // Find the data for the year, or set it to 0 if missing
+        const yearData = result.data.find(
+          (item: AttendanceData) => parseInt(item.year) === year
+        );
+        return yearData ? parseFloat(yearData.attendancePercentage) : 0;
+      });
+      setData(attendancePercentage);
+    } catch (error) {
+      console.log("Error while fetching data: ", error);
+    }
+  };
+
+  useEffect(() => {
+    const fetchGraphData = async () => {
+      await fetchData();
+    };
+    fetchGraphData();
+  }, []);
+
   const years = [1, 2, 3, 4];
   const attendancePercentage = [100, 80, 60, 50];
 
@@ -20,7 +63,14 @@ const ActiveYear = () => {
     themeColors.secondary_turquoise,
     themeColors.secondary_teal,
   ];
-
+  // Return loading spinner if data is still loading
+  if (data === null) {
+    return (
+      <Typography variant="h6" color="black">
+        Loading...
+      </Typography>
+    );
+  }
   return (
     <>
       <Box
@@ -30,13 +80,13 @@ const ActiveYear = () => {
         mb={2}
       >
         <Typography variant="h6" color="black">
-          Attendance Progress By Year
+          Attendance Percentage By Year
         </Typography>
       </Box>
 
       <Box>
         {years.map((year, index) => {
-          const progress = attendancePercentage[index]; // Get the percentage for each year
+          const progress = data[index]; // Get the percentage for each year
           const scaledProgress = progress > 100 ? 100 : progress; // Ensure progress doesn't exceed 100%
 
           return (
@@ -51,7 +101,7 @@ const ActiveYear = () => {
                 <Typography sx={{ fontWeight: 500, color: yearColors[index] }}>
                   Year {year}
                 </Typography>
-                <Typography>{attendancePercentage[index]}%</Typography>
+                <Typography>{data[index]}%</Typography>
               </Box>
               <LinearProgress
                 variant="determinate"
